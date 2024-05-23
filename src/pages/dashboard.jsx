@@ -4,6 +4,7 @@ import DisplayLecture from '../components/DisplayLecture';
 import Navbar from '../components/NavBar';
 import { setLectures } from '../reducers/lecturesSlice';
 import axios from 'axios';
+const apiLecture = import.meta.env.VITE_LECTURE_URL;
 
 
 
@@ -17,7 +18,7 @@ function Dashboard() {
       try {
         let response = await axios({
           method: 'get',
-          url: 'https://studybuddy-api.onrender.com/api/lecture/',
+          url: apiLecture,
           headers: {
             'Content-Type': 'application/json',
           },

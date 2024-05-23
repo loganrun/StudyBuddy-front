@@ -1,16 +1,16 @@
 import { useState } from 'react'
-import { useAuth } from '../contexts/auth/auth_context'
 import { useNavigate } from 'react-router-dom'
 import { Link } from 'react-router-dom'
 import Navbar from '../components/NavBar'
 import { useDispatch } from 'react-redux';
 import { signupSuccess, signupError } from '../reducers/signupReducer'
 import axios from 'axios'
+
+const apiSignup = import.meta.env.VITE_SIGNUP_URL;
 function signupPage() {
 
     const nav = useNavigate()
     const dispatch = useDispatch();
-    //const { signUp } = useAuth()
 
     const [formData, setFormData] = useState({
         name: '',
@@ -20,10 +20,10 @@ function signupPage() {
 
     const onChange = (e) =>{
         setFormData({
-           ...formData,
+       ...formData,
 
             [e.target.name]: e.target.value
-           
+        
         })
         
         console.log(formData)
@@ -32,7 +32,7 @@ function signupPage() {
     const onSubmit = async(e) =>{
         e.preventDefault()
         try {
-            const response = await axios.post("https://studybuddy-api.onrender.com/api/users", formData);
+            const response = await axios.post(apiSignup, formData);
             const user = response.data; // Assuming the API returns the user object upon successful signup
             console.log(user)
             dispatch(signupSuccess(user));

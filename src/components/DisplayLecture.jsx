@@ -5,6 +5,8 @@ import axios from 'axios';
 import { deleteLecture } from '../reducers/lecturesSlice';
 import { useDispatch } from'react-redux';
 
+const baseDeleteUrl = import.meta.env.VITE_DELETE_URL
+
 
 
 function DisplayLecture({ data}) {
@@ -17,10 +19,11 @@ function DisplayLecture({ data}) {
 
     const handleDelete = async () => {
 
+        const deleteApi = `${baseDeleteUrl}${_id}`
         try {
             const response = await axios({
                 method: "delete",
-                url: `http://localhost:3000/api/lecture/${_id}`,
+                url: deleteApi,
             });
         
             console.log(response);

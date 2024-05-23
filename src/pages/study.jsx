@@ -10,6 +10,8 @@ import { updateLectures } from '../reducers/lecturesSlice'
 import axios from 'axios'
 import Alert from '../components/Alert'
 
+const notesApi = import.meta.env.VITE_NOTES_URL
+
 
 function study() {
     const [isOpen, setIsOpen] = useState(false);
@@ -24,10 +26,11 @@ function study() {
 
 const handleSubmit = async (e) => {
   e.preventDefault();
-  try {
+  const apiNotes = `${notesApi}${_id}`
+  try { 
     const response = await axios({
       method: "put",
-      url: `https://studybuddy-api.onrender.com/api/lecture/${_id}`,
+      url: apiNotes,
       data: {
         notes: newNotes
       },

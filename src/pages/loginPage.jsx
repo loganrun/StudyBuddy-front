@@ -1,16 +1,15 @@
 import { useState } from 'react'
-import { useAuth } from '../contexts/auth/auth_context'
 import { useNavigate } from 'react-router-dom'
-import { Link } from 'react-router-dom'
 import Navbar from '../components/NavBar'
 import { useDispatch } from 'react-redux';
 import { loginSuccess, loginError } from '../reducers/authReducer';
 import axios from 'axios'
+const apiAuth = import.meta.env.VITE_AUTH_URL;
 
 function loginPage() {
     const nav = useNavigate()
     const dispatch = useDispatch();
-    //const { login } = useAuth()
+
 
     const [formData, setFormData] = useState({
         email: '',
@@ -31,8 +30,8 @@ function loginPage() {
         e.preventDefault()
         //console.log(formData)
         try {
-            const response = await axios.post("https://studybuddy-api.onrender.com/api/auth", formData);
-            const user = response.data; // Assuming the API returns the user object upon successful signup
+            const response = await axios.post(apiAuth, formData);
+            const user = response.data; 
             dispatch(loginSuccess(user));
             // await login(formData)
             nav('/dashboard')

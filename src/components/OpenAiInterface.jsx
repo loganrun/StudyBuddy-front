@@ -3,6 +3,8 @@ import axios from 'axios';
 import { useDispatch } from 'react-redux';
 import { addMessage } from '../reducers/conversationReducer';
 
+const openUrl = import.meta.env.VITE_OPENAI_URL
+
 
 const OpenAIInterface = () => {
   const [input, setInput] = useState('');
@@ -17,7 +19,7 @@ const OpenAIInterface = () => {
     //console.log(input)
     dispatch(addMessage(input));
 
-    const apiResponse = await axios.post("https://studybuddy-api.onrender.com/api/chat/chat", {
+    const apiResponse = await axios.post(openUrl, {
 
       headers: {
         'Content-Type': 'application/json',
