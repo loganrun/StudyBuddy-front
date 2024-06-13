@@ -20,7 +20,7 @@ Features:
 
 Try the Demo
 
-A live demo of Study Buddy is available at https://studybuddy-6ezc.onrender.com. This is a great way to experience the application's functionalities before setting up your own environment.
+A live demo of Study Buddy is available at https://studybuddy0602.netlify.app . This is a great way to experience the application's functionalities before setting up your own environment.
 
 Demo Login Credentials
 
