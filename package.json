@@ -19,7 +19,6 @@
     "express-validator": "^7.0.1",
     "extendable-media-recorder": "^9.1.12",
     "extendable-media-recorder-wav-encoder": "^7.0.107",
-    "ffmpeg-static": "^5.2.0",
     "fix-webm-duration": "^1.0.5",
     "fluent-ffmpeg": "^2.1.2",
     "groq-sdk": "^0.3.3",

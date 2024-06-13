@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { AudioManager } from "../components/AudioManager";
 import { useDispatch } from 'react-redux';
 import { useTranscriber } from "../hooks/use.Transcriber";
