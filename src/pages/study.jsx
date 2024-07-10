@@ -18,7 +18,7 @@ function study() {
     const [summaryIsOpen, setsummaryIsOpen] = useState(false);
     const params = useLocation()
     const [newNotes, setNewNotes] = useState('')
-    const {url, subject, transcript, date, _id, notes, summary} = params.state;
+    const {url, subject, transcript, date, _id, notes, summary, roomId} = params.state;
     const dispatch = useDispatch()
     const [alertMessage, setAlertMessage] = useState('');
     //console.log(_id)
