@@ -1,14 +1,20 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useQuill } from 'react-quilljs';
+// import VoiceChat from '../components/VoiceChat'
 import 'quill/dist/quill.snow.css';
 import io from 'socket.io-client';
-import { useParams} from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import useSocket from '../components/UseSocket';
 
-function TextEditor({socket}) {
-    const { roomId } = useParams();
-    
-    const [currentRoomId, setCurrentRoomId] = useState(roomId);
+function TextEditor() {
+  const socket = useSocket('http://localhost:4000');
+  const tutor = useSelector(state => state.tutorauth.tutor.payload.tutor); 
+    const roomId  = tutor.roomId
+    //console.log(roomId);
+    const userName = tutor.userName 
+    //console.log(userName);
+
+
 
   const modules = {
     toolbar: [
@@ -28,16 +34,10 @@ function TextEditor({socket}) {
   const { quill, quillRef: editorContainerRef } = useQuill({ modules, theme: 'snow' });
 
   useEffect(() => {
-    // if (!roomId) {
-    //     socket.emit('create-room', (newRoomId) => {
-    //         setCurrentRoomId(newRoomId);
-    //         history.push(`/room/${newRoomId}`);
-    //     });
-    //   } else {
-    //     socket.emit('join-room', currentRoomId);
-    //   }
+    
+    
 
-    if (quill) {
+    if (quill && socket) {
       // Apply custom styles to the toolbar
       const toolbar = document.querySelector('.ql-toolbar');
       if (toolbar) {
@@ -45,17 +45,22 @@ function TextEditor({socket}) {
       }
 
       // Set up Socket.io connection
-      const socket = io('http://localhost:4000');
+      //const socket = io('http://localhost:4000');
+      //setSocket(newSocket);
+
+      socket.emit('join-room', {roomId, username:userName});
 
       // Handle incoming changes
       socket.on('text-change', (delta) => {
         quill.updateContents(delta);
       });
 
+
+
       // Send changes to server
       quill.on('text-change', (delta, oldDelta, source) => {
         if (source === 'user') {
-          socket.emit('text-change', currentRoomId, delta);
+          socket.emit('text-change', delta);
         }
       });
 
@@ -63,7 +68,7 @@ function TextEditor({socket}) {
         socket.disconnect();
       };
     }
-  }, [quill, currentRoomId]);
+  }, [quill,socket, roomId,userName]);
 
   const roomUrl = window.location.href;
 
@@ -71,7 +76,8 @@ function TextEditor({socket}) {
     <div className="container mx-auto p-4 h-screen">
     <h1 className="text-2xl font-bold mb-4">Tutoring Session</h1>
     <div ref={editorContainerRef} className="h-2/3 mb-4 bg-white text-black shadow rounded"></div>
-      {/* Add chat component here */}
+  
+      {/* {socket && <VoiceChat socket={socket}/> } */}
     </div>
   );
 }

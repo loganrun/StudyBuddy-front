@@ -1,11 +1,27 @@
-import { Navigate,Outlet } from "react-router-dom"
-import { useSelector } from "react-redux"
+import { Navigate, Outlet } from "react-router-dom";
+import { useSelector } from "react-redux";
 
-function ProtectedRoutes() {
-  const user = useSelector(state => state.auth.user)
+function ProtectedRoute({ userType }) {
+  const user = useSelector(state => state.auth.user);
+  const tutor = useSelector(state => state.tutorauth.tutor?.payload?.tutor);
 
-    
-  return user ? <Outlet/> : <Navigate to ='/login' />
+  const isAuthenticated = userType === 'student' ? user : tutor;
+
+  return isAuthenticated ? <Outlet /> : <Navigate to="/login" />;
 }
 
-export default ProtectedRoutes
+export default ProtectedRoute;
+
+
+// import { Navigate,Outlet } from "react-router-dom"
+// import { useSelector } from "react-redux"
+
+// function ProtectedRoutes() {
+//   const student = useSelector(state => state.auth.user)
+//   const tutor = useSelector(state => state.tutorauth.tutor.payload.tutor);
+
+    
+//   return student ? <Outlet/> : <Navigate to ='/login' />
+// }
+
+// export default ProtectedRoutes

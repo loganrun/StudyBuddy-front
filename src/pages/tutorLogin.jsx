@@ -2,12 +2,12 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Navbar from '../components/NavBar'
 import { useDispatch } from 'react-redux';
-import { loginSuccess, loginError } from '../reducers/authReducer';
+import { loginSuccess, loginError } from '../reducers/tutorauthReducer';
 import { Link } from 'react-router-dom';
 import axios from 'axios'
-const apiAuth = import.meta.env.VITE_AUTH_URL;
+const tutorAuth = import.meta.env.VITE_TUTOR_AUTH_URL;
 
-function loginPage() {
+function tutorLogin() {
     const nav = useNavigate()
     const dispatch = useDispatch();
 
@@ -31,11 +31,11 @@ function loginPage() {
         e.preventDefault()
         //console.log(formData)
         try {
-            const response = await axios.post(apiAuth, formData);
-            const user = response.data; 
-            dispatch(loginSuccess(user));
+            const response = await axios.post(tutorAuth, formData);
+            const tutor = response.data; 
+            dispatch(loginSuccess(tutor));
             // await login(formData)
-            nav('/dashboard')
+            nav('/tutordashboard')
             
         } catch (error) {
             dispatch(loginError(error.message));
@@ -50,7 +50,7 @@ function loginPage() {
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
         
         <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-            Login to your account
+            Tutor's Login
         </h2>
         </div>
 
@@ -109,9 +109,9 @@ function loginPage() {
         </form>
 
         <p className="mt-10 text-center text-sm text-gray-500">
-            
-             <Link to='/tutorlogin' signup className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
-            Tutors Login Here
+        
+             <Link to='/login' signup className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
+            Students Login Here
              </Link>
             
         </p>
@@ -121,4 +121,4 @@ function loginPage() {
 )
 }
 
-export default loginPage
+export default tutorLogin

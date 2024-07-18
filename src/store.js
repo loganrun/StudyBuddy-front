@@ -4,6 +4,7 @@ import signupReducer from './reducers/signupReducer';
 import lecturesReducer from './reducers/lecturesSlice';
 import openaiReducer from './reducers/openaiReducer';
 import conversationReducer from './reducers/conversationReducer';
+import tutorauthReducer from './reducers/tutorauthReducer';
 
 const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ const store = configureStore({
     lectures: lecturesReducer,
     openai: openaiReducer,
     conversation: conversationReducer,
+    tutorauth: tutorauthReducer
   },
 });
 
