@@ -6,12 +6,13 @@ import io from 'socket.io-client';
 import { useSelector } from 'react-redux';
 import useSocket from '../components/UseSocket';
 
-function TextEditor() {
+function TextEditor({roomId}) {
   const socket = useSocket('http://localhost:4000');
-  const tutor = useSelector(state => state.tutorauth.tutor.payload.tutor); 
-    const roomId  = tutor.roomId
+  //console.log(roomId)
+  //const tutor = useSelector(state => state.tutorauth.tutor.payload.tutor); 
+    //const roomId  = tutor.roomId
     //console.log(roomId);
-    const userName = tutor.userName 
+    //const userName = tutor.userName 
     //console.log(userName);
 
 
@@ -48,7 +49,7 @@ function TextEditor() {
       //const socket = io('http://localhost:4000');
       //setSocket(newSocket);
 
-      socket.emit('join-room', {roomId, username:userName});
+      socket.emit('join-room', {roomId});
 
       // Handle incoming changes
       socket.on('text-change', (delta) => {
@@ -68,7 +69,7 @@ function TextEditor() {
         socket.disconnect();
       };
     }
-  }, [quill,socket, roomId,userName]);
+  }, [quill,socket, roomId]);
 
   const roomUrl = window.location.href;
 
