@@ -10,7 +10,7 @@ import ConversationThread from '../components/ConversationThread'
 function tutoringPage({socket}) {
   //const tutor = useSelector(state => state.tutorauth.tutor.payload.tutor); 
   const {roomId} = useParams();
-  console.log(roomId)
+  //console.log(id)
 
 
   return (<>
@@ -20,7 +20,7 @@ function tutoringPage({socket}) {
       <div className="container mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-          <TextEditor socket={socket} roomId={roomId} />
+          <TextEditor socket={socket} id={roomId} />
           </div>
           <div className="space-y-4">
           <ConversationThread/>
