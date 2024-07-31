@@ -7,7 +7,7 @@ import { useSelector } from 'react-redux';
 import useSocket from '../components/UseSocket';
 
 function TextEditor({id}) {
-  console.log(id)
+  //console.log(id)
   const documentId = id
   const socket = useSocket('http://localhost:4000');
   //console.log(roomId)
@@ -46,7 +46,7 @@ function TextEditor({id}) {
     }
 
     socket.once("load-document", document => {
-      console.log("loading docs")
+      //console.log("loading docs")
       quill.setContents(document)
       quill.enable()
     })
@@ -92,54 +92,6 @@ function TextEditor({id}) {
       quill.off("text-change", handler)
     }
   }, [socket, quill])
-
-  // const wrapperRef = useCallback(wrapper => {
-  //   if (wrapper == null) return
-
-  //   wrapper.innerHTML = ""
-  //   const editor = document.createElement("div")
-  //   wrapper.append(editor)
-  //   const q = new Quill(editor, {
-  //     theme: "snow",
-  //     modules: { toolbar: TOOLBAR_OPTIONS },
-  //   })
-  //   q.disable()
-  //   q.setText("Loading...")
-  //   setQuill(q)
-  // }, [])
-
-  // useEffect(() => {
-    
-    
-
-  //   if (quill && socket) {
-  //     // Apply custom styles to the toolbar
-  //     const toolbar = document.querySelector('.ql-toolbar');
-  //     if (toolbar) {
-  //       toolbar.classList.add('bg-white', 'text-black');
-  //     }
-
-  //     socket.emit('join-room', {id});
-
-  //     // Handle incoming changes
-  //     socket.on('text-change', (delta) => {
-  //       quill.updateContents(delta);
-  //     });
-
-
-
-  //     // Send changes to server
-  //     quill.on('text-change', (delta, oldDelta, source) => {
-  //       if (source === 'user') {
-  //         socket.emit('text-change', delta);
-  //       }
-  //     });
-
-  //     return () => {
-  //       socket.disconnect();
-  //     };
-  //   }
-  // }, [quill,socket, id]);
 
   const roomUrl = window.location.href;
 

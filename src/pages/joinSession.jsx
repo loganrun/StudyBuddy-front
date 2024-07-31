@@ -8,20 +8,20 @@ const JoinSession = () => {
   const navigate = useNavigate();
   const [socket, setSocket] = useState(null);
   const user = useSelector(state => state.auth.user.payload.user);
-  console.log(user)
+  const userType = user.name
   
   
-  useEffect(() => {
-    const newSocket = io("http://localhost:4000");
-    setSocket(newSocket);
+//   useEffect(() => {
+//     const newSocket = io("http://localhost:4000");
+//     setSocket(newSocket);
 
-    return () => newSocket.close();
-  }, []);
+//     return () => newSocket.close();
+//   }, []);
 
   const joinSession = () => {
     if (roomId) {
-      socket.emit('join_room', roomId);
-      navigate(`/tutoring/${roomId}`, { state: { user, isHost: false}, socketUrl: "http://localhost:4000" });
+    //   socket.emit('join_room', roomId);
+      navigate(`/tutoring/${roomId}/${userType}`);
     }
   };
 

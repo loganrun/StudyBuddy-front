@@ -9,6 +9,7 @@ import ProtectedRoutes from './components/protectedRoutes/ProtectedRoutes'
 import Dashboard from './pages/dashboard'
 import Study from './pages/study'
 import TutorDashboard from './pages/tutorDashboard'
+import JoinSession from './pages/joinSession'
 import './App.css'
 
 function App() {
@@ -21,12 +22,13 @@ function App() {
       <Route path="/login" element={<LoginPage />} />
       {/* <Route path="/login" element={<Login />} /> */}
       <Route path="/tutorlogin" element={<TutorLogin />} />
-      <Route path="tutoring/:roomId" element={<TutoringPage />} />
+      <Route path="tutoring/:roomId/:userType" element={<TutoringPage />} />
         
         <Route path="/" element={<ProtectedRoutes userType="student" />}>
           <Route path='dashboard' element={<Dashboard/>}/>
           <Route path='record' element={<Main />} />
           <Route path='study' element={<Study/>} />
+          <Route path='joinsession' element={<JoinSession/>} />
         </Route>
         
         <Route path="/" element={<ProtectedRoutes userType="teacher" />}>

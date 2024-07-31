@@ -9,11 +9,14 @@ import ConversationThread from '../components/ConversationThread'
 
 function tutoringPage({socket}) {
   //const tutor = useSelector(state => state.tutorauth.tutor.payload.tutor); 
-  const {roomId} = useParams();
-  //console.log(id)
+  
+  const {roomId, userType} = useParams()
+
+  console.log(userType)
 
 
-  return (<>
+  return (
+  <>
     <Navbar />
     <div className="relative min-h-screen p-4">
    
@@ -23,17 +26,12 @@ function tutoringPage({socket}) {
           <TextEditor socket={socket} id={roomId} />
           </div>
           <div className="space-y-4">
-          <ConversationThread/>
+          {/* <ConversationThread/> */}
           <OpenAiInterface/>
           </div>
         </div>
       </div>
     </div>
-    {/* <div>Tutoring Session : {roomId}</div>
-   
-    
-    
-     */}
   </>
 
 )

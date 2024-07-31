@@ -41,6 +41,9 @@ const Navbar = (props) => {
       case 'dashboard':
         return (
           <>
+          <Link to="/joinsession" className="bg-rose-600 hover:bg-rose-300 text-white font-bold py-2 px-4 rounded">
+            Start Tutoring
+          </Link>
             <Link to="/record" className="bg-rose-600 hover:bg-rose-300 text-white font-bold py-2 px-4 rounded">
               New Lesson?
             </Link>
