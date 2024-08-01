@@ -1,45 +1,44 @@
-import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { addMessage } from '../reducers/conversationReducer';
-import ConversationThread from './ConversationThread';
+import React, { useState, useRef, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { addMessage, updateLastMessage } from '../reducers/conversationReducer';
+//import ConversationThread from './ConversationThread';
+//import Message from './Message';
 
 const openUrl = import.meta.env.VITE_OPENAI_URL
 
 
 const OpenAIInterface = () => {
   const [input, setInput] = useState('');
+  const messages = useSelector((state) => state.conversation.messages);
   const [response, setResponse] = useState('');
   const dispatch = useDispatch();
+  const chatEndRef = useRef(null);
 
 
 
 const handleSubmit = async (e) => {
   e.preventDefault();
   //setIsLoading(true);
-  console.log(input)
-  dispatch(addMessage(input));
+  //console.log(input)
+  dispatch(addMessage({ type: 'question', text: input }));
+  dispatch(addMessage({ type: 'response', text: '' }));
   
 
   try {
-    
-
     const eventSource = new EventSource(`${openUrl}?prompt=${encodeURIComponent(input)}`);
     eventSource.onmessage = (event) => {
       const data = JSON.parse(event.data)
       if (data.content){
-        setResponse(prevResponse => prevResponse + data.content);
-        console.log(data.content)
-        //dispatch(addMessage(response));
+        dispatch(updateLastMessage({ text: data.content }));
+        //console.log(data.content)
       }{
         if(data.done){
           setInput("")
-          //setResponse("")
           eventSource.close();
           
         }
       }
     };
-
 
     eventSource.onerror = (error) => {
       console.error('EventSource failed:', error);
@@ -52,36 +51,29 @@ const handleSubmit = async (e) => {
   }
   setInput('')
   };
+
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
  
 
   return (
-    <>
-    
+<>
+<div className="max-w-3xl mx-auto p-8 text-white">
+  
+  <div className="flex-1 overflow-y-auto pb-32">
+  
+        {messages.map((message, index) => (
+          <div
+            key={index}
+            className={`p-2 my-2 rounded-md ${message.type === 'question' ? ' text-blue-400 text-2xl text-center  self-start ' : ' text-white self-end '}`}
+          >
+            {message.text}
+          </div>
+        ))}
+        <div ref={chatEndRef} />
 
-    {/* //<div className="fixed bottom-0 left-0 right-0 bg-white shadow-lg p-4 flex items-center">
-    //   <input
-    //     type="text"
-    //     className="flex-1 border border-gray-300 rounded-l-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-    //     placeholder="Type your message..."
-    //     value={prompt}
-    //     onChange={(e) => setPrompt(e.target.value)}
-    //     // onKeyDown={(e) => {
-    //     //   if (e.key === 'Enter') handleSend();
-    //     // }}
-    //   />
-    //   <button
-    //     className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-r-md"
-    //     //onClick={handleSend}
-    //   >
-    //     Send
-    //   </button>
-    // </div> */}
-
-    
-
-<div className="max-w-3xl mx-auto p-8">
-  <ConversationThread response={response} />
-
+</div>
 </div>
 
 <div className="fixed bottom-0 max-w-3xl mx-auto p-8 w-full">
@@ -95,12 +87,12 @@ const handleSubmit = async (e) => {
           onChange={(e) => setInput(e.target.value)}
         ></textarea>
         <button
-          className="bg-rose-600 text-white p-2 rounded-full ml-4 flex items-center justify-center"
+          className="bg-rose-600 text-white p-1.5 rounded-full ml-4 flex items-center justify-center"
           onClick={handleSubmit}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            className="h-9 w-9"
+            className="h-7 w-7"
             viewBox="0 0 20 20"
             fill="currentColor"
           >
@@ -108,82 +100,14 @@ const handleSubmit = async (e) => {
           </svg>
         </button>
       </div>
-    </div>
-
-    {/* <div className=" fixed bottom-0 max-w-3xl mx-auto p-8 w-full">
-      <h1 className="text-2xl font-bold mb-4">Ask Tyson</h1>
-      <textarea
-        className=" flex-grow w-full p-4  rounded-md mb-4  bg-[#1D1F20] resize-none overflow-y-auto "
-        rows="5"
-        placeholder="Enter your question here..."
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        style={{ minHeight: '48px', maxHeight: '200px' }}
-      ></textarea>
-      <button
-        className="bg-rose-600 text-white py-2 px-4 rounded-md mb-4"
-        onClick={handleSubmit}
-      >
-        Submit
-      </button>
-      
-    </div> */}
+    </div>  
     </>
   );
 };
 
 export default OpenAIInterface;
 
-// import React from 'react';
-// import { useSelector, useDispatch } from 'react-redux';
-// import { setInput, setResponse, setIsLoading } from '../reducers/openaiReducer';
-// import axios from 'axios';
 
-// const OpenAIInterface = () => {
-//   const input = useSelector((state) => state.openAI.input);
-//   const response = useSelector((state) => state.openAI.response);
-//   const isLoading = useSelector((state) => state.openAI.isLoading);
-//   const dispatch = useDispatch();
-
-//   const handleSubmit = async () => {
-//     dispatch(setIsLoading(true));
-//     try {
-//       const apiResponse = await axios.post('http://localhost:3000/api/chat/chat', {
-//         prompt: input,
-//       });
-//       const data = apiResponse.data;
-//       dispatch(setResponse(data.content));
-//     } catch (error) {
-//       console.error(error.message);
-//     } finally {
-//       dispatch(setIsLoading(false));
-//     }
-//   };
-
-//   return (
-//     <div className="max-w-3xl mx-auto p-8">
-//       <h1 className="text-2xl font-bold mb-4">Ask Your Study Buddy</h1>
-//       <textarea
-//         className="w-full p-4 rounded-md mb-4 bg-[#1D1F20]"
-//         rows="5"
-//         placeholder="Enter your text here..."
-//         value={input}
-//         onChange={(e) => dispatch(setInput(e.target.value))}
-//       ></textarea>
-//       <button className="bg-rose-600 text-white py-2 px-4 rounded-md mb-4" onClick={handleSubmit} disabled={isLoading}>
-//         {isLoading ? 'Loading...' : 'Submit'}
-//       </button>
-//       {response && (
-//         <div className="p-4 rounded-md bg-[#1D1F20]">
-//           <h2 className="text-lg font-bold mb-2">Response:</h2>
-//           <p>{response}</p>
-//         </div>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default OpenAIInterface;
 
 
 

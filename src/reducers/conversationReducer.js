@@ -15,8 +15,14 @@ const conversationSlice = createSlice({
     clearMessages: (state) => {
       state.messages = [];
     },
+    updateLastMessage: (state, action) => {
+      const lastMessage = state.messages[state.messages.length - 1];
+      if (lastMessage && lastMessage.type === 'response') {
+        lastMessage.text += action.payload.text;
+      }
+    },
   },
 });
 
-export const { addMessage, clearMessages } = conversationSlice.actions;
+export const { addMessage, clearMessages, updateLastMessage } = conversationSlice.actions;
 export default conversationSlice.reducer;

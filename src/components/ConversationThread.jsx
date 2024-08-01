@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 
 const ConversationThread = (props) => {
   //console.log(props)
-  //const messages = useSelector((state) => state.conversation.messages);
+  //const messages = useSelector((state) => state.coersation.nvmessages);
 
   return (
     <div className="w-full h-96 p-2 border border-gray-500 rounded-md overflow-y-scroll">
