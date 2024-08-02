@@ -4,24 +4,25 @@ import { useNavigate } from 'react-router-dom';
 import io from 'socket.io-client';
 
 const JoinSession = () => {
-  const [roomId, setRoomId] = useState('');
+  const [url, setUrl] = useState('');
   const navigate = useNavigate();
   const [socket, setSocket] = useState(null);
   const user = useSelector(state => state.auth.user.payload.user);
-  const userType = user.name
+  //console.log(user)
+  const userType = user.userType
   
   
-//   useEffect(() => {
-//     const newSocket = io("http://localhost:4000");
-//     setSocket(newSocket);
-
-//     return () => newSocket.close();
-//   }, []);
 
   const joinSession = () => {
+    const regex = /\/join\/([^\/]+)\/([^\/]+)/;
+    const match = url.match(regex)
+    const roomId = match ? match[2] : null;
+    console.log(roomId)
+    const documentId = match ? match[1] : null;
+    console.log(documentId)
     if (roomId) {
     //   socket.emit('join_room', roomId);
-      navigate(`/tutoring/${roomId}/${userType}`);
+      navigate(`/tutoring/${documentId}/${roomId}/${userType}`);
     }
   };
 
@@ -31,8 +32,8 @@ const JoinSession = () => {
         <h2 className="text-xl text-black font-semibold text-center mb-4">Join a Session</h2>
         <input
           type="text"
-          value={roomId}
-          onChange={(e) => setRoomId(e.target.value)}
+          value={url}
+          onChange={(e) => setUrl(e.target.value)}
           placeholder="Enter Room ID"
           className="w-full p-2 text-black mb-4 border rounded"
         />

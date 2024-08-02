@@ -20,9 +20,10 @@ function App() {
     <Routes>
       <Route path="/" element={<LandingPage/>}/>
       <Route path="/login" element={<LoginPage />} />
+      {/* <Route path="/signup" element={<SignupPage />} /> */}
       {/* <Route path="/login" element={<Login />} /> */}
       <Route path="/tutorlogin" element={<TutorLogin />} />
-      <Route path="tutoring/:roomId/:userType" element={<TutoringPage />} />
+      <Route path="tutoring/:documentId/:roomId/:userType" element={<TutoringPage />} />
         
         <Route path="/" element={<ProtectedRoutes userType="student" />}>
           <Route path='dashboard' element={<Dashboard/>}/>
@@ -36,20 +37,6 @@ function App() {
           
           <Route path="tutordashboard" element={<TutorDashboard/>}/>
         </Route>
-      
-        {/* }/>
-        <Route path="/signup" element={<SignupPage />} />
-        
-      
-        <Route path="/dashboard" element={<Dashboard/>}/>
-        <Route path='/record' element={<Main />} />
-        <Route path='/study' element={<Study/>} /> 
-        <Route element={<ProtectedRoutes/>}>
-          <Route path='/dashboard' element={<Dashboard/>}/>
-          <Route path='/record' element={<Main />} />
-          <Route path='/study' element={<Study/>} />
-        </Route> */}
-        
     </Routes>
     </>
   )

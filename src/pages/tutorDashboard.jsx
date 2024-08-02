@@ -5,19 +5,19 @@ import { FaVideo, FaUserPlus } from 'react-icons/fa';
 
 const TutorDashboard = () => {
   const tutor = useSelector(state => state.tutorauth.tutor.payload.tutor); 
-  //console.log(tutor)
+  console.log(tutor)
   const [inviteLink, setInviteLink] = useState('');
   const navigate = useNavigate();
 
 
   const generateInviteLink = () => {
-    const link = `${window.location.origin}/join/${tutor.roomId}`;
+    const link = `${window.location.origin}/join/${tutor.documentId}/${tutor.roomId}/${tutor.userType}`;
     setInviteLink(link);
   };
 
   const startMeeting = () => {
     //socket.emit('create_room', tutor.roomId);
-    navigate(`/tutoring/${tutor.roomId}/${tutor.name}`, { state: { tutor, isHost: true } });
+    navigate(`/tutoring/${tutor.documentId}/${tutor.roomId}/${tutor.userType}`, { state: { tutor, isHost: true } });
   };
 
 

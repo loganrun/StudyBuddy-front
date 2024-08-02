@@ -93,14 +93,13 @@ function TextEditor({id}) {
     }
   }, [socket, quill])
 
-  const roomUrl = window.location.href;
+  //const roomUrl = window.location.href;
 
   return (
-    <div className="container mx-auto p-4 h-screen">
+    <div className="container mx-auto p-4 h-screen ">
     <h1 className="text-2xl font-bold mb-4">Tutoring Session</h1>
-    <div ref={editorContainerRef} className="h-2/3 mb-4 bg-white text-black shadow rounded"></div>
+    <div ref={editorContainerRef} className="h-full bg-white text-black shadow rounded "></div>
   
-      {/* {socket && <VoiceChat socket={socket}/> } */}
     </div>
   );
 }
