@@ -9,7 +9,7 @@ import useSocket from '../components/UseSocket';
 function TextEditor({id}) {
   //console.log(id)
   const documentId = id
-  const socket = useSocket('http://localhost:4000');
+  const socket = useSocket('http://54.183.226.175');
   //console.log(roomId)
   //const tutor = useSelector(state => state.tutorauth.tutor.payload.tutor); 
     //const roomId  = tutor.roomId
