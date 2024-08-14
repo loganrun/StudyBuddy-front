@@ -3,7 +3,6 @@ import { useQuill } from 'react-quilljs';
 // import VoiceChat from '../components/VoiceChat'
 import 'quill/dist/quill.snow.css';
 import io from 'socket.io-client';
-import { useSelector } from 'react-redux';
 import useSocket from '../components/UseSocket';
 
 function TextEditor({id}) {
