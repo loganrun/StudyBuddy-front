@@ -45,13 +45,13 @@ function signupPage() {
         }
         
     }
-  return (
+return (
 <>
 <Navbar/>
     
     <div className="flex min-h-full flex-1 flex-col justify-center items-center px-6 py-12 lg:px-8 bg-white mt-32 ">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-       
+    
         <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
             Create Your Account
         </h2>
@@ -124,9 +124,9 @@ function signupPage() {
 
         <p className="mt-10 text-center text-sm text-gray-500">
             Already Have an Account?{' '}
-             <Link to='/login' signup className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
+            <Link to='/login' signup className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
             Login here
-             </Link>
+            </Link>
             
         </p>
         </div>

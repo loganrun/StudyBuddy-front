@@ -17,9 +17,9 @@ const JoinSession = () => {
     const regex = /\/join\/([^\/]+)\/([^\/]+)/;
     const match = url.match(regex)
     const roomId = match ? match[2] : null;
-    console.log(roomId)
+    // console.log(roomId)
     const documentId = match ? match[1] : null;
-    console.log(documentId)
+    //console.log(documentId)
     if (roomId) {
     //   socket.emit('join_room', roomId);
       navigate(`/tutoring/${documentId}/${roomId}/${userType}`);
