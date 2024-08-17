@@ -1,7 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import Quill from 'quill';
 import 'quill/dist/quill.snow.css';
-import io from 'socket.io-client';
 import useSocket from '../components/UseSocket';
 
 function TextEditor({ id }) {
@@ -23,7 +22,6 @@ function TextEditor({ id }) {
           [{ 'list': 'ordered' }, { 'list': 'bullet' }, { 'list': 'check' }],
           [{ 'indent': '-1' }, { 'indent': '+1' }],
           [{ 'direction': 'rtl' }],
-          [{ 'size': ['small', false, 'large', 'huge'] }],
           [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
           [{ 'color': [] }, { 'background': [] }],
           [{ 'font': [] }],
@@ -33,14 +31,21 @@ function TextEditor({ id }) {
       }
     });
 
-    const quill = quillRef.current;
+    //const quill = quillRef.current;
 
     // Adding custom class to the toolbar
     const toolbar = document.querySelector('.ql-toolbar');
     if (toolbar) {
-      toolbar.classList.add('bg-white', 'text-black');
+      toolbar.classList.add();
 
     }
+
+  }, []);
+
+  useEffect(() => {
+    if (socket == null || quillRef.current == null) return;
+
+    const quill = quillRef.current;
 
     socket.once("load-document", document => {
       quill.setContents(document);
@@ -76,7 +81,7 @@ function TextEditor({ id }) {
   return (
     <div className="container mx-auto p-4 h-screen">
       <h1 className="text-2xl font-bold mb-4">Tutoring Session</h1>
-      <div ref={editorContainerRef} className="h-full bg-white text-black shadow rounded"></div>
+      <div ref={editorContainerRef} className="h-full   shadow rounded "></div>
     </div>
   );
 }
