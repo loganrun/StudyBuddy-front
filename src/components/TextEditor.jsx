@@ -3,7 +3,10 @@ import Quill from 'quill';
 import 'quill/dist/quill.snow.css';
 import useSocket from '../components/UseSocket';
 
-function TextEditor({ id }) {
+function TextEditor({ id, title }) {
+  console.log(title)
+  //const purpose1= purpose
+  //console.log(id)
   const documentId = id;
   const socket = useSocket('https://www.2sigmasolution.com');
   const editorContainerRef = useRef(null);
@@ -80,7 +83,7 @@ function TextEditor({ id }) {
 
   return (
     <div className="container mx-auto p-4 h-screen">
-      <h1 className="text-2xl font-bold mb-4">Tutoring Session</h1>
+      <h1 className="text-2xl font-bold mb-4">{title}</h1>
       <div ref={editorContainerRef} className="h-full   shadow rounded "></div>
     </div>
   );

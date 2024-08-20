@@ -24,7 +24,7 @@ function tutoringPage({socket}) {
           <div className="container mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-              <TextEditor socket={socket} id={documentId} roomId={roomId} />
+              <TextEditor socket={socket} id={documentId} roomId={roomId} purpose={'Tutoring Session'} />
               </div>
               {/* <div className="space-y-4">
               <OpenAiInterface/>
