@@ -57,8 +57,9 @@ const Navbar = (props) => {
             </Link> 
           </Button>
     
-          <Button variant="ghost">
-          <LogOut className="h-4 w-4 mr-2" onClick={handleLogOut} /> Log Out
+          <Button variant="ghost" onClick={handleLogOut}>
+            
+          <LogOut className="h-4 w-4 mr-2"  /> Log Out
           </Button>
 
           </>
@@ -72,8 +73,8 @@ const Navbar = (props) => {
             </Link>
             
             </Button>
-           <Button variant="ghost">
-              <LogOut className="h-4 w-4 mr-2" onClick={handleLogOut} /> Log Out
+           <Button variant="ghost" onClick={handleLogOut}>
+              <LogOut className="h-4 w-4 mr-2"  /> Log Out
             </Button>
               
             </>
@@ -87,8 +88,8 @@ const Navbar = (props) => {
             </Link>
 
             </Button>
-           <Button variant="ghost">
-              <LogOut className="h-4 w-4 mr-2" onClick={handleLogOut} /> Log Out
+           <Button variant="ghost" onClick={handleLogOut}>
+              <LogOut className="h-4 w-4 mr-2"  /> Log Out
             </Button>
             </>
           );

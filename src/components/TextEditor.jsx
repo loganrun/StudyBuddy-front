@@ -42,7 +42,6 @@ function TextEditor({ id, title }) {
       toolbar.classList.add();
 
     }
-
   }, []);
 
   useEffect(() => {
