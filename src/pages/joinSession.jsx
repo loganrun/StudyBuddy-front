@@ -10,6 +10,7 @@ const JoinSession = () => {
   const user = useSelector(state => state.auth.user.payload.user);
   //console.log(user)
   const userType = user.userType
+  const userId = user.id
   
   
 
@@ -22,7 +23,7 @@ const JoinSession = () => {
     //console.log(documentId)
     if (roomId) {
     //   socket.emit('join_room', roomId);
-      navigate(`/tutoring/${documentId}/${roomId}/${userType}`);
+      navigate(`/tutoring/${documentId}/${roomId}/${userId}/${userType}`);
     }
   };
 

@@ -4,7 +4,7 @@ import 'quill/dist/quill.snow.css';
 import useSocket from '../components/UseSocket';
 
 function TextEditor({ id, title }) {
-  console.log(title)
+  //console.log(title)
   //const purpose1= purpose
   //console.log(id)
   const documentId = id;
