@@ -23,7 +23,7 @@ function App() {
       {/* <Route path="/signup" element={<SignupPage />} /> */}
       {/* <Route path="/login" element={<Login />} /> */}
       <Route path="/tutorlogin" element={<TutorLogin />} />
-      <Route path="tutoring/:documentId/:roomId/:userType" element={<TutoringPage />} />
+      <Route path="tutoring/:documentId/:roomId/:tutorId/:userType" element={<TutoringPage />} />
         
         <Route path="/" element={<ProtectedRoutes userType="student" />}>
           <Route path='dashboard' element={<Dashboard/>}/>

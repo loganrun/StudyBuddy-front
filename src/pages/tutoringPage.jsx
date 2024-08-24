@@ -27,7 +27,7 @@ function tutoringPage({socket}) {
               <TextEditor socket={socket} id={documentId} purpose={'Tutoring Session'} />
               </div>
               <div className="space-y-4">
-              <VideoChat/>
+              <VideoChat roomId={roomId} userId={userId}/>
               </div> 
             </div>
           </div>
@@ -48,6 +48,8 @@ function tutoringPage({socket}) {
               <TextEditor socket={socket} id={documentId} roomId={roomId} />
               </div>
               <div className="space-y-4">
+                <VideoChat roomId={roomId} userId={userId}/>
+              
               <OpenAiInterface/>
               </div>
             </div>
