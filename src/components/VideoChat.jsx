@@ -1,3 +1,54 @@
+import React, { useEffect, useRef, useState } from 'react';
+import Peer from 'simple-peer';
+
+const VideoChat = () => {
+  const [peer, setPeer] = useState(null);
+  const [localStream, setLocalStream] = useState(null);
+  const videoRef = useRef();
+
+  useEffect(() => {
+    const initPeer = async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        setLocalStream(stream);
+        const newPeer = new Peer({
+          initiator: true,
+          trickle: false,
+          stream: stream,
+        });
+        setPeer(newPeer);
+      } catch (err) {
+        console.error('Error creating peer:', err);
+      }
+    };
+
+    initPeer();
+
+    return () => {
+      if (localStream) {
+        localStream.getTracks().forEach(track => track.stop());
+      }
+      if (peer) {
+        peer.destroy();
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (videoRef.current && localStream) {
+      videoRef.current.srcObject = localStream;
+    }
+  }, [localStream]);
+
+  return (
+    <div>
+      <video ref={videoRef} autoPlay muted playsInline />
+    </div>
+  );
+};
+
+export default VideoChat;
+
 // import React, { useEffect, useRef, useState } from 'react';
 // import io from 'socket.io-client';
 // import Peer from 'simple-peer';
