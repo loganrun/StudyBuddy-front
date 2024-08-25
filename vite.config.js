@@ -7,11 +7,18 @@ export default defineConfig({
     react(),
     nodePolyfills({
       include: ['stream', 'buffer', 'crypto', 'events', 'process', 'util'],
+      globals: {
+        Buffer: true,
+        global: true,
+        process: true,
+      },
     }),
   ],
   resolve: {
     alias: {
       'simple-peer': 'simple-peer/simplepeer.min.js',
+      stream: 'stream-browserify',
+      'stream-browserify': 'stream-browserify',
     },
   },
   define: {
@@ -22,6 +29,12 @@ export default defineConfig({
     commonjsOptions: {
       transformMixedEsModules: true,
     },
+    rollupOptions: {
+      external: ['stream-browserify'],
+    },
+  },
+  optimizeDeps: {
+    include: ['@xenova/transformers'],
   },
 });
 
