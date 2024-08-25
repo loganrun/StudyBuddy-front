@@ -6,6 +6,7 @@ export default defineConfig({
   plugins: [
     react(),
     nodePolyfills({
+      include: ['stream', 'buffer', 'crypto', 'events', 'process', 'util'],
       globals: {
         Buffer: true,
         global: true,
@@ -21,5 +22,18 @@ export default defineConfig({
   },
   define: {
     'process.env': {},
+    global: 'globalThis',
+  },
+  build: {
+    commonjsOptions: {
+      transformMixedEsModules: true,
+    },
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'transformers': ['@xenova/transformers'],
+        },
+      },
+    },
   },
 });
