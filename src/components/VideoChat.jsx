@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import io from 'socket.io-client';
 import Peer from 'simple-peer';
+import { Button } from './Button';
 
 const VideoChat = ({ roomId, userId }) => {
   const [peers, setPeers] = useState({});
@@ -106,8 +107,8 @@ const VideoChat = ({ roomId, userId }) => {
         <Video key={peerId} peer={stream} />
       ))}
       <div>
-        {!isChatActive && <button onClick={startChat}>Start Chat</button>}
-        {isChatActive && <button onClick={stopChat}>Stop Chat</button>}
+        {!isChatActive && <Button variant= "outline" onClick={startChat}>Start Chat</Button>}
+        {isChatActive && <Button variant= "outline" onClick={stopChat}>Stop Chat</Button>}
       </div>
     </div>
   );

@@ -18,7 +18,7 @@ function tutoringPage({socket}) {
 
     return (
       <>
-        <Navbar />
+        <Navbar id="study" />
         <div className="relative min-h-screen p-4">
        
           <div className="container mx-auto">
