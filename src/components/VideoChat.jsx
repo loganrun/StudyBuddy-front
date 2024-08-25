@@ -13,7 +13,7 @@ const VideoChat = ({ roomId, userId }) => {
 
   useEffect(() => {
     if (isChatActive) {
-      socketRef.current = io.connect('http://localhost:4000');
+      socketRef.current = io.connect('https://www.2sigmasolution.com');
       navigator.mediaDevices.getUserMedia({ video: true, audio: true })
         .then(stream => {
           setStream(stream);
