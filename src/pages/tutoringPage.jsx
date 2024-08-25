@@ -3,9 +3,9 @@ import Navbar from '../components/NavBar'
 import { useParams,useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import TextEditor from '../components/TextEditor'
-import VoiceChat from '../components/VoiceChat'
+//import VoiceChat from '../components/VoiceChat'
 import OpenAiInterface from '../components/OpenAiInterface'
-import VideoChat from '../components/VideoChat';
+//import VideoChat from '../components/VideoChat';
 
 function tutoringPage({socket}) {
   //const tutor = useSelector(state => state.tutorauth.tutor.payload.tutor); 
@@ -27,7 +27,7 @@ function tutoringPage({socket}) {
               <TextEditor socket={socket} id={documentId} purpose={'Tutoring Session'} />
               </div>
               <div className="space-y-4">
-              <VideoChat roomId={roomId} userId={userId}/>
+              {/* <VideoChat roomId={roomId} userId={userId}/> */}
               </div> 
             </div>
           </div>
@@ -48,7 +48,7 @@ function tutoringPage({socket}) {
               <TextEditor socket={socket} id={documentId} roomId={roomId} />
               </div>
               <div className="space-y-4">
-                <VideoChat roomId={roomId} userId={userId}/>
+                {/* <VideoChat roomId={roomId} userId={userId}/> */}
               
               <OpenAiInterface/>
               </div>
