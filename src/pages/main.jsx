@@ -1,7 +1,7 @@
 import React from 'react';
 import { AudioManager } from "../components/AudioManager";
 import { useDispatch } from 'react-redux';
-import { useTranscriber } from "../hooks/use.Transcriber";
+//import { useTranscriber } from "../hooks/use.Transcriber";
 import Navbar from "../components/NavBar";
 import { addSubject } from '../reducers/lecturesSlice';
 
@@ -9,7 +9,7 @@ import { addSubject } from '../reducers/lecturesSlice';
 
 function main() {
 
-const transcriber = useTranscriber();
+//const transcriber = useTranscriber();
 const dispatch = useDispatch();
 
 
@@ -37,7 +37,7 @@ return (
         placeholder="Subject"
         />
     </form>
-    <AudioManager transcriber={transcriber}  />
+    <AudioManager/>
 
     </div>
                     
