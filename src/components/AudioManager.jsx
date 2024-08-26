@@ -26,7 +26,7 @@ const AudioSource = Object.freeze( {
     RECORDING : "RECORDING",
 })
 
-export function AudioManager(props = { transcriber}) {
+export function AudioManager() {
     const [progress, setProgress] = useState(undefined);
     const [audioData, setAudioData] = useState(undefined);
     const [audioDownloadUrl, setAudioDownloadUrl] = useState(undefined);
@@ -79,7 +79,7 @@ export function AudioManager(props = { transcriber}) {
                                 icon={<MicrophoneIcon />}
                                 text={"Record"}
                                 setAudioData={(e) => {
-                                    props.transcriber.onInputChange();
+                                    
                                     setAudioFromRecording(e);
                                 }}
                             />
@@ -113,7 +113,7 @@ function SettingsTile(props) {
                 show={showModal}
                 onSubmit={onSubmit}
                 onClose={onClose}
-                transcriber={props.transcriber}
+                
             />
         </div>
     );
