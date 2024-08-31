@@ -17,6 +17,7 @@ const TutorDashboard = () => {
 
   const startMeeting = () => {
     //socket.emit('create_room', tutor.roomId);
+    console.log(tutor.id)
     navigate(`/tutoring/${tutor.documentId}/${tutor.roomId}/${tutor.id}/${tutor.userType}`, { state: { tutor, isHost: true } });
   };
 

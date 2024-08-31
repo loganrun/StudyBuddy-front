@@ -4,6 +4,7 @@ import Peer from 'simple-peer';
 import { Button } from './Button';
 
 const VideoChat = ({ roomId, userId }) => {
+  //console.log(roomId, userId);
   const [peers, setPeers] = useState({});
   const [stream, setStream] = useState(null);
   const [isChatActive, setIsChatActive] = useState(false);
@@ -21,7 +22,7 @@ const VideoChat = ({ roomId, userId }) => {
           socketRef.current.emit('join-room', roomId, userId);
 
           socketRef.current.on('user-connected', (peerId) => {
-            connectToNewUser(peerId, stream);
+            connectToNewUser(peerId, stream, false);
           });
 
           socketRef.current.on('user-disconnected', (peerId) => {
@@ -34,7 +35,7 @@ const VideoChat = ({ roomId, userId }) => {
           });
 
           socketRef.current.on('existing-users', (users) => {
-            users.forEach(peerId => connectToNewUser(peerId, stream));
+            users.forEach(peerId => connectToNewUser(peerId, stream, true));
           });
 
           socketRef.current.on('signal', (from, signal) => {
@@ -52,26 +53,31 @@ const VideoChat = ({ roomId, userId }) => {
     };
   }, [isChatActive]);
 
-  function connectToNewUser(peerId, stream) {
+  function connectToNewUser(peerId, stream, isInitiator = false) {
     const peer = new Peer({
-      initiator: true,
+      initiator: isInitiator,
       trickle: false,
       stream,
     });
-
+  
     peer.on('signal', signal => {
-      socketRef.current.emit('signal', peerId, userId, signal);
+      socketRef.current.emit('signal', { to: peerId, from: userId, signal });
     });
-
+  
     peer.on('stream', peerStream => {
       setPeers(peers => ({
         ...peers,
         [peerId]: peerStream,
       }));
     });
-
+  
+    peer.on('close', () => {
+      peer.destroy();
+    });
+  
     peersRef.current[peerId] = peer;
   }
+  
 
   const startChat = () => {
     setIsChatActive(true);
@@ -112,6 +118,21 @@ const VideoChat = ({ roomId, userId }) => {
       </div>
     </div>
   );
+};
+
+const Video = ({ peer }) => {
+  // 1. Component definition and prop destructuring
+  
+  const ref = useRef();
+  // 2. Creating a ref to hold a reference to the video element
+
+  useEffect(() => {
+    ref.current.srcObject = peer;
+  }, [peer]);
+  // 3. Side effect to set the video source when the peer changes
+
+  return <video playsInline ref={ref} autoPlay />;
+  // 4. Rendering the video element
 };
 
 export default VideoChat;

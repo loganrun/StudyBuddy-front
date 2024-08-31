@@ -10,9 +10,9 @@ import VideoChat from '../components/VideoChat';
 function tutoringPage({socket}) {
   //const tutor = useSelector(state => state.tutorauth.tutor.payload.tutor); 
   
-  const {documentId, roomId, userType, userId} = useParams()
+  const {documentId, roomId, id, userType} = useParams()
 
-  //console.log(userType)
+  console.log(id)
 
   if(userType === 'student'){
 
@@ -20,14 +20,13 @@ function tutoringPage({socket}) {
       <>
         <Navbar id="study" />
         <div className="relative min-h-screen p-4">
-       
           <div className="container mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
               <TextEditor socket={socket} id={documentId} purpose={'Tutoring Session'} />
               </div>
               <div className="space-y-4">
-              <VideoChat roomId={roomId} userId={userId}/> 
+              <VideoChat roomId={roomId} userId={id}/> 
               </div> 
             </div>
           </div>
@@ -41,14 +40,13 @@ function tutoringPage({socket}) {
       <>
         <Navbar />
         <div className="relative min-h-screen p-4">
-       
           <div className="container mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
               <TextEditor socket={socket} id={documentId} roomId={roomId} />
               </div>
               <div className="space-y-4">
-                <VideoChat roomId={roomId} userId={userId}/>             
+                <VideoChat roomId={roomId} userId={id}/>             
               <OpenAiInterface/>
               </div>
             </div>
