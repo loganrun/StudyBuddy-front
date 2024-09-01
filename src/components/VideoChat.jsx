@@ -3,8 +3,8 @@ import io from 'socket.io-client';
 import Peer from 'simple-peer';
 import { Button } from './Button';
 
-const VideoChat = ({ roomId, userId }) => {
-  //console.log(roomId, userId);
+const VideoChat = ({ roomID, userId, userType }) => {
+  console.log(roomID, userId);
   const [peers, setPeers] = useState({});
   const [stream, setStream] = useState(null);
   const [isChatActive, setIsChatActive] = useState(false);
@@ -16,10 +16,11 @@ const VideoChat = ({ roomId, userId }) => {
     if (isChatActive) {
       socketRef.current = io.connect('https://www.2sigmasolution.com');
       navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+      console.log(roomID)
         .then(stream => {
           setStream(stream);
           userVideo.current.srcObject = stream;
-          socketRef.current.emit('join-room', roomId, userId);
+          socketRef.current.emit('join-room', roomID, userId);
 
           socketRef.current.on('user-connected', (peerId) => {
             connectToNewUser(peerId, stream, false);
