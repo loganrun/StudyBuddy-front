@@ -46,7 +46,7 @@ function tutoringPage({socket}) {
               <TextEditor socket={socket} id={documentId} roomId={roomId} />
               </div>
               <div className="space-y-4">
-                <VideoChat roomId={roomId} userId={id}/>             
+                <VideoChat roomID={roomId} userId={id}/>             
               <OpenAiInterface/>
               </div>
             </div>
