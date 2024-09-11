@@ -11,8 +11,10 @@ function tutoringPage({socket}) {
   //const tutor = useSelector(state => state.tutorauth.tutor.payload.tutor); 
   
   const {documentId, roomId, id, userType} = useParams()
+  // const appId = import.meta.env.VITE_APP_ID
+  // console.log(appId)
 
-  console.log(id)
+  //console.log(id)
 
   if(userType === 'student'){
 

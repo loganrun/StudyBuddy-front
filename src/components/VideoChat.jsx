@@ -1,268 +1,248 @@
-import React, { useEffect, useRef, useState } from 'react';
-import io from 'socket.io-client';
-import Peer from 'simple-peer';
-import { Button } from './Button';
+import React, { useState, useMemo } from "react";
+import {
+  LocalUser,
+  RemoteUser,
+  useIsConnected,
+  useJoin,
+  useLocalMicrophoneTrack,
+  useLocalCameraTrack,
+  usePublish,
+  useRemoteUsers,
+} from "agora-rtc-react";
+import { Button } from "./Button";
 
-const VideoChat = ({ roomID, userId, userType }) => {
-  console.log(roomID, userId);
-  const [peers, setPeers] = useState({});
-  const [stream, setStream] = useState(null);
-  const [isChatActive, setIsChatActive] = useState(false);
-  const socketRef = useRef();
-  const userVideo = useRef();
-  const peersRef = useRef({});
-
-  useEffect(() => {
-    if (isChatActive) {
-      socketRef.current = io.connect('https://www.2sigmasolution.com');
-      navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-      console.log(roomID)
-        .then(stream => {
-          setStream(stream);
-          userVideo.current.srcObject = stream;
-          socketRef.current.emit('join-room', roomID, userId);
-
-          socketRef.current.on('user-connected', (peerId) => {
-            connectToNewUser(peerId, stream, false);
-          });
-
-          socketRef.current.on('user-disconnected', (peerId) => {
-            if (peersRef.current[peerId]) {
-              peersRef.current[peerId].destroy();
-              const newPeers = { ...peers };
-              delete newPeers[peerId];
-              setPeers(newPeers);
-            }
-          });
-
-          socketRef.current.on('existing-users', (users) => {
-            users.forEach(peerId => connectToNewUser(peerId, stream, true));
-          });
-
-          socketRef.current.on('signal', (from, signal) => {
-            if (peersRef.current[from]) {
-              peersRef.current[from].signal(signal);
-            }
-          });
-        });
-    }
-
-    return () => {
-      if (isChatActive) {
-        stopChat();
-      }
-    };
-  }, [isChatActive]);
-
-  function connectToNewUser(peerId, stream, isInitiator = false) {
-    const peer = new Peer({
-      initiator: isInitiator,
-      trickle: false,
-      stream,
-    });
-  
-    peer.on('signal', signal => {
-      socketRef.current.emit('signal', { to: peerId, from: userId, signal });
-    });
-  
-    peer.on('stream', peerStream => {
-      setPeers(peers => ({
-        ...peers,
-        [peerId]: peerStream,
-      }));
-    });
-  
-    peer.on('close', () => {
-      peer.destroy();
-    });
-  
-    peersRef.current[peerId] = peer;
-  }
-  
-
-  const startChat = () => {
-    setIsChatActive(true);
-  };
-
-  const stopChat = () => {
-    // Disconnect from socket
-    if (socketRef.current) {
-      socketRef.current.disconnect();
-    }
-
-    // Destroy all peers
-    Object.values(peersRef.current).forEach(peer => peer.destroy());
-
-    // Stop the user's media stream
-    if (stream) {
-      stream.getTracks().forEach(track => track.stop());
-    }
-
-    // Clear the state
-    setStream(null);
-    setPeers({});
-    peersRef.current = {};
-
-    // Set chat inactive
-    setIsChatActive(false);
-  };
-
+const VideoPlayer = ({ videoTrack, audioTrack }) => {
   return (
-    <div>
-      <video playsInline muted ref={userVideo} autoPlay />
-      {Object.entries(peers).map(([peerId, stream]) => (
-        <Video key={peerId} peer={stream} />
-      ))}
-      <div>
-        {!isChatActive && <Button variant= "outline" onClick={startChat}>Start Chat</Button>}
-        {isChatActive && <Button variant= "outline" onClick={stopChat}>Stop Chat</Button>}
-      </div>
+    <div className="relative w-full h-full">
+      {videoTrack && (
+        <div 
+          ref={(ref) => {
+            if (ref) videoTrack.play(ref);
+          }} 
+          className="absolute inset-0 w-full h-full object-cover"
+        ></div>
+      )}
+      {audioTrack && audioTrack.play()}
     </div>
   );
 };
 
-const Video = ({ peer }) => {
-  // 1. Component definition and prop destructuring
-  
-  const ref = useRef();
-  // 2. Creating a ref to hold a reference to the video element
+export const VideoCall = ({ roomID }) => {
+  const [calling, setCalling] = useState(false);
+  const isConnected = useIsConnected();
+  const [appId, setAppId] = useState("");
+  const [channel, setChannel] = useState("");
+  const [token, setToken] = useState("");
 
-  useEffect(() => {
-    ref.current.srcObject = peer;
-  }, [peer]);
-  // 3. Side effect to set the video source when the peer changes
+  useJoin({ appid: appId, channel: channel, token: token ? token : null }, calling);
 
-  return <video playsInline ref={ref} autoPlay />;
-  // 4. Rendering the video element
+  const [micOn, setMic] = useState(true);
+  const [cameraOn, setCamera] = useState(true);
+  const { localMicrophoneTrack } = useLocalMicrophoneTrack(micOn);
+  const { localCameraTrack } = useLocalCameraTrack(cameraOn);
+  usePublish([localMicrophoneTrack, localCameraTrack]);
+
+  const remoteUsers = useRemoteUsers();
+
+  const gridClassName = useMemo(() => {
+    const totalUsers = remoteUsers.length + 1;
+    if (totalUsers === 1) return 'grid-cols-1';
+    if (totalUsers === 2) return 'grid-cols-2';
+    if (totalUsers <= 4) return 'grid-cols-2';
+    return 'grid-cols-3';
+  }, [remoteUsers.length]);
+
+  return (
+    <div className="flex flex-col h-full">
+      <div className="flex-grow overflow-hidden">
+        {isConnected ? (
+          <div className="h-full p-2">
+            <div className={`grid ${gridClassName} gap-2 h-full`}>
+              <div className="relative aspect-video">
+                <LocalUser
+                  audioTrack={localMicrophoneTrack}
+                  cameraOn={cameraOn}
+                  micOn={micOn}
+                  videoTrack={localCameraTrack}
+                  cover="https://www.agora.io/en/wp-content/uploads/2022/10/3d-spatial-audio-icon.svg"
+                >
+                  <span className="absolute bottom-2 left-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded z-10 text-xs">You</span>
+                  <VideoPlayer videoTrack={localCameraTrack} audioTrack={localMicrophoneTrack} />
+                </LocalUser>
+              </div>
+              {remoteUsers.map((user) => (
+                <div className="relative aspect-video" key={user.uid}>
+                  <RemoteUser cover="https://www.agora.io/en/wp-content/uploads/2022/10/3d-spatial-audio-icon.svg" user={user}>
+                    <span className="absolute bottom-2 left-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded z-10 text-xs">{user.uid}</span>
+                    <VideoPlayer videoTrack={user.videoTrack} audioTrack={user.audioTrack} />
+                  </RemoteUser>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center h-full space-y-2">
+            <input
+              className="w-full p-2 border rounded text-sm"
+              onChange={e => setAppId(e.target.value)}
+              placeholder="<Your app ID>"
+              value={appId}
+            />
+            <input
+              className="w-full p-2 border rounded text-sm"
+              onChange={e => setChannel(e.target.value)}
+              placeholder="<Your channel Name>"
+              value={channel}
+            />
+            <input
+              className="w-full p-2 border rounded text-sm"
+              onChange={e => setToken(e.target.value)}
+              placeholder="<Your token>"
+              value={token}
+            /> 
+            <Button
+              className="w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm"
+              onClick={() => setCalling(true)}
+            >
+              <span>Join Channel</span>
+            </Button>
+          </div>
+        )}
+      </div>
+      {isConnected && (
+        <div className="flex justify-between items-center p-2 bg-gray-100">
+          <div className="space-x-2">
+            <button className="p-1 rounded-full bg-white shadow" onClick={() => setMic(a => !a)}>
+              <i className={`${micOn ? 'text-blue-500' : 'text-red-500'} text-sm`}>🎤</i>
+            </button>
+            <button className="p-1 rounded-full bg-white shadow" onClick={() => setCamera(a => !a)}>
+              <i className={`${cameraOn ? 'text-blue-500' : 'text-red-500'} text-sm`}>📷</i>
+            </button>
+          </div>
+          <button
+            className={`p-1 rounded-full ${calling ? 'bg-red-500' : 'bg-green-500'} text-white text-sm`}
+            onClick={() => setCalling(a => !a)}
+          >
+            {calling ? '📞' : '📞'}
+          </button>
+        </div>
+      )}
+    </div>
+  );
 };
 
-export default VideoChat;
+export default VideoCall;
 
 // import React, { useEffect, useRef, useState } from 'react';
-// import io from 'socket.io-client';
-// import Peer from 'simple-peer';
+// //import io from 'socket.io-client';
+// //import Peer from 'simple-peer';
+// import {
+//   LocalUser,
+//   RemoteUser,
+//   useIsConnected,
+//   useJoin,
+//   useLocalMicrophoneTrack,
+//   useLocalCameraTrack,
+//   usePublish,
+//   useRemoteUsers,
+// } from "agora-rtc-react";
 // import { Button } from './Button';
+// const VideoChat = ({ roomID, userId, userType }) => {
+//   const [calling, setCalling] = useState(false); // Is calling
+//   //const [appId, setAppId] = useState(""); // Store the app ID state
+//   //const [channel, setChannel] = useState(""); // Store the channel name state 
+//   //const [token, setToken] = useState(""); // Store the token state
+//   const appId = import.meta.env.appId;
+//   const isConnected = useIsConnected();
+//   const token = null
 
-// const VideoChat = ({ roomId, userId }) => {
-//   const [peers, setPeers] = useState({});
-//   const [stream, setStream] = useState(null);
-//   const [isChatActive, setIsChatActive] = useState(false);
-//   const socketRef = useRef();
-//   const userVideo = useRef();
-//   const peersRef = useRef({});
+//   useJoin({appid: appId, channel: roomID, token: token ? token : null}, calling)
 
-//   useEffect(() => {
-//     if (isChatActive) {
-//       socketRef.current = io.connect('https://www.2sigmasolution.com');
-//       navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-//         .then(stream => {
-//           setStream(stream);
-//           userVideo.current.srcObject = stream;
-//           socketRef.current.emit('join-room', roomId, userId);
+//   const [micOn, setMic] = useState(true);
+//   const [cameraOn, setCamera] = useState(true);
+//   const { localMicrophoneTrack } = useLocalMicrophoneTrack(micOn);
+//   const { localCameraTrack } = useLocalCameraTrack(cameraOn);
+//   usePublish([localMicrophoneTrack, localCameraTrack]);
 
-//           socketRef.current.on('user-connected', (peerId) => {
-//             connectToNewUser(peerId, stream);
-//           });
-
-//           socketRef.current.on('user-disconnected', (peerId) => {
-//             if (peersRef.current[peerId]) {
-//               peersRef.current[peerId].destroy();
-//               const newPeers = { ...peers };
-//               delete newPeers[peerId];
-//               setPeers(newPeers);
-//             }
-//           });
-
-//           socketRef.current.on('existing-users', (users) => {
-//             users.forEach(peerId => connectToNewUser(peerId, stream));
-//           });
-
-//           socketRef.current.on('signal', (from, signal) => {
-//             if (peersRef.current[from]) {
-//               peersRef.current[from].signal(signal);
-//             }
-//           });
-//         });
-//     }
-
-//     return () => {
-//       if (isChatActive) {
-//         stopChat();
-//       }
-//     };
-//   }, [isChatActive]);
-
-//   function connectToNewUser(peerId, stream) {
-//     const peer = new Peer({
-//       initiator: true,
-//       trickle: false,
-//       stream,
-//     });
-
-//     peer.on('signal', signal => {
-//       socketRef.current.emit('signal', peerId, userId, signal);
-//     });
-
-//     peer.on('stream', peerStream => {
-//       setPeers(peers => ({
-//         ...peers,
-//         [peerId]: peerStream,
-//       }));
-//     });
-
-//     peersRef.current[peerId] = peer;
-//   }
-
-//   const startChat = () => {
-//     setIsChatActive(true);
-//   };
-
-//   const stopChat = () => {
-//     // Disconnect from socket
-//     if (socketRef.current) {
-//       socketRef.current.disconnect();
-//     }
-
-//     // Destroy all peers
-//     Object.values(peersRef.current).forEach(peer => peer.destroy());
-
-//     // Stop the user's media stream
-//     if (stream) {
-//       stream.getTracks().forEach(track => track.stop());
-//     }
-
-//     // Clear the state
-//     setStream(null);
-//     setPeers({});
-//     peersRef.current = {};
-
-//     // Set chat inactive
-//     setIsChatActive(false);
-//   };
+//   const remoteUsers = useRemoteUsers();
 
 //   return (
-//     <div>
-//       <video playsInline muted ref={userVideo} autoPlay />
-//       {Object.entries(peers).map(([peerId, stream]) => (
-//         <Video key={peerId} peer={stream} />
-//       ))}
-//       <div>
-//         {!isChatActive && <Button variant= "outline" onClick={startChat}>Start Chat</Button>}
-//         {isChatActive && <Button variant= "outline" onClick={stopChat}>Stop Chat</Button>}
+//     <>
+//       <div className="room">
+        
+//         {isConnected ? (
+//           <div className="user-list">
+//             <div className="user">
+//               <LocalUser
+//                 audioTrack={localMicrophoneTrack}
+//                 cameraOn={cameraOn}
+//                 micOn={micOn}
+//                 videoTrack={localCameraTrack}
+//                 cover="https://www.agora.io/en/wp-content/uploads/2022/10/3d-spatial-audio-icon.svg"
+//               >
+//                 <samp className="user-name">You</samp>
+//               </LocalUser>
+//             </div>
+//             {remoteUsers.map((user) => (
+//               <div className="user" key={user.uid}>
+//                 <RemoteUser cover="https://www.agora.io/en/wp-content/uploads/2022/10/3d-spatial-audio-icon.svg" user={user}>
+//                   <samp className="user-name">{user.uid}</samp>
+//                 </RemoteUser>
+//               </div>
+//             ))}
+//           </div>
+//         ) : (
+//           <div className="join-room">
+//             {/* <img alt="agora-logo" className="logo" src={agoraLogo} /> */}
+//             {/* <input
+//               onChange={e => setAppId(e.target.value)}
+//               placeholder="<Your app ID>"
+//               value={appId}
+//             />
+//             <input
+//               onChange={e => setChannel(e.target.value)}
+//               placeholder="<Your channel Name>"
+//               value={channel}
+//             />
+//             <input
+//               onChange={e => setToken(e.target.value)}
+//               placeholder="<Your token>"
+//               value={token}
+//             /> */}
+
+//             <Button
+//               className={`join-channel ${!appId || !channel ? "disabled" : ""}`}
+//               disabled={!appId || !channel}
+//               onClick={() => setCalling(true)}
+//             >
+//               <span>Start Chat</span>
+//             </Button>
+//           </div>
+//         )}
 //       </div>
-//     </div>
+//       {isConnected && (
+//         <div className="control">
+//           <div className="left-control">
+//             <button className="btn" onClick={() => setMic(a => !a)}>
+//               <i className={`i-microphone ${!micOn ? "off" : ""}`} />
+//             </button>
+//             <button className="btn" onClick={() => setCamera(a => !a)}>
+//               <i className={`i-camera ${!cameraOn ? "off" : ""}`} />
+//             </button>
+//           </div>
+//           <button
+//             className={`btn btn-phone ${calling ? "btn-phone-active" : ""}`}
+//             onClick={() => setCalling(a => !a)}
+//           >
+//             {calling ? <i className="i-phone-hangup" /> : <i className="i-mdi-phone" />}
+//           </button>
+//         </div>
+//       )}
+//     </>
 //   );
-// };
-
-// const Video = ({ peer }) => {
-//   const ref = useRef();
-
-//   useEffect(() => {
-//     ref.current.srcObject = peer;
-//   }, [peer]);
-
-//   return <video playsInline ref={ref} autoPlay />;
-// };
+// }
 
 // export default VideoChat;
+
+
 
