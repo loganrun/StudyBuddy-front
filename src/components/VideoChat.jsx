@@ -30,9 +30,15 @@ const VideoPlayer = ({ videoTrack, audioTrack }) => {
 export const VideoCall = ({ roomID }) => {
   const [calling, setCalling] = useState(false);
   const isConnected = useIsConnected();
-  const [appId, setAppId] = useState("");
-  const [channel, setChannel] = useState("");
+  //const [appId, setAppId] = useState("");
+  //const [channel, setChannel] = useState("");
   const [token, setToken] = useState("");
+
+  const appId = import.meta.env.VITE_APP_ID
+  console.log(appId)
+
+  const channel = roomID
+  console.log(channel)
 
   useJoin({ appid: appId, channel: channel, token: token ? token : null }, calling);
 
@@ -82,7 +88,7 @@ export const VideoCall = ({ roomID }) => {
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center h-full space-y-2">
-            <input
+            {/* <input
               className="w-full p-2 border rounded text-sm"
               onChange={e => setAppId(e.target.value)}
               placeholder="<Your app ID>"
@@ -99,12 +105,12 @@ export const VideoCall = ({ roomID }) => {
               onChange={e => setToken(e.target.value)}
               placeholder="<Your token>"
               value={token}
-            /> 
+            />  */}
             <Button
-              className="w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm"
+              className="p-6 bg-red-500 text-white rounded hover:bg-red-600 text-sm"
               onClick={() => setCalling(true)}
             >
-              <span>Join Channel</span>
+              <span>Join Session</span>
             </Button>
           </div>
         )}

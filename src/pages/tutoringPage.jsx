@@ -1,7 +1,7 @@
 import React from 'react'
 import Navbar from '../components/NavBar'
 import { useParams,useLocation } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+//import { useSelector } from 'react-redux';
 import TextEditor from '../components/TextEditor'
 //import VoiceChat from '../components/VoiceChat'
 import OpenAiInterface from '../components/OpenAiInterface'
@@ -11,8 +11,8 @@ function tutoringPage({socket}) {
   //const tutor = useSelector(state => state.tutorauth.tutor.payload.tutor); 
   
   const {documentId, roomId, id, userType} = useParams()
-  // const appId = import.meta.env.VITE_APP_ID
-  // console.log(appId)
+  //const appId = import.meta.env.VITE_APP_ID
+  //console.log(appId)
 
   //console.log(id)
 
