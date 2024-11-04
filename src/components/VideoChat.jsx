@@ -81,7 +81,7 @@ export const VideoCall = ({ roomID }) => {
   }, [remoteUsers.length]);
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col pt-4 ">
       <div className="flex-grow overflow-hidden">
         {isConnected ? (
           <div className="h-full p-2">
@@ -118,7 +118,7 @@ export const VideoCall = ({ roomID }) => {
             </div>
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center h-full space-y-2">
+          <div className="flex flex-col items-center justify-center h-4/6 space-y-2">
             <Button
               className="p-6 bg-red-500 text-white rounded hover:bg-red-600 text-sm"
               onClick={() => setCalling(true)}
