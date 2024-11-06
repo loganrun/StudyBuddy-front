@@ -43,7 +43,7 @@ function tutoringPage({socket}) {
         <Navbar />
         <div className="relative min-h-screen p-4">
           <div className="container mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2">
               <div>
               <TextEditor socket={socket} id={documentId} roomId={roomId} />
               </div>

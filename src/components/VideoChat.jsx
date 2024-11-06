@@ -74,7 +74,7 @@ export const VideoCall = ({ roomID }) => {
 
   const gridClassName = useMemo(() => {
     const totalUsers = remoteUsers.length + 1;
-    if (totalUsers === 1) return 'grid-cols-1';
+    if (totalUsers === 1) return 'grid-cols-2';
     if (totalUsers === 2) return 'grid-cols-2';
     if (totalUsers <= 4) return 'grid-cols-2';
     return 'grid-cols-3';
