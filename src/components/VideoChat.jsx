@@ -14,11 +14,7 @@ import { Button } from "./Button";
 const VideoPlayer = ({ 
   videoTrack, 
   audioTrack, 
-  onMicToggle, 
-  onCameraToggle, 
   onCallToggle, 
-  micOn, 
-  cameraOn, 
   calling 
 }) => {
   return (
@@ -40,21 +36,12 @@ const VideoPlayer = ({
       >
         {calling ? 'End Call' : 'Start Call'}
       </button>
-
-      {/* Mic and Camera Toggle Buttons Centered */}
-      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-4 bg-black bg-opacity-50 p-4 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-        <button className="p-3 rounded-full  shadow-lg" onClick={onMicToggle}>
-          <i className={`${micOn ? 'text-blue-500' : 'text-red-500'} text-lg`}>🎤</i>
-        </button>
-        <button className="p-3 rounded-full  shadow-lg" onClick={onCameraToggle}>
-          <i className={`${cameraOn ? 'text-blue-500' : 'text-red-500'} text-lg`}>📷</i>
-        </button>
-      </div>
+      
     </div>
   );
 };
 
-export const VideoCall = ({ roomID }) => {
+export const VideoCall = ({ roomID, isVideoOn, isMuted }) => {
   const [calling, setCalling] = useState(false);
   const isConnected = useIsConnected();
   const [token, setToken] = useState("");
@@ -64,10 +51,8 @@ export const VideoCall = ({ roomID }) => {
 
   useJoin({ appid: appId, channel: channel, token: token ? token : null }, calling);
 
-  const [micOn, setMic] = useState(true);
-  const [cameraOn, setCamera] = useState(true);
-  const { localMicrophoneTrack } = useLocalMicrophoneTrack(micOn);
-  const { localCameraTrack } = useLocalCameraTrack(cameraOn);
+  const { localMicrophoneTrack } = useLocalMicrophoneTrack(!isMuted);
+  const { localCameraTrack } = useLocalCameraTrack(isVideoOn);
   usePublish([localMicrophoneTrack, localCameraTrack]);
 
   const remoteUsers = useRemoteUsers();
@@ -89,8 +74,8 @@ export const VideoCall = ({ roomID }) => {
               <div className="relative aspect-video">
                 <LocalUser
                   audioTrack={localMicrophoneTrack}
-                  cameraOn={cameraOn}
-                  micOn={micOn}
+                  cameraOn={isVideoOn}
+                  micOn={!isMuted}
                   videoTrack={localCameraTrack}
                   cover="https://www.agora.io/en/wp-content/uploads/2022/10/3d-spatial-audio-icon.svg"
                 >
@@ -98,11 +83,9 @@ export const VideoCall = ({ roomID }) => {
                   <VideoPlayer
                     videoTrack={localCameraTrack}
                     audioTrack={localMicrophoneTrack}
-                    onMicToggle={() => setMic((prev) => !prev)}
-                    onCameraToggle={() => setCamera((prev) => !prev)}
                     onCallToggle={() => setCalling((prev) => !prev)}
-                    micOn={micOn}
-                    cameraOn={cameraOn}
+                    micOn={!isMuted}
+                    cameraOn={isVideoOn}
                     calling={calling}
                   />
                 </LocalUser>

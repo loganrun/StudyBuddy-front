@@ -76,7 +76,7 @@ const handleSubmit = async (e) => {
 </div>
 </div>
 
-<div className="fixed bottom-0 p-4 sm:p-6 md:p-8 w-full max-w-full md:max-w-3xl mx-auto">
+<div className="fixed bottom-10 p-4 sm:p-6 md:p-8 w-full max-w-full md:max-w-3xl mx-auto">
   <h1 className="text-2xl font-bold mb-4">Ask Tyson</h1>
   <div className="flex items-center space-x-4">
     <textarea
@@ -107,7 +107,6 @@ const handleSubmit = async (e) => {
 
 export default OpenAIInterface;
 
-
-
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#E11D48" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-log-out"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
 
 
