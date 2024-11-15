@@ -1,6 +1,7 @@
 import React, {useState} from 'react'
 import Navbar from '../components/NavBar'
 import BottomToolbar from '../components/BottomToolbar'
+import StartButton from '../components/modal/StartButton';
 import { useParams,useLocation } from 'react-router-dom';
 //import { useSelector } from 'react-redux';
 import TextEditor from '../components/TextEditor'
@@ -16,11 +17,23 @@ function tutoringPage({socket}) {
   const [isVideoOn, setIsVideoOn] = useState(true);
   const [isMuted, setIsMuted] = useState(false);
   const [isCalling, setIsCalling] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(true);
 
   // Control functions
   const toggleVideo = () => setIsVideoOn((prev) => !prev);
   const toggleMute = () => setIsMuted((prev) => !prev);
   const toggleCall = () => setIsCalling((prev) => !prev);
+
+  const handleStartSession = () => {
+    setIsCalling(true)
+    setIsModalOpen(false);
+    
+  };
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+    // Additional logic for canceling, if needed
+  };
 
   if(userType === 'student'){
 
@@ -47,6 +60,13 @@ function tutoringPage({socket}) {
   }else{
     return (
       <>
+      {isModalOpen && (
+        <StartButton
+          buttonText="Start Session"
+          onStart={handleStartSession}
+          onCancel={handleCancel}
+        />
+      )}
         <div className="relative min-h-screen p-4">
           <div className="container mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-2">
@@ -54,13 +74,13 @@ function tutoringPage({socket}) {
               <TextEditor socket={socket} id={documentId} roomId={roomId} />
               </div>
               <div className="space-y-4">
-                <VideoChat roomID={roomId} userId={id} isVideoOn={isVideoOn} isMuted={isMuted}/>             
+                <VideoChat roomID={roomId} userId={id} isVideoOn={isVideoOn} isMuted={isMuted} isCalling={isCalling}/>             
               <OpenAiInterface/>
               </div>
             </div>
           </div>
         </div>
-        <BottomToolbar toggleVideo={toggleVideo} toggleMute={toggleMute} isVideoOn={isVideoOn} isMuted={isMuted} toggleCall={toggleCall} />
+        <BottomToolbar toggleVideo={toggleVideo} toggleMute={toggleMute} isVideoOn={isVideoOn} isMuted={isMuted} toggleCall={toggleCall} isCalling={isCalling} />
       </>
     )
 

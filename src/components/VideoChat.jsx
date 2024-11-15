@@ -30,26 +30,26 @@ const VideoPlayer = ({
       {audioTrack && audioTrack.play()}
 
       {/* Start/Stop Call Button in the Upper Right */}
-      <button
+      {/* <button
         className={`absolute top-0 right-0 px-4 py-2 rounded bg-${calling ? 'red' : 'green'}-500 text-white text-sm`}
         onClick={onCallToggle}
       >
         {calling ? 'End Call' : 'Start Call'}
-      </button>
+      </button> */}
       
     </div>
   );
 };
 
-export const VideoCall = ({ roomID, isVideoOn, isMuted }) => {
-  const [calling, setCalling] = useState(false);
+export const VideoCall = ({ roomID, isVideoOn, isMuted, isCalling }) => {
+  //const [calling, setCalling] = useState(false);
   const isConnected = useIsConnected();
   const [token, setToken] = useState("");
 
   const appId = import.meta.env.VITE_APP_ID;
   const channel = roomID;
 
-  useJoin({ appid: appId, channel: channel, token: token ? token : null }, calling);
+  useJoin({ appid: appId, channel: channel, token: token ? token : null }, isCalling);
 
   const { localMicrophoneTrack } = useLocalMicrophoneTrack(!isMuted);
   const { localCameraTrack } = useLocalCameraTrack(isVideoOn);
@@ -83,10 +83,10 @@ export const VideoCall = ({ roomID, isVideoOn, isMuted }) => {
                   <VideoPlayer
                     videoTrack={localCameraTrack}
                     audioTrack={localMicrophoneTrack}
-                    onCallToggle={() => setCalling((prev) => !prev)}
+                    onCallToggle={isCalling}
                     micOn={!isMuted}
                     cameraOn={isVideoOn}
-                    calling={calling}
+                    calling={isCalling}
                   />
                 </LocalUser>
               </div>
@@ -102,12 +102,12 @@ export const VideoCall = ({ roomID, isVideoOn, isMuted }) => {
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center h-4/6 space-y-2">
-            <Button
+            {/* <Button
               className="p-6 bg-red-500 text-white rounded hover:bg-red-600 text-sm"
               onClick={() => setCalling(true)}
             >
               <span>Join Session</span>
-            </Button>
+            </Button> */}
           </div>
         )}
       </div>
