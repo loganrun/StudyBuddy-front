@@ -4,7 +4,7 @@ import React from 'react';
 import {Camera, CameraOff,  Mic, MicOff, House, LogOut} from 'lucide-react'
 
 
-const BottomToolbar = ({ toggleVideo, toggleMute, isVideoOn, isMuted, toggleCall }) => {
+const BottomToolbar = ({ toggleVideo, toggleMute, isVideoOn, isMuted, toggleCall, isCalling }) => {
 
 
 
@@ -42,8 +42,18 @@ const BottomToolbar = ({ toggleVideo, toggleMute, isVideoOn, isMuted, toggleCall
         <button
         onClick={toggleCall} 
         className="flex flex-col items-center hover:bg-gray-700  p-1 rounded-md transition ease-in-out duration-200">
-          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#E11D48" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-log-out"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
-          <span className="text-xs md:text-sm ">End Call</span>
+          {isCalling? (
+            <div>
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#E11D48" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-log-out"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+            <span className="text-xs md:text-sm ">End Call</span>
+            </div>
+          ) : (
+            <div>
+             <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-log-in"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" x2="3" y1="12" y2="12"/></svg>
+              <span className="text-xs md:text-sm ">Start Call</span>
+            </div>
+          )}
+          
         </button>
       </div>
     </div>

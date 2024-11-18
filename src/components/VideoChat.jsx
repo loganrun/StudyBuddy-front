@@ -13,9 +13,7 @@ import { Button } from "./Button";
 
 const VideoPlayer = ({ 
   videoTrack, 
-  audioTrack, 
-  onCallToggle, 
-  calling 
+  audioTrack
 }) => {
   return (
     <div className="relative w-full h-full group">
@@ -28,15 +26,6 @@ const VideoPlayer = ({
         ></div>
       )}
       {audioTrack && audioTrack.play()}
-
-      {/* Start/Stop Call Button in the Upper Right */}
-      {/* <button
-        className={`absolute top-0 right-0 px-4 py-2 rounded bg-${calling ? 'red' : 'green'}-500 text-white text-sm`}
-        onClick={onCallToggle}
-      >
-        {calling ? 'End Call' : 'Start Call'}
-      </button> */}
-      
     </div>
   );
 };
