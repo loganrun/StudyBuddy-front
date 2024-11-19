@@ -1,20 +1,17 @@
-// BottomToolbar.js
 import React from 'react';
-
-import {Camera, CameraOff,  Mic, MicOff, House, LogOut} from 'lucide-react'
+import { Link } from 'react-router-dom'
+import {House} from 'lucide-react'
 
 
 const BottomToolbar = ({ toggleVideo, toggleMute, isVideoOn, isMuted, toggleCall, isCalling }) => {
 
-
-
   return (
     <div className="fixed bottom-0 w-full bg-[#1C2C50] text-white shadow-lg">
       <div className="flex justify-around items-center ">
-        <button className="flex flex-col items-center hover:bg-gray-700 p-1 rounded-md transition ease-in-out duration-200">
+        <Link to="/tutordashboard" className="flex flex-col items-center hover:bg-gray-700 p-1 rounded-md transition ease-in-out duration-200">
           <House className="w-3 h-3 md:w-5 md:h-5" />
           <span className="text-xs md:text-sm mt-1">Home</span>
-        </button>
+        </Link>
         
         <button 
         onClick={toggleMute}
@@ -49,7 +46,7 @@ const BottomToolbar = ({ toggleVideo, toggleMute, isVideoOn, isMuted, toggleCall
             </div>
           ) : (
             <div>
-             <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-log-in"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" x2="3" y1="12" y2="12"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-log-in"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" x2="3" y1="12" y2="12"/></svg>
               <span className="text-xs md:text-sm ">Start Call</span>
             </div>
           )}

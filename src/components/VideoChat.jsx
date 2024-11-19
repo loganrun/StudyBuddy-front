@@ -9,12 +9,12 @@ import {
   usePublish,
   useRemoteUsers,
 } from "agora-rtc-react";
-import { Button } from "./Button";
+//import { Button } from "./Button";
 
 const VideoPlayer = ({ 
   videoTrack, 
   audioTrack,
-  isMuted
+  //isMuted
 }) => {
   return (
     <div className="relative w-full h-full group">
@@ -29,10 +29,10 @@ const VideoPlayer = ({
       {audioTrack && audioTrack.play()}
       {/* <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-4 bg-black bg-opacity-50 p-4 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300">
         <button>
-        {isMuted ?(
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E11D48" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-mic-off"><line x1="2" x2="22" y1="2" y2="22"/><path d="M18.89 13.23A7.12 7.12 0 0 0 19 12v-2"/><path d="M5 10v2a7 7 0 0 0 12 5"/><path d="M15 9.34V5a3 3 0 0 0-5.68-1.33"/><path d="M9 9v3a3 3 0 0 0 5.12 2.12"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+        {isMuted && (
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#E11D48" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-mic-off"><line x1="2" x2="22" y1="2" y2="22"/><path d="M18.89 13.23A7.12 7.12 0 0 0 19 12v-2"/><path d="M5 10v2a7 7 0 0 0 12 5"/><path d="M15 9.34V5a3 3 0 0 0-5.68-1.33"/><path d="M9 9v3a3 3 0 0 0 5.12 2.12"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
         )}
-        </button>
+        </button> 
       </div> */}
     </div>
   );

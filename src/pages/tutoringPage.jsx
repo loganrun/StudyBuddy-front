@@ -1,6 +1,6 @@
 import React, {useState} from 'react'
-import Navbar from '../components/NavBar'
-import BottomToolbar from '../components/BottomToolbar'
+import TutorToolbar from '../components/TutorToolbar'
+import StudentToolbar from '../components/StudentToolbar';
 import StartButton from '../components/modal/StartButton';
 import { useParams,useLocation } from 'react-router-dom';
 //import { useSelector } from 'react-redux';
@@ -39,7 +39,13 @@ function tutoringPage({socket}) {
 
     return (
       <>
-        <Navbar id="study" />
+      {isModalOpen && (
+        <StartButton
+          buttonText="Join Session"
+          onStart={handleStartSession}
+          onCancel={handleCancel}
+        />
+      )}
         <div className="relative min-h-screen p-4">
           <div className="container mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -47,12 +53,12 @@ function tutoringPage({socket}) {
               <TextEditor socket={socket} id={documentId} purpose={'Tutoring Session'} />
               </div>
               <div className="space-y-4">
-              <VideoChat roomID={roomId} userId={id} userType={userType}/> 
+              <VideoChat roomID={roomId} userId={id} userType={userType} isVideoOn={isVideoOn} isMuted={isMuted} isCalling={isCalling}/> 
               </div> 
             </div>
           </div>
         </div>
-        
+        <StudentToolbar toggleVideo={toggleVideo} toggleMute={toggleMute} isVideoOn={isVideoOn} isMuted={isMuted} toggleCall={toggleCall} isCalling={isCalling} />
       </>
     
     )
@@ -80,7 +86,7 @@ function tutoringPage({socket}) {
             </div>
           </div>
         </div>
-        <BottomToolbar toggleVideo={toggleVideo} toggleMute={toggleMute} isVideoOn={isVideoOn} isMuted={isMuted} toggleCall={toggleCall} isCalling={isCalling} />
+        <TutorToolbar toggleVideo={toggleVideo} toggleMute={toggleMute} isVideoOn={isVideoOn} isMuted={isMuted} toggleCall={toggleCall} isCalling={isCalling} />
       </>
     )
 
