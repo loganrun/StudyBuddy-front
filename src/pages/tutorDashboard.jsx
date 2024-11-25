@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import { useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaVideo, FaUserPlus } from 'react-icons/fa';
+import Navbar from '../components/NavBar';
 
 const TutorDashboard = () => {
   const tutor = useSelector(state => state.tutorauth.tutor.payload.tutor); 
@@ -23,6 +24,8 @@ const TutorDashboard = () => {
 
 
   return (
+    <>
+    <Navbar id="tutor" />
     <div className="flex items-center justify-center h-screen">
       <div className="space-y-6">
         <div className="space-x-6 flex">
@@ -54,6 +57,7 @@ const TutorDashboard = () => {
         )}
       </div>
     </div>
+    </>
   );
 };
 

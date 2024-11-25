@@ -73,9 +73,9 @@ const Navbar = (props) => {
             </Link>
             
             </Button>
-           <Button variant="ghost" onClick={handleLogOut}>
-              <LogOut className="h-4 w-4 mr-2"  /> Log Out
-            </Button>
+          <Button variant="ghost" onClick={handleLogOut}>
+            <LogOut className="h-4 w-4 mr-2"  /> Log Out
+          </Button>
               
             </>
           );
@@ -88,18 +88,21 @@ const Navbar = (props) => {
             </Link>
 
             </Button>
-           <Button variant="ghost" onClick={handleLogOut}>
+          <Button variant="ghost" onClick={handleLogOut}>
               <LogOut className="h-4 w-4 mr-2"  /> Log Out
-            </Button>
+          </Button>
             </>
+          );
+          case 'tutor':
+          return (
+          <Button variant="ghost" onClick={handleLogOut}>
+            <LogOut className="h-4 w-4 mr-2"  /> Log Out
+          </Button>
           );
       default:
         return (
           <button
-            className="bg-rose-200 hover:bg-rose-300 text-white font-bold py-2 px-4 rounded"
-            
-            
-          >
+            className="bg-rose-200 hover:bg-rose-300 text-white font-bold py-2 px-4 rounded">
             Sign Up
           </button>
         );
