@@ -9,7 +9,7 @@ function TextEditor({ id, title }) {
   //const purpose1= purpose
   //console.log(id)
   const documentId = id;
-  const socket = useSocket('https://www.2sigmasolution.com');
+  const socket = useSocket('http://localhost:4000');
   const editorContainerRef = useRef(null);
   const quillRef = useRef(null);
 
