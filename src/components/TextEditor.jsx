@@ -82,9 +82,9 @@ function TextEditor({ id, title }) {
   }, [socket, documentId]);
 
   return (
-    <div className="container mx-auto p-4 h-screen">
+    <div className="container mx-auto  h-[calc(100vh-6rem)] flex  flex-col">
       <h1 className="text-2xl font-bold mb-4">{title}</h1>
-      <div ref={editorContainerRef} className="h-full   shadow rounded "></div>
+      <div ref={editorContainerRef} className=" flex-grow overflow-y-auto shadow rounded "></div>
     </div>
   );
 }

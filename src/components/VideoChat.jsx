@@ -1,545 +1,121 @@
-import React, { useEffect, useRef, useState } from 'react';
-import io from 'socket.io-client';
-import Peer from 'simple-peer';
-import { Button } from './Button';
+import React, { useState, useMemo } from "react";
+import {
+  LocalUser,
+  RemoteUser,
+  useIsConnected,
+  useJoin,
+  useLocalMicrophoneTrack,
+  useLocalCameraTrack,
+  usePublish,
+  useRemoteUsers,
+} from "agora-rtc-react";
+//import { Button } from "./Button";
 
+const VideoPlayer = ({ 
+  videoTrack, 
+  audioTrack,
+  //isMuted
+}) => {
+  return (
+    <div className="relative w-full h-full group">
+      {videoTrack && (
+        <div 
+          ref={(ref) => {
+            if (ref) videoTrack.play(ref);
+          }} 
+          className="absolute inset-0 w-full h-full object-cover"
+        ></div>
+      )}
+      {audioTrack && audioTrack.play()}
+      {/* <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-4 bg-black bg-opacity-50 p-4 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <button>
+        {isMuted && (
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#E11D48" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-mic-off"><line x1="2" x2="22" y1="2" y2="22"/><path d="M18.89 13.23A7.12 7.12 0 0 0 19 12v-2"/><path d="M5 10v2a7 7 0 0 0 12 5"/><path d="M15 9.34V5a3 3 0 0 0-5.68-1.33"/><path d="M9 9v3a3 3 0 0 0 5.12 2.12"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+        )}
+        </button> 
+      </div> */}
+    </div>
+  );
+};
 
-const VideoChat = ({ roomID, userId, userType }) => {
-  console.log(roomID, userId);
-  const [peers, setPeers] = useState([]);
-  const [stream, setStream] = useState(null);
-  const [isChatActive, setIsChatActive] = useState(false);
-  const socketRef = useRef();
-  const userVideo = useRef();
-  const peersRef = useRef([]);
+export const VideoCall = ({ roomID, isVideoOn, isMuted, isCalling }) => {
+  //const [calling, setCalling] = useState(false);
+  const isConnected = useIsConnected();
+  const [token, setToken] = useState("");
 
-  useEffect(() => {
-    socketRef.current = io.connect("https://www.2sigmasolution.com");
-    navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(stream => {
-        userVideo.current.srcObject = stream;
-        socketRef.current.emit("join room", roomID);
-        socketRef.current.on("all users", users => {
-            const peers = [];
-            users.forEach(userID => {
-                const peer = createPeer(userID, socketRef.current.id, stream);
-                peersRef.current.push({
-                    peerID: userID,
-                    peer,
-                })
-                peers.push(peer);
-            })
-            setPeers(peers);
-        })
+  const appId = import.meta.env.VITE_APP_ID;
+  const channel = roomID;
 
-        socketRef.current.on("user joined", payload => {
-            const peer = addPeer(payload.signal, payload.callerID, stream);
-            peersRef.current.push({
-                peerID: payload.callerID,
-                peer,
-            })
+  useJoin({ appid: appId, channel: channel, token: token ? token : null }, isCalling);
 
-            setPeers(users => [...users, peer]);
-        });
+  const { localMicrophoneTrack } = useLocalMicrophoneTrack(!isMuted);
+  const { localCameraTrack } = useLocalCameraTrack(isVideoOn);
+  usePublish([localMicrophoneTrack, localCameraTrack]);
 
-        socketRef.current.on("receiving returned signal", payload => {
-            const item = peersRef.current.find(p => p.peerID === payload.id);
-            item.peer.signal(payload.signal);
-        });
-    })
-}, []);
-  // useEffect(() => {
-  //   if (isChatActive) {
-  //     socketRef.current = io.connect('https://www.2sigmasolution.com');
-  //     navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-  //     //console.log(roomID)
-  //       .then(stream => {
-  //         //setStream(stream);
-  //         userVideo.current.srcObject = stream;
-  //         socketRef.current.emit('join room', roomID, userId);
+  const remoteUsers = useRemoteUsers();
 
-
-  //         socketRef.current.on("all users", users => {  
-  //           const peers = [];
-  //           users.forEach(userID => {
-  //               const peer = createPeer(userID, socketRef.current.id, stream);
-  //               peersRef.current.push({
-  //                   peerID: userID,
-  //                   peer,
-  //               })
-  //               peers.push(peer);
-  //           })
-  //           setPeers(peers);
-  //         })
-
-
-  //         socketRef.current.on("user joined", payload => {
-  //           const peer = addPeer(payload.signal, payload.callerID, stream);
-  //           peersRef.current.push({
-  //               peerID: payload.callerID,
-  //               peer,
-  //           })
-
-
-  //           setPeers(users => [...users, peer]);
-  //         });
-
-
-  //         socketRef.current.on("receiving returned signal", payload => {
-  //             const item = peersRef.current.find(p => p.peerID === payload.id);
-  //             item.peer.signal(payload.signal);
-  //         });
-
-
-  //         // socketRef.current.on('user-connected', (peerId) => {
-  //         //   connectToNewUser(peerId, stream, false);
-  //         // });
-
-
-  //         // socketRef.current.on('user-disconnected', (peerId) => {
-  //         //   if (peersRef.current[peerId]) {
-  //         //     peersRef.current[peerId].destroy();
-  //         //     const newPeers = { ...peers };
-  //         //     delete newPeers[peerId];
-  //         //     setPeers(newPeers);
-  //         //   }
-  //         // });
-
-
-  //         // socketRef.current.on('existing-users', (users) => {
-  //         //   users.forEach(peerId => connectToNewUser(peerId, stream, true));
-  //         // });
-
-
-  //         // socketRef.current.on('signal', (from, signal) => {
-  //         //   if (peersRef.current[from]) {
-  //         //     peersRef.current[from].signal(signal);
-  //         //   }
-  //         // });
-  //       });
-  //   }
-
-
-  //   return () => {
-  //     if (isChatActive) {
-  //       stopChat();
-  //     }
-  //   };
-  // }, [isChatActive]);
-
-
-  function createPeer(userToSignal, callerID, stream) {
-    const peer = new Peer({
-        initiator: true,
-        trickle: false,
-        stream,
-    });
-
-
-    peer.on("signal", signal => {
-        socketRef.current.emit("sending signal", { userToSignal, callerID, signal })
-    })
-
-
-    return peer;
-}
-
-
-function addPeer(incomingSignal, callerID, stream) {
-    const peer = new Peer({
-        initiator: false,
-        trickle: false,
-        stream,
-    })
-
-
-    peer.on("signal", signal => {
-        socketRef.current.emit("returning signal", { signal, callerID })
-    })
-
-
-    peer.signal(incomingSignal);
-
-
-    return peer;
-}
-
-
-  // function connectToNewUser(peerId, stream, isInitiator = false) {
-  //   const peer = new Peer({
-  //     initiator: isInitiator,
-  //     trickle: false,
-  //     stream,
-  //   });
- 
-  //   peer.on('signal', signal => {
-  //     socketRef.current.emit('signal', { to: peerId, from: userId, signal });
-  //   });
- 
-  //   peer.on('stream', peerStream => {
-  //     setPeers(peers => ({
-  //       ...peers,
-  //       [peerId]: peerStream,
-  //     }));
-  //   });
- 
-  //   peer.on('close', () => {
-  //     peer.destroy();
-  //   });
- 
-  //   peersRef.current[peerId] = peer;
-  // }
- 
-
-
-  const startChat = () => {
-    setIsChatActive(true);
-  };
-
-
-  const stopChat = () => {
-    // Disconnect from socket
-    if (socketRef.current) {
-      socketRef.current.disconnect();
-    }
-
-
-    // Destroy all peers
-    Object.values(peersRef.current).forEach(peer => peer.destroy());
-
-
-    // Stop the user's media stream
-    if (stream) {
-      stream.getTracks().forEach(track => track.stop());
-    }
-
-
-    // Clear the state
-    setStream(null);
-    setPeers([]);
-    peersRef.current = {};
-
-
-    // Set chat inactive
-    setIsChatActive(false);
-  };
-
+  const gridClassName = useMemo(() => {
+    const totalUsers = remoteUsers.length + 1;
+    if (totalUsers === 1) return 'grid-cols-2';
+    if (totalUsers === 2) return 'grid-cols-2';
+    if (totalUsers <= 4) return 'grid-cols-2';
+    return 'grid-cols-3';
+  }, [remoteUsers.length]);
 
   return (
-    <div>
-      <video playsInline muted ref={userVideo} autoPlay />
-      {peers.map((peer, index) => {
-                return (
-                    <Video key={index} peer={peer} />
-                );
-            })}
-      <div>
-        {!isChatActive && <Button variant= "outline" onClick={startChat}>Start Chat</Button>}
-        {isChatActive && <Button variant= "outline" onClick={stopChat}>Stop Chat</Button>}
+    <div className="flex flex-col pt-4 ">
+      <div className="flex-grow overflow-hidden">
+        {isConnected ? (
+          <div className="h-full p-2">
+            <div className={`grid ${gridClassName} gap-2 h-full`}>
+              <div className="relative aspect-video">
+                <LocalUser
+                  audioTrack={localMicrophoneTrack}
+                  cameraOn={isVideoOn}
+                  micOn={!isMuted}
+                  videoTrack={localCameraTrack}
+                  cover="https://www.agora.io/en/wp-content/uploads/2022/10/3d-spatial-audio-icon.svg"
+                >
+                  <span className="absolute bottom-2 left-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded z-10 text-xs">You</span>
+                  <VideoPlayer
+                    videoTrack={localCameraTrack}
+                    audioTrack={localMicrophoneTrack}
+                    onCallToggle={isCalling}
+                    micOn={!isMuted}
+                    cameraOn={isVideoOn}
+                    calling={isCalling}
+                  />
+                </LocalUser>
+              </div>
+              {remoteUsers.map((user) => (
+                <div className="relative aspect-video" key={user.uid}>
+                  <RemoteUser cover="https://www.agora.io/en/wp-content/uploads/2022/10/3d-spatial-audio-icon.svg" user={user}>
+                    <span className="absolute bottom-2 left-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded z-10 text-xs">{user.uid}</span>
+                    <VideoPlayer videoTrack={user.videoTrack} audioTrack={user.audioTrack} />
+                  </RemoteUser>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center h-4/6 space-y-2">
+            {/* <Button
+              className="p-6 bg-red-500 text-white rounded hover:bg-red-600 text-sm"
+              onClick={() => setCalling(true)}
+            >
+              <span>Join Session</span>
+            </Button> */}
+          </div>
+        )}
       </div>
     </div>
   );
 };
 
-
-// const Video = ({ peer }) => {
-//   // 1. Component definition and prop destructuring
- 
-//   const ref = useRef();
-//   // 2. Creating a ref to hold a reference to the video element
+export default VideoCall;
 
 
-//   useEffect(() => {
-//     ref.current.srcObject = peer;
-//   }, [peer]);
-//   // 3. Side effect to set the video source when the peer changes
 
 
-//   return <video playsInline ref={ref} autoPlay />;
-//   // 4. Rendering the video element
-// };
-const Video = (props) => {
-  const ref = useRef();
 
-
-  useEffect(() => {
-      props.peer.on("stream", stream => {
-          ref.current.srcObject = stream;
-      })
-  }, []);
-
-
-  return (
-    <video playsInline ref={ref} autoPlay />
-  );
-}
-
-
-export default VideoChat;
-
-// import React, { useEffect, useRef, useState } from 'react';
-// import io from 'socket.io-client';
-// import Peer from 'simple-peer';
-// import { Button } from './Button';
-
-// const VideoChat = ({ roomId, userId }) => {
-//   //console.log(roomId, userId);
-//   const [peers, setPeers] = useState({});
-//   const [stream, setStream] = useState(null);
-//   const [isChatActive, setIsChatActive] = useState(false);
-//   const socketRef = useRef();
-//   const userVideo = useRef();
-//   const peersRef = useRef({});
-
-//   useEffect(() => {
-//     if (isChatActive) {
-//       socketRef.current = io.connect('https://www.2sigmasolution.com');
-//       navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-//         .then(stream => {
-//           setStream(stream);
-//           userVideo.current.srcObject = stream;
-//           socketRef.current.emit('join-room', roomId, userId);
-
-//           socketRef.current.on('user-connected', (peerId) => {
-//             connectToNewUser(peerId, stream, false);
-//           });
-
-//           socketRef.current.on('user-disconnected', (peerId) => {
-//             if (peersRef.current[peerId]) {
-//               peersRef.current[peerId].destroy();
-//               const newPeers = { ...peers };
-//               delete newPeers[peerId];
-//               setPeers(newPeers);
-//             }
-//           });
-
-//           socketRef.current.on('existing-users', (users) => {
-//             users.forEach(peerId => connectToNewUser(peerId, stream, true));
-//           });
-
-//           socketRef.current.on('signal', (from, signal) => {
-//             if (peersRef.current[from]) {
-//               peersRef.current[from].signal(signal);
-//             }
-//           });
-//         });
-//     }
-
-//     return () => {
-//       if (isChatActive) {
-//         stopChat();
-//       }
-//     };
-//   }, [isChatActive]);
-
-//   function connectToNewUser(peerId, stream, isInitiator = false) {
-//     const peer = new Peer({
-//       initiator: isInitiator,
-//       trickle: false,
-//       stream,
-//     });
-  
-//     peer.on('signal', signal => {
-//       socketRef.current.emit('signal', { to: peerId, from: userId, signal });
-//     });
-  
-//     peer.on('stream', peerStream => {
-//       setPeers(peers => ({
-//         ...peers,
-//         [peerId]: peerStream,
-//       }));
-//     });
-  
-//     peer.on('close', () => {
-//       peer.destroy();
-//     });
-  
-//     peersRef.current[peerId] = peer;
-//   }
-  
-
-//   const startChat = () => {
-//     setIsChatActive(true);
-//   };
-
-//   const stopChat = () => {
-//     // Disconnect from socket
-//     if (socketRef.current) {
-//       socketRef.current.disconnect();
-//     }
-
-//     // Destroy all peers
-//     Object.values(peersRef.current).forEach(peer => peer.destroy());
-
-//     // Stop the user's media stream
-//     if (stream) {
-//       stream.getTracks().forEach(track => track.stop());
-//     }
-
-//     // Clear the state
-//     setStream(null);
-//     setPeers({});
-//     peersRef.current = {};
-
-//     // Set chat inactive
-//     setIsChatActive(false);
-//   };
-
-//   return (
-//     <div>
-//       <video playsInline muted ref={userVideo} autoPlay />
-//       {Object.entries(peers).map(([peerId, stream]) => (
-//         <Video key={peerId} peer={stream} />
-//       ))}
-//       <div>
-//         {!isChatActive && <Button variant= "outline" onClick={startChat}>Start Chat</Button>}
-//         {isChatActive && <Button variant= "outline" onClick={stopChat}>Stop Chat</Button>}
-//       </div>
-//     </div>
-//   );
-// };
-
-// const Video = ({ peer }) => {
-//   // 1. Component definition and prop destructuring
-  
-//   const ref = useRef();
-//   // 2. Creating a ref to hold a reference to the video element
-
-//   useEffect(() => {
-//     ref.current.srcObject = peer;
-//   }, [peer]);
-//   // 3. Side effect to set the video source when the peer changes
-
-//   return <video playsInline ref={ref} autoPlay />;
-//   // 4. Rendering the video element
-// };
-
-// export default VideoChat;
-
-// import React, { useEffect, useRef, useState } from 'react';
-// import io from 'socket.io-client';
-// import Peer from 'simple-peer';
-// import { Button } from './Button';
-
-// const VideoChat = ({ roomId, userId }) => {
-//   const [peers, setPeers] = useState({});
-//   const [stream, setStream] = useState(null);
-//   const [isChatActive, setIsChatActive] = useState(false);
-//   const socketRef = useRef();
-//   const userVideo = useRef();
-//   const peersRef = useRef({});
-
-//   useEffect(() => {
-//     if (isChatActive) {
-//       socketRef.current = io.connect('https://www.2sigmasolution.com');
-//       navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-//         .then(stream => {
-//           setStream(stream);
-//           userVideo.current.srcObject = stream;
-//           socketRef.current.emit('join-room', roomId, userId);
-
-//           socketRef.current.on('user-connected', (peerId) => {
-//             connectToNewUser(peerId, stream);
-//           });
-
-//           socketRef.current.on('user-disconnected', (peerId) => {
-//             if (peersRef.current[peerId]) {
-//               peersRef.current[peerId].destroy();
-//               const newPeers = { ...peers };
-//               delete newPeers[peerId];
-//               setPeers(newPeers);
-//             }
-//           });
-
-//           socketRef.current.on('existing-users', (users) => {
-//             users.forEach(peerId => connectToNewUser(peerId, stream));
-//           });
-
-//           socketRef.current.on('signal', (from, signal) => {
-//             if (peersRef.current[from]) {
-//               peersRef.current[from].signal(signal);
-//             }
-//           });
-//         });
-//     }
-
-//     return () => {
-//       if (isChatActive) {
-//         stopChat();
-//       }
-//     };
-//   }, [isChatActive]);
-
-//   function connectToNewUser(peerId, stream) {
-//     const peer = new Peer({
-//       initiator: true,
-//       trickle: false,
-//       stream,
-//     });
-
-//     peer.on('signal', signal => {
-//       socketRef.current.emit('signal', peerId, userId, signal);
-//     });
-
-//     peer.on('stream', peerStream => {
-//       setPeers(peers => ({
-//         ...peers,
-//         [peerId]: peerStream,
-//       }));
-//     });
-
-//     peersRef.current[peerId] = peer;
-//   }
-
-//   const startChat = () => {
-//     setIsChatActive(true);
-//   };
-
-//   const stopChat = () => {
-//     // Disconnect from socket
-//     if (socketRef.current) {
-//       socketRef.current.disconnect();
-//     }
-
-//     // Destroy all peers
-//     Object.values(peersRef.current).forEach(peer => peer.destroy());
-
-//     // Stop the user's media stream
-//     if (stream) {
-//       stream.getTracks().forEach(track => track.stop());
-//     }
-
-//     // Clear the state
-//     setStream(null);
-//     setPeers({});
-//     peersRef.current = {};
-
-//     // Set chat inactive
-//     setIsChatActive(false);
-//   };
-
-//   return (
-//     <div>
-//       <video playsInline muted ref={userVideo} autoPlay />
-//       {Object.entries(peers).map(([peerId, stream]) => (
-//         <Video key={peerId} peer={stream} />
-//       ))}
-//       <div>
-//         {!isChatActive && <Button variant= "outline" onClick={startChat}>Start Chat</Button>}
-//         {isChatActive && <Button variant= "outline" onClick={stopChat}>Stop Chat</Button>}
-//       </div>
-//     </div>
-//   );
-// };
-
-// const Video = ({ peer }) => {
-//   const ref = useRef();
-
-//   useEffect(() => {
-//     ref.current.srcObject = peer;
-//   }, [peer]);
-
-//   return <video playsInline ref={ref} autoPlay />;
-// };
-
-// export default VideoChat;
 

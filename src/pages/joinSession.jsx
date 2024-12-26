@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import io from 'socket.io-client';
+//import io from 'socket.io-client';
 
 const JoinSession = () => {
-  const [url, setUrl] = useState('');
+  //const [url, setUrl] = useState('');
   const navigate = useNavigate();
   const [socket, setSocket] = useState(null);
   const user = useSelector(state => state.auth.user.payload.user);
-  //console.log(user)
+  const url = import.meta.env.VITE_HARD_CODE
   const userType = user.userType
   const userId = user.id
+  
+
   
   
 
@@ -18,7 +20,7 @@ const JoinSession = () => {
     const regex = /\/join\/([^\/]+)\/([^\/]+)/;
     const match = url.match(regex)
     const roomId = match ? match[2] : null;
-    // console.log(roomId)
+    //console.log(roomId)
     const documentId = match ? match[1] : null;
     //console.log(documentId)
     if (roomId) {
