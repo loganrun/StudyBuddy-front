@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { addMessage, updateLastMessage } from '../reducers/conversationReducer';
+//import { ScrollArea } from './ScrollArea';
 //import ConversationThread from './ConversationThread';
 //import Message from './Message';
 
@@ -59,9 +60,8 @@ const handleSubmit = async (e) => {
 
   return (
 <>
-<div className="max-w-3xl mx-auto p-4 text-white">
-  
-  <div className="flex-1 overflow-y-auto pb-32">
+<div className="max-w-3xl mx-auto  text-white">
+  <div className="flex-1 max-h-[calc(100vh-19rem)] overflow-y-auto ">
   
         {messages.map((message, index) => (
           <div
@@ -76,11 +76,11 @@ const handleSubmit = async (e) => {
 </div>
 </div>
 
-<div className="fixed bottom-10 p-4 sm:p-6 md:p-8 w-full max-w-full md:max-w-3xl mx-auto">
+<div className="fixed bottom-4  pb-4">
   <h1 className="text-2xl font-bold mb-4">Ask Tyson</h1>
-  <div className="flex items-center space-x-4">
+  <div className="flex items-center space-x-4 w-full">
     <textarea
-      className="w-full sm:w-3/5 md:w-2/5 lg:w-3/5 xl:w-10/12   rounded-md bg-[#1D1F20] text-white resize-none"
+      className="  rounded-md bg-[#1D1F20] text-white resize-none"
       rows='2'
       placeholder="Enter your question here..."
       value={input}
