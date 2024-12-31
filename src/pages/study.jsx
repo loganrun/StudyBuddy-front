@@ -5,8 +5,9 @@ import { useLocation } from 'react-router-dom'
 import { Card, CardContent, CardHeader, CardTitle } from '../components/Card'
 import { ScrollArea } from '../components/ScrollArea'
 import { Button } from '../components/Button';
-import { Play, ChevronDown, Trash2 } from 'lucide-react';
+import { Play, ChevronDown, CircleArrowLeft, Trash2, CircleArrowLeftIcon } from 'lucide-react';
 import AudioPlayer from '../components/AudioPlayer'
+import { Link } from 'react-router-dom'
 import OpenAiInterface from '../components/OpenAiInterface'
 import Navbar from '../components/NavBar'
 import ConversationThread from '../components/ConversationThread'
@@ -64,7 +65,11 @@ const handleSubmit = async (e) => {
 <Alert message={alertMessage} />
         <div className="relative p-4">
           <div className="container mx-auto">
-            <div>
+            <div className='flex items-center space-x-2'>
+              <Link to="/dashboard"  >
+              <CircleArrowLeftIcon className='h-8 w-8 mb-2 mx-2'/>
+              </Link>
+              
             <h1 className="text-4xl font-bold mb-2 ">{subject} Notes</h1>
             </div>
                 <div className="grid grid-cols-1 lg: grid-cols-[1fr,2fr,1fr] gap-4">
@@ -114,27 +119,20 @@ const handleSubmit = async (e) => {
                   <div className="">
                   <Card className="w-full  relative h-[calc(100vh-5rem)] bg-black border-0"> 
                     <CardContent className="">
-                    <CardHeader>
-                        <CardTitle className="text-lg">Chats</CardTitle>
-                      </CardHeader>
-
-                    <OpenAIInterface roomId={roomId} />
-
+                        <CardHeader>
+                          <CardTitle className="text-lg">Chats</CardTitle>
+                        </CardHeader>
+                        <OpenAIInterface roomId={roomId} />
                     </CardContent>
-                    
-
                   </Card>
                   </div>
                   <div className="">
                   <Card className="w-full relative h-[calc(100vh-5rem)] border-0 bg-black">
                   <CardContent className="">
-                    <CardHeader>
+                      <CardHeader>
                         <CardTitle className="text-lg">Notes</CardTitle>
                       </CardHeader>
-
-                    
-
-                    </CardContent>
+                  </CardContent>
 
                   </Card>     
                   </div>

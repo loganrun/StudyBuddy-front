@@ -61,7 +61,7 @@ const handleSubmit = async (e) => {
   return (
 <>
 <div className="max-w-3xl mx-auto  text-white">
-  <div className="flex-1 max-h-[calc(100vh-19rem)] overflow-y-auto ">
+  <div className="flex-1 max-h-[calc(100vh-19rem)] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
   
         {messages.map((message, index) => (
           <div
@@ -74,13 +74,11 @@ const handleSubmit = async (e) => {
         <div ref={chatEndRef} />
 
 </div>
-</div>
-
-<div className="fixed bottom-4  pb-4">
+<div className="flex-1 fixed bottom-8 lg:w-{38rem} xl:w-[36rem]">
   <h1 className="text-2xl font-bold mb-4">Ask Tyson</h1>
-  <div className="flex items-center space-x-4 w-full">
+  <div className="flex items-center space-x-4">
     <textarea
-      className="  rounded-md bg-[#1D1F20] text-white resize-none"
+      className="w-full rounded-md bg-[#1D1F20] text-white resize-none"
       rows='2'
       placeholder="Enter your question here..."
       value={input}
@@ -101,6 +99,9 @@ const handleSubmit = async (e) => {
     </button>
   </div>
 </div>
+</div>
+
+
   </>
   );
 };
