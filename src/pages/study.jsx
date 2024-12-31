@@ -3,6 +3,7 @@ import {useState} from 'react'
 import { useDispatch } from 'react-redux'
 import { useLocation } from 'react-router-dom'
 import { Card, CardContent, CardHeader, CardTitle } from '../components/Card'
+import {Sheet, SheetClose,SheetContent,SheetDescription,SheetFooter,SheetHeader,SheetTitle,SheetTrigger,} from "../components/Sheets"
 import { ScrollArea } from '../components/ScrollArea'
 import { Button } from '../components/Button';
 import { Play, ChevronDown, CircleArrowLeft, Trash2, CircleArrowLeftIcon } from 'lucide-react';
@@ -83,34 +84,47 @@ const handleSubmit = async (e) => {
                                 <AudioPlayer audioUrl={url} />
                               </div>
                               <div className="space-y-2">
-                                <Button
-                                  variant="outline"
-                                  className="w-full justify-between"
-                                  onClick={() => setIsOpen(!isOpen)}
-                                >
-                                  Lecture Transcript <ChevronDown className="h-4 w-4" />
-                                </Button>
-                                {isOpen && (
-                                  <ScrollArea className="h-48 w-full rounded-md border-0">
-                                    <div className="p-4">
-                                      {transcript}
-                                    </div>
-                                  </ScrollArea>
-                                )}
-                                <Button
-                                  variant="outline"
-                                  className="w-full justify-between"
-                                  onClick={() => setSummaryIsOpen(!summaryIsOpen)}
-                                >
-                                  Summary <ChevronDown className="h-4 w-4" />
-                                </Button>
-                                {summaryIsOpen && (
-                                  <ScrollArea className="h-48 w-full rounded-md border-0">
-                                  <div className="p-4">
-                                    {summary}
-                                  </div>
-                                </ScrollArea>
-                                )}
+                                <Sheet className="flex w-full mt-6">
+                                  <SheetTrigger>
+                                    <Button
+                                      variant="outline"
+                                      className="flex w-full justify-between mt-6"
+                                    >
+                                      <h1 className='text-lg'>Lecture Transcript</h1>
+                                    </Button>
+                                  </SheetTrigger>
+                                  <SheetContent side="left">
+                                    <SheetDescription className="max-h-[calc(100vh-14rem)] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                                      <div className="text-lg text-muted-foreground mt-2">
+                                        {transcript}
+                                      </div>
+                                    </SheetDescription>
+                                    <SheetFooter>
+                                      <SheetClose>Close</SheetClose>
+                                    </SheetFooter>
+                                  </SheetContent>   
+                                </Sheet>
+                                <Sheet>
+                                  <SheetTrigger>
+                                    <Button
+                                      variant="outline"
+                                      className=" flex w-full justify-between p-4 mt-6"
+                                    >
+                                      <h1 className='text-lg p-4'>Summary</h1>
+                                    </Button>
+                                  </SheetTrigger>
+                                  <SheetContent side="left">
+                                    <SheetDescription className="max-h-[calc(100vh-14rem)] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                                      <div className="text-sm text-muted-foreground mt-2">
+                                        {summary}
+                                      </div>
+                                    </SheetDescription>
+                                    <SheetFooter>
+                                      <SheetClose>Close</SheetClose>
+                                    </SheetFooter>
+                                  </SheetContent>
+                                </Sheet>
+                                
                               </div>
                             </CardContent>
 
