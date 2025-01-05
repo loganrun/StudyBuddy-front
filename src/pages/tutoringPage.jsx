@@ -3,6 +3,8 @@ import TutorToolbar from '../components/TutorToolbar'
 import StudentToolbar from '../components/StudentToolbar';
 import StartButton from '../components/modal/StartButton';
 import { useParams,useLocation } from 'react-router-dom';
+import {Card,CardContent,CardDescription,CardFooter,CardHeader,CardTitle,} from "../components/Card";
+import {Tabs,TabsContent,TabsList,TabsTrigger,} from "../components/Tabs";
 //import { useSelector } from 'react-redux';
 import TextEditor from '../components/TextEditor'
 //import VoiceChat from '../components/VoiceChat'
@@ -48,10 +50,20 @@ function tutoringPage({socket}) {
       )}
         <div className="relative min-h-screen p-4">
           <div className="container mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-              <TextEditor socket={socket} id={documentId} purpose={'Tutoring Session'} />
-              </div>
+            <div className="grid grid-cols-1 md:grid-cols-2">
+              <Tabs defaultValue='TextEditor' >
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="WhiteBoard">WhiteBoard</TabsTrigger>
+                  <TabsTrigger value="TextEditor">Text Editor</TabsTrigger>
+                </TabsList>
+                <TabsContent value="TextEditor" >
+                  <Card className="border-0 ">
+                    <CardContent>
+                    <TextEditor socket={socket} id={documentId} purpose={'Tutoring Session'} />
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+              </Tabs>
               <div className="space-y-4">
               <VideoChat roomID={roomId} userId={id} userType={userType} isVideoOn={isVideoOn} isMuted={isMuted} isCalling={isCalling}/> 
               </div> 
