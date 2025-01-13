@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {io} from 'socket.io-client';
 
-const Whiteboard = ({roomId = 'default-room'}) => {
+const Whiteboard = ({roomId}) => {
 const canvasRef = useRef(null);
 const [isDrawing, setIsDrawing] = useState(false);
 const [color, setColor] = useState('#000000');
@@ -27,7 +27,7 @@ useEffect(() => {
     context.strokeStyle = color;
     context.lineWidth = lineWidth;
     contextRef.current = context;
-
+    socketRef.current.emit('joinRoom', { roomId });
     socketRef.current.on('draw', drawLine);
     socketRef.current.on('clear', clearCanvas);
     socketRef.current.on('userCount', count => setUserCount(count));
@@ -61,21 +61,6 @@ const draw = ({ nativeEvent }) => {
     if (!isDrawing) return;
     const { offsetX, offsetY } = nativeEvent;
     const lastPos = lastPositionRef.current;
-    // contextRef.current.lineTo(offsetX, offsetY);
-    // contextRef.current.stroke();
-    // const x0 = offsetX;
-    // const y0 = offsetY;
-    // const x1 = offsetX;
-    // const y1 = offsetY;
-
-    // drawLine({
-    //     x0: x0,
-    //     y0: y0,
-    //     x1: x1,
-    //     y1: y1,
-    //     color,
-    //     lineWidth
-    // });
     
     drawLine({
       x0: lastPos.x,
