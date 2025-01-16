@@ -59,7 +59,7 @@ function tutoringPage({socket}) {
                 </TabsList>
                 <TabsContent value="TextEditor" >
                   <Card className="border-0 ">
-                    <CardContent>
+                    <CardContent className="container mx-auto flex  flex-col  ">
                     <TextEditor socket={socket} id={documentId} purpose={'Tutoring Session'} />
                     </CardContent>
                   </Card>
@@ -103,7 +103,7 @@ function tutoringPage({socket}) {
                 </TabsList>
                 <TabsContent value="TextEditor" >
                   <Card className="border-0 ">
-                    <CardContent>
+                    <CardContent className="container mx-auto  h-[calc(100vh-6rem)] flex  flex-col">
                     <TextEditor socket={socket} id={documentId} purpose={'Tutoring Session'} />
                     </CardContent>
                   </Card>

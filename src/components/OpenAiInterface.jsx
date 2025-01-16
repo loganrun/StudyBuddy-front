@@ -74,7 +74,7 @@ const handleSubmit = async (e) => {
         <div ref={chatEndRef} />
 
 </div>
-<div className="flex-1 fixed bottom-8 lg:w-{38rem} xl:w-[36rem]">
+<div className="flex-1 fixed bottom-20 lg:w-{38rem} xl:w-[36rem]">
   <h1 className="text-2xl font-bold mb-4">Ask Tyson</h1>
   <div className="flex items-center space-x-4">
     <textarea
