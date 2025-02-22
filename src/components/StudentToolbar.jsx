@@ -1,9 +1,52 @@
-import React from 'react';
+import React, {useState, useEffect}from 'react';
 import { Link } from 'react-router-dom'
 import {House} from 'lucide-react'
 
 
 const StudentToolbar = ({ toggleVideo, toggleMute, isVideoOn, isMuted, toggleCall, isCalling }) => {
+
+  // const {isVisible, setIsVisible} = useState(true)
+  // const {mouseNearBottom, setMouseNearBottom} = useState(false);
+
+  // useEffect(() => {
+  //   const initialTimer = setTimeout(() => {
+  //     if (!mouseNearBottom) {
+  //       setIsVisible(false)
+  //     }
+  //   }, 3000);
+
+  //   const handleMouseMove = (e) => {
+  //     const windowHeight = window.innerHeight;
+  //     const mouseY = e.clientY;
+  //     const threshold = windowHeight - 100
+
+  //     setMouseNearBottom(mouseY > threshold);
+  //     setIsVisible(mouseY > threshold);
+  //   }
+
+  //   const handleScroll = (e) => {
+  //     const scrollToBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 100;
+
+  //     if (scrollToBottom) {
+  //       setIsVisible(true);
+  //     }else if (!mouseNearBottom) {
+  //       setIsVisible(false);
+  //     }
+  //   };
+
+  //   window.addEventListener('mousemove', handleMouseMove);
+  //   window.addEventListener('scroll', handleScroll);
+
+  //   return () => {
+  //     clearTimeout(initialTimer);
+  //     window.removeEventListener('mousemove', handleMouseMove);
+  //     window.removeEventListener('scroll', handleScroll);
+  //     //clearTimeout(initialTimer);
+  //   };
+  // }, [mouseNearBottom])
+
+
+
 
   return (
     <div className="fixed bottom-0 w-full bg-[#1C2C50] text-white shadow-lg">

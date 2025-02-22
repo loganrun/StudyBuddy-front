@@ -27,10 +27,10 @@ function TextEditor({ id, title }) {
           [{ 'indent': '-1' }, { 'indent': '+1' }],
           [{ 'direction': 'rtl' }],
           [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-          [{ 'color': [] }, { 'background': [] }],
+          [{ 'color': [] }],
           [{ 'font': [] }],
           [{ 'align': [] }],
-          [ 'link', 'image' ]
+        
         ]
       }
     });
@@ -82,7 +82,7 @@ function TextEditor({ id, title }) {
   }, [socket, documentId]);
 
   return (
-    <div className="container mx-auto  h-[calc(100vh-6rem)] flex  flex-col">
+    <div >
       <h1 className="text-2xl font-bold mb-4">{title}</h1>
       <div ref={editorContainerRef} className=" flex-grow overflow-y-auto shadow rounded "></div>
     </div>

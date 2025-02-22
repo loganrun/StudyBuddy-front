@@ -5,7 +5,7 @@ import lecturesReducer from './reducers/lecturesSlice';
 import openaiReducer from './reducers/openaiReducer';
 import conversationReducer from './reducers/conversationReducer';
 import tutorauthReducer from './reducers/tutorauthReducer';
-
+import lessonsReducer from './reducers/lessonsReducer';
 const store = configureStore({
   reducer: {
     auth: authReducer,
@@ -13,7 +13,8 @@ const store = configureStore({
     lectures: lecturesReducer,
     openai: openaiReducer,
     conversation: conversationReducer,
-    tutorauth: tutorauthReducer
+    tutorauth: tutorauthReducer,
+    lessons: lessonsReducer,
   },
 });
 

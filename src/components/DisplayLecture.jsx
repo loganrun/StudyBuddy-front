@@ -29,22 +29,23 @@ function DisplayLecture({ data }) {
   };
 
   return (
-    <Card className="w-full mb-4 relative">
+    <Card className="w-full mb-4 relative h-64 bg-gradient-to-r from-[#09203F] to-[#537895]">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium">{subject}</CardTitle>
-        <div className="text-xs text-muted-foreground">{date}</div>
+        <CardTitle className="text-4xl font-medium">{subject}</CardTitle>
+        <div className="text-lg text-muted-foreground">{date}</div>
       </CardHeader>
       <CardContent>
-        <div className="flex items-center space-x-2 mb-4">
+        {/* <div className="flex items-center space-x-2 mb-4">
           <AudioPlayer audioUrl={url} />
-        </div>
+        </div> background-image: radial-gradient( circle 710px at 5.2% 7.2%,  rgba(37,89,222,1) 0%, rgba(37,89,222,1) 7.5%, rgba(4,4,29,1) 44.7% ); */}
         <div className="flex justify-between items-center mb-4">
           <Button variant="default" asChild>
             <Link
               to="/study"
               state={{ url, subject, transcript, date, _id, notes, summary }}
+              
             >
-              Study
+             <h1 className='text-lg'>Notes</h1> 
             </Link>
           </Button>
           <Button
@@ -52,11 +53,11 @@ function DisplayLecture({ data }) {
             size="icon"
             onClick={() => setShowModal(true)}
           >
-            <Trash2 className="h-4 w-4 text-red-500" />
+            <Trash2 className="h-5 w-5 text-red-500" />
           </Button>
         </div>
         <div className="space-y-2">
-          <Button
+          {/* <Button
             variant="outline"
             className="w-full justify-between"
             onClick={() => setIsOpen(!isOpen)}
@@ -67,7 +68,7 @@ function DisplayLecture({ data }) {
             <div className="text-sm text-muted-foreground mt-2">
               {transcript}
             </div>
-          )}
+          )} */}
           <Button
             variant="outline"
             className="w-full justify-between"
@@ -76,7 +77,7 @@ function DisplayLecture({ data }) {
             Summary <ChevronDown className="h-4 w-4" />
           </Button>
           {summaryIsOpen && (
-            <div className="text-sm text-muted-foreground mt-2">
+            <div className="text-sm text-muted-foreground mt-2 max-h-14 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
               {summary}
             </div>
           )}

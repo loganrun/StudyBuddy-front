@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { addMessage, updateLastMessage } from '../reducers/conversationReducer';
+import ReactMarkdown from 'react-markdown'
+//import { ScrollArea } from './ScrollArea';
 //import ConversationThread from './ConversationThread';
 //import Message from './Message';
 
@@ -59,28 +61,28 @@ const handleSubmit = async (e) => {
 
   return (
 <>
-<div className="max-w-3xl mx-auto p-4 text-white">
-  
-  <div className="flex-1 overflow-y-auto pb-32">
-  
+<div className="max-w-3xl mx-auto  text-white">
+  <div className="flex-1 max-h-[calc(100vh-19rem)] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
         {messages.map((message, index) => (
-          <div
-            key={index}
-            className={`p-2 my-2 rounded-md ${message.type === 'question' ? ' text-blue-400 text-2xl text-center  self-start ' : ' text-white self-end '}`}
-          >
-            {message.text}
-          </div>
-        ))}
-        <div ref={chatEndRef} />
+                <div
+                    key={index}
+                    className={`p-2 my-2 rounded-md ${message.type === 'question' ? ' text-blue-400 text-2xl text-center  self-start ' : ' text-white self-end '}`}
+                >
+                {message.type === 'question' ? (
+                    message.text
+                ) : (
+                    <ReactMarkdown>{message.text}</ReactMarkdown>
+                )}
+                </div>
+                ))}
+                <div ref={chatEndRef} />
 
 </div>
-</div>
-
-<div className="fixed bottom-10 p-4 sm:p-6 md:p-8 w-full max-w-full md:max-w-3xl mx-auto">
+<div className="flex-1 fixed bottom-20 lg:w-{38rem} xl:w-[36rem]">
   <h1 className="text-2xl font-bold mb-4">Ask Tyson</h1>
   <div className="flex items-center space-x-4">
     <textarea
-      className="w-full sm:w-3/5 md:w-2/5 lg:w-3/5 xl:w-10/12   rounded-md bg-[#1D1F20] text-white resize-none"
+      className="w-full rounded-md bg-[#1D1F20] text-white resize-none"
       rows='2'
       placeholder="Enter your question here..."
       value={input}
@@ -101,6 +103,9 @@ const handleSubmit = async (e) => {
     </button>
   </div>
 </div>
+</div>
+
+
   </>
   );
 };
