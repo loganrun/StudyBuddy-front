@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {io} from 'socket.io-client';
+import { WbToolbar } from './WbToolbar';
 
 const Whiteboard = ({roomId}) => {
 const canvasRef = useRef(null);
@@ -109,7 +110,8 @@ const updateLineWidth = (newWidth) => {
 };
 
 return (
-    <div className="flex flex-col items-center p-4 bg-gray-100 rounded-lg">
+    <div className="flex flex-col items-center p-4 bg-white rounded-lg">
+      <WbToolbar />
       <div className="flex gap-4 mb-4">
         <button
           onClick={clearCanvas}
