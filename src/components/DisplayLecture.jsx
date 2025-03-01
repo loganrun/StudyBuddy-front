@@ -30,6 +30,7 @@ function DisplayLecture({ data }) {
 
   return (
     <Card className="w-full mb-4 relative h-64 bg-gradient-to-r from-[#09203F] to-[#537895]">
+      
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-4xl font-medium">{subject}</CardTitle>
         <div className="text-lg text-muted-foreground">{date}</div>

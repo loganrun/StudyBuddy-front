@@ -131,7 +131,7 @@ const handleSubmit = async (e) => {
                     </Card>
                   </div>
                   <div className="">
-                  <Card className="w-full  relative h-[calc(100vh-5rem)] bg-black border-0"> 
+                  <Card className="w-full  relative h-[calc(100vh-5rem)] bg-black border-0 pb-10"> 
                     <CardContent className="">
                         <CardHeader>
                           <CardTitle className="text-lg">Chats</CardTitle>
