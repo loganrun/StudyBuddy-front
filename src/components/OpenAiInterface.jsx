@@ -16,7 +16,53 @@ const OpenAIInterface = () => {
   const dispatch = useDispatch();
   const chatEndRef = useRef(null);
 
-
+  const components = {
+    // Headings
+    h1: ({ node, ...props }) => (
+      <h1 className="text-4xl font-bold mb-4" {...props} />
+    ),
+    h2: ({ node, ...props }) => (
+      <h2 className="text-3xl font-semibold mb-3" {...props} />
+    ),
+    h3: ({ node, ...props }) => (
+      <h3 className="text-2xl font-medium mb-2" {...props} />
+    ),
+  
+    // Paragraphs
+    p: ({ node, ...props }) => (
+      <p className="mb-4 text-base leading-relaxed" {...props} />
+    ),
+  
+    // Links
+    a: ({ node, ...props }) => (
+      <a className="text-blue-600 hover:underline" {...props} />
+    ),
+  
+    // Lists
+    li: ({ node, ordered, ...props }) => (
+      <li className="mb-2 list-disc ml-5" {...props} />
+    ),
+  
+    // Blockquotes
+    blockquote: ({ node, ...props }) => (
+      <blockquote className="border-l-4 border-blue-500 pl-4 italic text-gray-600 my-4" {...props} />
+    ),
+  
+    // Code Blocks & Inline Code
+    code: ({ node, inline, className, children, ...props }) => {
+      return !inline ? (
+        <pre className="bg-gray-800 text-gray-100 p-4 rounded-md overflow-auto my-4">
+          <code className={className} {...props}>
+            {children}
+          </code>
+        </pre>
+      ) : (
+        <code className="bg-gray-100 rounded-sm px-1 font-mono text-sm" {...props}>
+          {children}
+        </code>
+      );
+    }
+  };
 
 const handleSubmit = async (e) => {
   e.preventDefault();
@@ -71,7 +117,7 @@ const handleSubmit = async (e) => {
                 {message.type === 'question' ? (
                     message.text
                 ) : (
-                    <ReactMarkdown>{message.text}</ReactMarkdown>
+                    <ReactMarkdown components={components}>{message.text}</ReactMarkdown>
                 )}
                 </div>
                 ))}
