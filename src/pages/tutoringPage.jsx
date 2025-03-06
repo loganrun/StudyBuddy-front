@@ -67,8 +67,8 @@ function TutoringPage({socket}) {
         </TabsList>
 
         <TabsContent value="TextEditor" className="w-full">
-          <Card className="border-0 w-full">
-            <CardContent className="p-0 w-full">
+          <Card className="border-0 w-full ">
+            <CardContent className="p-0 w-full ">
               <TextEditor socket={socket} id={documentId} purpose={'Tutoring Session'} />
             </CardContent>
           </Card>
