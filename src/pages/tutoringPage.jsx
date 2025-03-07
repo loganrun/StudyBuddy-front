@@ -15,7 +15,6 @@ import {
 } from "../components/Tabs";
 import Whiteboard from '../components/WhiteBoard';
 import TextEditor from '../components/TextEditor'
-import OpenAiInterface from '../components/OpenAiInterface'
 import VideoChat from '../components/VideoChat';
 import LessonPlanner from '../components/LessonPlanner';
 
@@ -26,8 +25,13 @@ function TutoringPage({socket}) {
   const [isMuted, setIsMuted] = useState(false);
   const [isCalling, setIsCalling] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(true);
-  const [activeTab, setActiveTab] = useState("TextEditor");
-  const [selectedTutorTab, setSelectedTutorTab] = useState("VideoChat");
+  
+  // For tablet and mobile: Single tab selection across all available tabs
+  const [activeSmallScreenTab, setActiveSmallScreenTab] = useState("VideoChat");
+  
+  // For large desktop: Separate tab selections for each section
+  const [activeMainTab, setActiveMainTab] = useState("TextEditor");
+  const [activeTutorTab, setActiveTutorTab] = useState("VideoChat");
 
   // Control functions
   const toggleVideo = () => setIsVideoOn((prev) => !prev);
@@ -43,32 +47,33 @@ function TutoringPage({socket}) {
     setIsModalOpen(false);
   };
 
-  const renderTabs = (isTutor) => (
+  // Desktop layout tabs for main content (Whiteboard/TextEditor)
+  const renderDesktopMainTabs = () => (
     <div className="w-full">
       <Tabs 
         defaultValue='TextEditor' 
-        value={activeTab} 
-        onValueChange={setActiveTab}
+        value={activeMainTab} 
+        onValueChange={setActiveMainTab}
         className="w-full"
       >
         <TabsList className="grid grid-cols-2 w-full">
           <TabsTrigger 
             value="WhiteBoard" 
-            className={`rounded-full ${activeTab === 'WhiteBoard' ? 'bg-white text-black' : 'text-gray-400'}`}
+            className={`rounded-full ${activeMainTab === 'WhiteBoard' ? 'bg-white text-black' : 'text-gray-400'}`}
           >
             WhiteBoard
           </TabsTrigger>
           <TabsTrigger 
             value="TextEditor" 
-            className={`rounded-full ${activeTab === 'TextEditor' ? 'bg-white text-black' : 'text-gray-400'}`}
+            className={`rounded-full ${activeMainTab === 'TextEditor' ? 'bg-white text-black' : 'text-gray-400'}`}
           >
             Text Editor
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="TextEditor" className="w-full">
-          <Card className="border-0 w-full ">
-            <CardContent className="p-0 w-full ">
+          <Card className="border-0 w-full">
+            <CardContent className="p-0 w-full">
               <TextEditor socket={socket} id={documentId} purpose={'Tutoring Session'} />
             </CardContent>
           </Card>
@@ -85,23 +90,24 @@ function TutoringPage({socket}) {
     </div>
   );
 
-  const renderTutorSpecificTabs = () => (
+  // Desktop layout tabs for tutor-specific content
+  const renderDesktopTutorTabs = () => (
     <Tabs 
       defaultValue='VideoChat'
-      value={selectedTutorTab}
-      onValueChange={setSelectedTutorTab}
+      value={activeTutorTab}
+      onValueChange={setActiveTutorTab}
       className="w-full"
     >
       <TabsList className="grid grid-cols-2 w-full">
         <TabsTrigger 
           value="VideoChat" 
-          className={`rounded-full ${selectedTutorTab === 'VideoChat' ? 'bg-white text-black' : 'text-gray-400'}`}
+          className={`rounded-full ${activeTutorTab === 'VideoChat' ? 'bg-white text-black' : 'text-gray-400'}`}
         >
           Video Chat
         </TabsTrigger>
         <TabsTrigger 
           value="LessonPlanner" 
-          className={`rounded-full ${selectedTutorTab === 'LessonPlanner' ? 'bg-white text-black' : 'text-gray-400'}`}
+          className={`rounded-full ${activeTutorTab === 'LessonPlanner' ? 'bg-white text-black' : 'text-gray-400'}`}
         >
           Lesson Planner
         </TabsTrigger>
@@ -131,20 +137,103 @@ function TutoringPage({socket}) {
     </Tabs>
   );
 
-  if(userType === 'student'){
+  // Mobile/Tablet layout with single column and all tabs accessible at the top
+  const renderSmallScreenTabs = () => {
+    // Define all available tabs based on user type
+    const allTabs = ["VideoChat", "TextEditor", "WhiteBoard"]
+    if (userType === 'tutor') {
+      allTabs.push("LessonPlanner")
+    }
+
     return (
-      <>
-        {isModalOpen && (
-          <StartButton
-            buttonText="Join Session"
-            onStart={handleStartSession}
-            onCancel={handleCancel}
-          />
-        )}
-        <div className="relative min-h-screen p-4 flex flex-col">
-          <div className="container mx-auto flex-grow">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-full">
-              {renderTabs()}
+      <div className="w-full">
+        <Tabs 
+          defaultValue='VideoChat' 
+          value={activeSmallScreenTab} 
+          onValueChange={setActiveSmallScreenTab}
+          className="w-full"
+        >
+          <TabsList className="flex w-full overflow-x-auto">
+            {allTabs.map(tab => (
+              <TabsTrigger 
+                key={tab}
+                value={tab} 
+                className={`flex-1 rounded-full ${activeSmallScreenTab === tab ? 'bg-white text-black' : 'text-gray-400'}`}
+              >
+                {tab === "WhiteBoard" ? "Whiteboard" : 
+                 tab === "TextEditor" ? "Text Editor" :
+                 tab === "VideoChat" ? "Video Chat" : "Lesson Planner"}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+
+          <TabsContent value="VideoChat" className="w-full">
+            <Card className="border-0 w-full">
+              <CardContent className="p-0 w-full">
+                <VideoChat 
+                  roomID={roomId} 
+                  userId={id} 
+                  userType={userType} 
+                  isVideoOn={isVideoOn} 
+                  isMuted={isMuted} 
+                  isCalling={isCalling}
+                />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="TextEditor" className="w-full">
+            <Card className="border-0 w-full">
+              <CardContent className="p-0 w-full">
+                <TextEditor socket={socket} id={documentId} purpose={'Tutoring Session'} />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="WhiteBoard" className="w-full">
+            <Card className="border-0 w-full">
+              <CardContent className="p-0 w-full">
+                <Whiteboard socket={socket} id={documentId} roomId={roomId} />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {userType === 'tutor' && (
+            <TabsContent value="LessonPlanner" className="w-full">
+              <Card className="border-0 w-full">
+                <CardContent className="p-0 w-full">
+                  <LessonPlanner/>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          )}
+        </Tabs>
+      </div>
+    );
+  };
+
+  return (
+    <>
+      {isModalOpen && (
+        <StartButton
+          buttonText={userType === 'tutor' ? "Start Session" : "Join Session"}
+          onStart={handleStartSession}
+          onCancel={handleCancel}
+        />
+      )}
+      <div className="relative min-h-screen p-4 flex flex-col">
+        <div className="container mx-auto flex-grow">
+          {/* For tablet and medium screens */}
+          <div className="block lg:hidden w-full">
+            {renderSmallScreenTabs()}
+          </div>
+          
+          {/* For large desktop screens only */}
+          <div className="hidden lg:grid lg:grid-cols-2 gap-4 h-full">
+            {renderDesktopMainTabs()}
+            {userType === 'tutor' ? (
+              renderDesktopTutorTabs()
+            ) : (
               <div className="flex items-center justify-center">
                 <VideoChat 
                   roomID={roomId} 
@@ -153,11 +242,13 @@ function TutoringPage({socket}) {
                   isVideoOn={isVideoOn} 
                   isMuted={isMuted} 
                   isCalling={isCalling}
-                /> 
+                />
               </div>
-            </div>
+            )}
           </div>
         </div>
+      </div>
+      {userType === 'student' ? (
         <StudentToolbar 
           toggleVideo={toggleVideo} 
           toggleMute={toggleMute} 
@@ -166,28 +257,7 @@ function TutoringPage({socket}) {
           toggleCall={toggleCall} 
           isCalling={isCalling} 
         />
-      </>
-    )
-  } else {
-    return (
-      <>
-        {isModalOpen && (
-          <StartButton
-            buttonText="Start Session"
-            onStart={handleStartSession}
-            onCancel={handleCancel}
-          />
-        )}
-        <div className="relative min-h-screen p-4 flex flex-col">
-          <div className="container mx-auto flex-grow">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 h-full">
-              {renderTabs()}
-              
-              {renderTutorSpecificTabs()}
-              
-            </div>
-          </div>
-        </div>
+      ) : (
         <TutorToolbar 
           toggleVideo={toggleVideo} 
           toggleMute={toggleMute} 
@@ -196,174 +266,11 @@ function TutoringPage({socket}) {
           toggleCall={toggleCall} 
           isCalling={isCalling} 
         />
-      </>
-    )
-  } 
+      )}
+    </>
+  );
 }
 
 export default TutoringPage
 
-// import React, {useState} from 'react'
-// import TutorToolbar from '../components/TutorToolbar'
-// import StudentToolbar from '../components/StudentToolbar';
-// import StartButton from '../components/modal/StartButton';
-// import { useParams,useLocation } from 'react-router-dom';
-// import {Card,CardContent,CardDescription,CardFooter,CardHeader,CardTitle,} from "../components/Card";
-// import {Tabs,TabsContent,TabsList,TabsTrigger,} from "../components/Tabs";
-// import Whiteboard from '../components/WhiteBoard';
-// //import { useSelector } from 'react-redux';
-// import TextEditor from '../components/TextEditor'
-// //import VoiceChat from '../components/VoiceChat'
-// import OpenAiInterface from '../components/OpenAiInterface'
-// import VideoChat from '../components/VideoChat';
-// import LessonPlanner from '../components/LessonPlanner';
 
-// function tutoringPage({socket}) {
-//   //const tutor = useSelector(state => state.tutorauth.tutor.payload.tutor); 
-  
-//   const {documentId, roomId, id, userType} = useParams()
-  
-//   const [isVideoOn, setIsVideoOn] = useState(true);
-//   const [isMuted, setIsMuted] = useState(false);
-//   const [isCalling, setIsCalling] = useState(false);
-//   const [isModalOpen, setIsModalOpen] = useState(true);
-//   const [isActive, setIsActive] = useState("TextEditor");
-//   const [selected, setSelected] = useState("VideoChat");
-
-//   // Control functions
-//   const toggleVideo = () => setIsVideoOn((prev) => !prev);
-//   const toggleMute = () => setIsMuted((prev) => !prev);
-//   const toggleCall = () => setIsCalling((prev) => !prev);
-
-//   const handleStartSession = () => {
-//     setIsCalling(true)
-//     setIsModalOpen(false);
-    
-//   };
-
-//   const handleCancel = () => {
-//     setIsModalOpen(false);
-//     // Additional logic for canceling, if needed
-//   };
-
-//   if(userType === 'student'){
-
-//     return (
-//       <>
-//       {isModalOpen && (
-//         <StartButton
-//           buttonText="Join Session"
-//           onStart={handleStartSession}
-//           onCancel={handleCancel}
-//         />
-//       )}
-//         <div className="relative min-h-screen p-4">
-//           <div className="container mx-auto">
-//             <div className="grid grid-cols-1 md:grid-cols-2">
-//               <Tabs defaultValue='TextEditor' >
-//                 <TabsList className="grid w-full grid-cols-2">
-//                   <TabsTrigger className={`rounded-full ${isActive === 'WhiteBoard' ? 'bg-white text-black w-32' : 'text-gray-400'}`} 
-//                   value="WhiteBoard" onClick={() => setIsActive('WhiteBoard')}>WhiteBoard</TabsTrigger>
-//                   <TabsTrigger className={`rounded-full ${isActive === 'TextEditor' ? 'bg-white text-black w-32' : 'text-gray-400'}`}
-//                   value="TextEditor" onClick={() => setIsActive('TextEditor')}>Text Editor</TabsTrigger>
-//                 </TabsList>
-//                 <TabsContent value="TextEditor" >
-//                   <Card className="border-0 ">
-//                     <CardContent className="container mx-auto flex  flex-col  ">
-//                     <TextEditor socket={socket} id={documentId} purpose={'Tutoring Session'} />
-//                     </CardContent>
-//                   </Card>
-//                 </TabsContent>
-//                 <TabsContent value="WhiteBoard" >
-//                   <Card className="border-0 ">
-//                     <CardContent>
-//                     <Whiteboard socket={socket} id={documentId} roomId={roomId} />
-//                     </CardContent>
-//                   </Card>
-//                 </TabsContent>
-//               </Tabs>
-//               <div className="space-y-4">
-//               <VideoChat roomID={roomId} userId={id} userType={userType} isVideoOn={isVideoOn} isMuted={isMuted} isCalling={isCalling}/> 
-//               </div> 
-//             </div>
-//           </div>
-//         </div>
-//         <StudentToolbar toggleVideo={toggleVideo} toggleMute={toggleMute} isVideoOn={isVideoOn} isMuted={isMuted} toggleCall={toggleCall} isCalling={isCalling} />
-//       </>
-    
-//     )
-
-//   }else{
-//     return (
-//       <>
-//       {isModalOpen && (
-//         <StartButton
-//           buttonText="Start Session"
-//           onStart={handleStartSession}
-//           onCancel={handleCancel}
-//         />
-//       )}
-//         <div className="relative min-h-screen p-4">
-//           <div className="container mx-auto">
-//             <div className="grid grid-cols-1 md:grid-cols-2">
-//             <Tabs defaultValue='TextEditor' >
-//                 <TabsList className="grid w-full grid-cols-2">
-//                 <TabsTrigger className={`rounded-full ${isActive === 'WhiteBoard' ? 'bg-white text-black w-32' : 'text-gray-400'}`} 
-//                   value="WhiteBoard" onClick={() => setIsActive('WhiteBoard')}>WhiteBoard</TabsTrigger>
-//                   <TabsTrigger className={`rounded-full ${isActive === 'TextEditor' ? 'bg-white text-black w-32' : 'text-gray-400'}`}
-//                   value="TextEditor" onClick={() => setIsActive('TextEditor')}>Text Editor</TabsTrigger>
-//                 </TabsList>
-//                 <TabsContent value="TextEditor" >
-//                   <Card className="border-0 ">
-//                     <CardContent className="container mx-auto  h-[calc(100vh-6rem)] flex  flex-col">
-//                     <TextEditor socket={socket} id={documentId} purpose={'Tutoring Session'} />
-//                     </CardContent>
-//                   </Card>
-//                 </TabsContent>
-//                 <TabsContent value="WhiteBoard" >
-//                   <Card className="border-0 ">
-//                     <CardContent>
-//                     <Whiteboard socket={socket} id={documentId} roomId={roomId} />
-//                     </CardContent>
-//                   </Card>
-//                 </TabsContent>
-//               </Tabs>
-//               <div className="space-y-4">
-//                 <Tabs defaultValue='VideoChat'>
-//                 <TabsList className="grid w-full grid-cols-2">
-//                   <TabsTrigger className={`rounded-full ${selected === 'VideoChat' ? 'bg-white text-black w-32' : 'text-gray-400'}`}
-//                   value="VideoChat" onClick={() => setSelected('VideoChat')}>Video Chat</TabsTrigger>
-//                   <TabsTrigger className={`rounded-full ${selected === 'LessonPlanner' ? 'bg-white text-black w-32' : 'text-gray-400'}`} 
-//                   value="LessonPlanner" onClick={() => setSelected('LessonPlanner')}>Lesson Planner</TabsTrigger>
-//                 </TabsList>
-//                 <TabsContent value="VideoChat" >
-//                   <Card className="border-0 ">
-//                     <CardContent className="container mx-auto  h-[calc(100vh-6rem)] flex  flex-col">
-//                     <VideoChat roomID={roomId} userId={id} isVideoOn={isVideoOn} isMuted={isMuted} isCalling={isCalling}/>             
-//                       <OpenAiInterface/>
-//                     </CardContent>
-//                   </Card>
-//                 </TabsContent>
-//                 <TabsContent className="w-full" value="LessonPlanner" >
-//                   <Card className="border-0 ">
-//                     <CardContent className="container mx-auto  w-full h-[calc(100vh-6rem)] flex  flex-col">
-//                     <LessonPlanner/>
-                    
-//                     </CardContent>
-//                   </Card>
-//                 </TabsContent>
-
-//                 </Tabs>
-                
-//               </div>
-//             </div>
-//           </div>
-//         </div>
-//         <TutorToolbar toggleVideo={toggleVideo} toggleMute={toggleMute} isVideoOn={isVideoOn} isMuted={isMuted} toggleCall={toggleCall} isCalling={isCalling} />
-//       </>
-//     )
-
-//   } 
-// }
-
-// export default tutoringPage
