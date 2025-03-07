@@ -130,7 +130,7 @@ function TutoringPage({socket}) {
       <TabsContent value="LessonPlanner" className="w-full">
         <Card className="border-0 w-full">
           <CardContent className="p-0 w-full">
-            <LessonPlanner/>
+            <LessonPlanner activeSmallScreenTab={activeSmallScreenTab}/>
           </CardContent>
         </Card>
       </TabsContent>
