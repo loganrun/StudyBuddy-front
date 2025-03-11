@@ -178,30 +178,6 @@ return (
 </div>
     )
 }
-{/* <div className="fixed bottom-20 right-2 w-1/2 px-4 ">
-        <h1 className="text-2xl font-bold mb-4">Lesson Planner</h1>
-    <div className="flex items-center space-x-4">
-        <textarea
-            className="flex-1 p-2 rounded-md bg-[#1D1F20] text-white resize-none"
-            rows='2'
-            placeholder="Enter your question here..."
-            value={input}
-            onChange={(e) => setInput(e.target.value)}>
-        </textarea>
-    <button
-    className="bg-rose-600 text-white p-1.5 rounded-full flex items-center justify-center"
-    onClick={handleSubmit}>
-        <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-7 w-7"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-        >
-    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12.414V14a1 1 0 11-2 0V5.586L5.707 9.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0l5 5a1 1 0 01-1.414 1.414L11 5.586z" clipRule="evenodd" />
-    </svg>
-    </button>
-    </div>
-</div> */}
 </div>
 </>
 );
