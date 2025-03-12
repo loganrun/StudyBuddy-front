@@ -9,6 +9,7 @@ const lessonUrl = import.meta.env.VITE_LESSON_URL
 
 const LessonPlanner = ({activeSmallScreenTab}) => {
 const [input, setInput] = useState('');
+const [isLoading, setIsLoading] = useState(false);
 const messages = useSelector((state) => state.lessons.lessons);
 // const [response, setResponse] = useState('');
 const dispatch = useDispatch();
@@ -66,8 +67,7 @@ const components = {
 
 const handleSubmit = async (e) => {
 e.preventDefault();
-  //setIsLoading(true);
-  //console.log(input)
+setIsLoading(true);
 dispatch(addLessons({ type: 'question', text: input }));
 dispatch(addLessons({ type: 'response', text: '' }));
 
@@ -78,11 +78,12 @@ try {
     const data = JSON.parse(event.data)
     if (data.content){
         dispatch(updateLastLesson({ text: data.content }));
-        //console.log(data.content)
+        
     }{
         if(data.done){
         setInput("")
         eventSource.close();
+        setIsLoading(false);
         
         }
     }
@@ -91,10 +92,12 @@ try {
     eventSource.onerror = (error) => {
     console.error('EventSource failed:', error);
     eventSource.close();
+    setIsLoading(false);
     }
     
 } catch (error) {
     console.error(error);
+    setIsLoading(false);
     
 }
 setInput('')
@@ -178,6 +181,11 @@ return (
 </div>
     )
 }
+{isLoading && (
+  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 ">
+    <div className="animate-spin h-14 w-14 border-t-4 border-b-4 rounded-full border-rose-600"></div>
+  </div>
+)}
 </div>
 </>
 );
