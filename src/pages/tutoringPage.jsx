@@ -29,7 +29,7 @@ function TutoringPage({socket}) {
   // For tablet and mobile: Single tab selection across all available tabs
   const [activeSmallScreenTab, setActiveSmallScreenTab] = useState("VideoChat");
   
-  // For large desktop: Separate tab selections for each section
+  // For large desktop: Separate tab selections for main content
   const [activeMainTab, setActiveMainTab] = useState("TextEditor");
   const [activeTutorTab, setActiveTutorTab] = useState("VideoChat");
 
@@ -47,7 +47,7 @@ function TutoringPage({socket}) {
     setIsModalOpen(false);
   };
 
-  // Desktop layout tabs for main content (Whiteboard/TextEditor)
+  // Desktop layout tabs for main content (Whiteboard/TextEditor) - first column for both user types
   const renderDesktopMainTabs = () => (
     <div className="w-full">
       <Tabs 
@@ -90,7 +90,7 @@ function TutoringPage({socket}) {
     </div>
   );
 
-  // Desktop layout tabs for tutor-specific content
+  // Desktop layout tabs for tutor's second column (VideoChat and LessonPlanner)
   const renderDesktopTutorTabs = () => (
     <Tabs 
       defaultValue='VideoChat'
@@ -130,7 +130,7 @@ function TutoringPage({socket}) {
       <TabsContent value="LessonPlanner" className="w-full">
         <Card className="border-0 w-full">
           <CardContent className="p-0 w-full">
-            <LessonPlanner activeSmallScreenTab={activeSmallScreenTab}/>
+            <LessonPlanner/>
           </CardContent>
         </Card>
       </TabsContent>
@@ -230,19 +230,28 @@ function TutoringPage({socket}) {
           
           {/* For large desktop screens only */}
           <div className="hidden lg:grid lg:grid-cols-2 gap-4 h-full">
+            {/* First column: WhiteBoard/TextEditor tabs for all users */}
             {renderDesktopMainTabs()}
+            
+            {/* Second column: Different for students and tutors */}
             {userType === 'tutor' ? (
+              // Tutor gets VideoChat/LessonPlanner tabs in second column
               renderDesktopTutorTabs()
             ) : (
-              <div className="flex items-center justify-center">
-                <VideoChat 
-                  roomID={roomId} 
-                  userId={id} 
-                  userType={userType} 
-                  isVideoOn={isVideoOn} 
-                  isMuted={isMuted} 
-                  isCalling={isCalling}
-                />
+              // Student always gets VideoChat component (no tabs) in second column
+              <div className="flex w-full">
+                <Card className="border-0 w-full">
+                  <CardContent className="p-0 w-full">
+                    <VideoChat 
+                      roomID={roomId} 
+                      userId={id} 
+                      userType={userType} 
+                      isVideoOn={isVideoOn} 
+                      isMuted={isMuted} 
+                      isCalling={isCalling}
+                    />
+                  </CardContent>
+                </Card>
               </div>
             )}
           </div>
@@ -272,5 +281,3 @@ function TutoringPage({socket}) {
 }
 
 export default TutoringPage
-
-
