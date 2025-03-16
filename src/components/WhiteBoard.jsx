@@ -145,6 +145,7 @@ const Whiteboard = ({ roomId }) => {
         points: [{ x: offsetX, y: offsetY }],
         color,
         lineWidth,
+        roomId
       };
       setCurrentStroke(newStroke);
       setIsDrawing(true);
@@ -234,25 +235,44 @@ const Whiteboard = ({ roomId }) => {
         const dx = offsetX - shapeStart.x;
         const dy = offsetY - shapeStart.y;
         const radius = Math.sqrt(dx * dx + dy * dy);
-        newItem = { id: generateId(), type: "circle", x: shapeStart.x, y: shapeStart.y, radius, color, lineWidth };
+        newItem = { 
+          id: generateId(), 
+          type: "circle", 
+          x: shapeStart.x, 
+          y: shapeStart.y, 
+          radius, 
+          color, 
+          lineWidth, 
+          roomId 
+        };
       } else {
         const dx = offsetX - shapeStart.x;
         const dy = offsetY - shapeStart.y;
         const size = Math.max(Math.abs(dx), Math.abs(dy));
         const x = dx < 0 ? shapeStart.x - size : shapeStart.x;
         const y = dy < 0 ? shapeStart.y - size : shapeStart.y;
-        newItem = { id: generateId(), type: "square", x, y, size, color, lineWidth };
+        newItem = { 
+          id: generateId(), 
+          type: "square", 
+          x, 
+          y, 
+          size, 
+          color, 
+          lineWidth,
+          roomId
+        };
       }
       setItems(prev => [...prev, newItem]);
       socketRef.current.emit('newItem', newItem);
       setShapeStart(null);
       redrawAll();
     } else if (currentTool === "select" && dragging) {
-      // Finalize selection movement.
       if (selectedItem) {
         const movedItem = items.find(item => item.id === selectedItem.id);
         if (movedItem) {
-          socketRef.current.emit('updateItem', movedItem);
+          // Add roomId to the moved item
+          const updatedItem = { ...movedItem, roomId };
+          socketRef.current.emit('updateItem', updatedItem);
         }
       }
       setDragging(false);
@@ -271,7 +291,7 @@ const Whiteboard = ({ roomId }) => {
   const commitText = () => {
     if (textInput.value.trim() === '') {
       setTextInput({ ...textInput, visible: false, value: '' });
-      return;
+      
     }
     const newTextItem = {
       id: generateId(),
@@ -280,7 +300,8 @@ const Whiteboard = ({ roomId }) => {
       y: textInput.y,
       text: textInput.value,
       color,
-      font: "16px sans-serif"
+      font: "16px sans-serif",
+      roomId
     };
     setItems(prev => [...prev, newTextItem]);
     socketRef.current.emit('newItem', newTextItem);
