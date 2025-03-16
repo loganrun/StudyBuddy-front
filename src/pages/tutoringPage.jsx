@@ -82,7 +82,7 @@ function TutoringPage({socket}) {
         <TabsContent value="WhiteBoard" className="w-full">
           <Card className="border-0 w-full">
             <CardContent className="p-0 w-full">
-              <Whiteboard socket={socket} id={documentId} roomId={roomId} />
+              <Whiteboard socket={socket} id={documentId} roomId={roomId} userType={userType} />
             </CardContent>
           </Card>
         </TabsContent>
@@ -193,7 +193,7 @@ function TutoringPage({socket}) {
           <TabsContent value="WhiteBoard" className="w-full">
             <Card className="border-0 w-full">
               <CardContent className="p-0 w-full">
-                <Whiteboard socket={socket} id={documentId} roomId={roomId} />
+                <Whiteboard socket={socket} id={documentId} roomId={roomId} userType={userType}/>
               </CardContent>
             </Card>
           </TabsContent>
