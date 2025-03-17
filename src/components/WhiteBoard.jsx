@@ -29,7 +29,7 @@ const Whiteboard = ({ roomId, userType }) => {
   const generateId = () => Date.now() + Math.random().toString(36).substr(2, 9);
 
   useEffect(() => {
-    socketRef.current = io('http://localhost:4000', { query: { roomId } });
+    socketRef.current = io('https://www.2sigmasolution.com', { query: { roomId } });
 
     const canvas = canvasRef.current;
     canvas.width = canvas.offsetWidth * 2;
