@@ -6,15 +6,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/Card'
 import {Sheet, SheetClose,SheetContent,SheetDescription,SheetFooter,SheetHeader,SheetTitle,SheetTrigger,} from "../components/Sheets"
 import { ScrollArea } from '../components/ScrollArea'
 import { Button } from '../components/Button';
-import { Play, ChevronDown, CircleArrowLeft, Trash2, CircleArrowLeftIcon } from 'lucide-react';
+import { CircleArrowLeftIcon } from 'lucide-react';
 import AudioPlayer from '../components/AudioPlayer'
 import { Link } from 'react-router-dom'
-import OpenAiInterface from '../components/OpenAiInterface'
-import Navbar from '../components/NavBar'
-import ConversationThread from '../components/ConversationThread'
-import TextEditor from '../components/TextEditor'
-import { updateLectures } from '../reducers/lecturesSlice'
-import axios from 'axios'
+//import { updateLectures } from '../reducers/lecturesSlice'
+//import axios from 'axios'
 import Alert from '../components/Alert'
 import OpenAIInterface from '../components/OpenAiInterface'
 
@@ -22,42 +18,42 @@ const notesApi = import.meta.env.VITE_NOTES_URL
 
 
 function study() {
-    const [isOpen, setIsOpen] = useState(false);
-    const [summaryIsOpen, setSummaryIsOpen] = useState(false);
+    //const [isOpen, setIsOpen] = useState(false);
+    //const [summaryIsOpen, setSummaryIsOpen] = useState(false);
     const params = useLocation()
-    const [newNotes, setNewNotes] = useState('')
+    //const [newNotes, setNewNotes] = useState('')
     const {url, subject, transcript, date, _id, notes, summary, roomId} = params.state;
-    const dispatch = useDispatch()
+    //const dispatch = useDispatch()
     const [alertMessage, setAlertMessage] = useState('');
     
-    const title = subject
+    //const title = subject
     //console.log(title)
     //console.log(notes)
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  const apiNotes = `${notesApi}${_id}`
-  try { 
-    const response = await axios({
-      method: "put",
-      url: apiNotes,
-      data: {
-        notes: newNotes
-      },
-      headers: {
-        "Content-Type": "application/json"
-      }
-    })
+// const handleSubmit = async (e) => {
+//   e.preventDefault();
+//   const apiNotes = `${notesApi}${_id}`
+//   try { 
+//     const response = await axios({
+//       method: "put",
+//       url: apiNotes,
+//       data: {
+//         notes: newNotes
+//       },
+//       headers: {
+//         "Content-Type": "application/json"
+//       }
+//     })
 
-    setAlertMessage('Notes Saved');
+//     setAlertMessage('Notes Saved');
 
-    dispatch(updateLectures(response.data))    
+//     dispatch(updateLectures(response.data))    
 
-  } catch (error) {
-    setAlertMessage(error.message)
-  }
+//   } catch (error) {
+//     setAlertMessage(error.message)
+//   }
   
-}
+// }
 
   return (
 <>
@@ -73,9 +69,9 @@ const handleSubmit = async (e) => {
               
             <h1 className="text-4xl font-bold mb-2 ">{subject} Notes</h1>
             </div>
-                <div className="grid grid-cols-1 lg: grid-cols-[1fr,2fr,1fr] gap-4">
+                <div className="grid grid-cols-1 lg:grid-cols-[1fr,2fr,1fr] gap-4">
                   <div>
-                    <Card className="w-full relative h-[calc(100vh-5rem)] border-0 bg-black">
+                    <Card className="w-full relative h-[calc(100vh-5rem)] border-0">
                       <CardHeader>
                         <CardTitle className="text-lg">Transcripts</CardTitle>
                       </CardHeader>
@@ -131,7 +127,7 @@ const handleSubmit = async (e) => {
                     </Card>
                   </div>
                   <div className="">
-                  <Card className="w-full  relative h-[calc(100vh-5rem)] bg-black border-0 pb-10"> 
+                  <Card className="w-full  relative h-[calc(100vh-5rem)] border-0 pb-10"> 
                     <CardContent className="">
                         <CardHeader>
                           <CardTitle className="text-lg">Chats</CardTitle>
@@ -141,7 +137,7 @@ const handleSubmit = async (e) => {
                   </Card>
                   </div>
                   <div className="">
-                  <Card className="w-full relative h-[calc(100vh-5rem)] border-0 bg-black">
+                  <Card className="w-full relative h-[calc(100vh-5rem)] border-0 ">
                   <CardContent className="">
                       <CardHeader>
                         <CardTitle className="text-lg">Notes</CardTitle>
