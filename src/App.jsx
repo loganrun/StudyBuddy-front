@@ -10,6 +10,7 @@ import Dashboard from './pages/dashboard'
 import Study from './pages/study'
 import TutorDashboard from './pages/tutorDashboard'
 import JoinSession from './pages/joinSession'
+import VoiceAgent from './pages/voiceAgent'
 import './App.css'
 
 function App() {
@@ -24,18 +25,21 @@ function App() {
       {/* <Route path="/login" element={<Login />} /> */}
       <Route path="/tutorlogin" element={<TutorLogin />} />
       <Route path="tutoring/:documentId/:roomId/:id/:userType" element={<TutoringPage />} />
+      <Route path="/voiceagent" element={<VoiceAgent />} />
         
         <Route path="/" element={<ProtectedRoutes userType="student" />}>
           <Route path='dashboard' element={<Dashboard/>}/>
           <Route path='record' element={<Main />} />
           <Route path='study' element={<Study/>} />
           <Route path='joinsession' element={<JoinSession/>} />
+          <Route path="/voiceagent" element={<VoiceAgent />} />
         </Route>
         
         <Route path="/" element={<ProtectedRoutes userType="teacher" />}>
           {/* <Route path="dashboard" element={<TeacherDashboard />} /> */}
           
           <Route path="tutordashboard" element={<TutorDashboard/>}/>
+          <Route path="/voiceagent" element={<VoiceAgent />} />
         </Route>
     </Routes>
     </>

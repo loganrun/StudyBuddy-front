@@ -68,6 +68,13 @@ function study() {
               </Link>
               
             <h1 className="text-4xl font-bold mb-2 ">{subject} Notes</h1>
+      <button
+        className="flex items-center justify-center px-6 py-3 bg-rose-600 text-white uppercase rounded-md hover:bg-gray-200 hover:text-rose-600 transition">
+          <Link to="/voiceAgent"> 
+          Talk to mel
+          </Link>
+        
+      </button>
             </div>
                 <div className="grid grid-cols-1 lg:grid-cols-[1fr,2fr,1fr] gap-4">
                   <div>
