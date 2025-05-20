@@ -4,6 +4,12 @@ import { useDispatch } from 'react-redux'
 import { useLocation } from 'react-router-dom'
 import { Card, CardContent, CardHeader, CardTitle } from '../components/Card'
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger, } from "../components/Sheets"
+
+
+
+
+
+
 import { ScrollArea } from '../components/ScrollArea'
 import { Button } from '../components/Button';
 import { CircleArrowLeftIcon } from 'lucide-react';
@@ -13,6 +19,7 @@ import { Link } from 'react-router-dom'
 //import axios from 'axios'
 import Alert from '../components/Alert'
 import OpenAIInterface from '../components/OpenAiInterface'
+import DownloadSources from '../components/DownloadSources'
 
 const notesApi = import.meta.env.VITE_NOTES_URL
 
@@ -64,9 +71,6 @@ function study() {
             <CircleArrowLeftIcon className='h-8 w-8 text-white' />
           </Link>
           <h1 className="text-2xl font-bold text-white">{subject} Notes</h1>
-          <button className="ml-auto flex items-center justify-center px-6 py-2 bg-rose-600 text-white uppercase rounded-md hover:bg-gray-200 hover:text-rose-600 transition">
-            <Link to="/voiceAgent">Talk to mel</Link>
-          </button>
         </div>
 
         <div className="flex gap-4 p-4 h-[calc(100vh-5rem)]">
@@ -78,6 +82,7 @@ function study() {
               </CardHeader>
               <CardContent className="p-4">
                 <div className="flex items-center space-x-2 mb-4">
+                  <DownloadSources />
                   <AudioPlayer audioUrl={url} />
                 </div>
                 <div className="space-y-2">
@@ -124,7 +129,14 @@ function study() {
           <div className="w-2/4">
             <Card className="h-full bg-slate-800 shadow-lg rounded-xl border border-slate-700">
               <CardHeader className="border-b border-slate-700">
-                <CardTitle className="text-lg text-white">Chat</CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-lg text-white">Chat</CardTitle>
+                  <Link to="/voiceAgent">
+                    <button className="flex items-center justify-center px-6 py-2 bg-rose-600 text-white uppercase rounded-md hover:bg-gray-200 hover:text-rose-600 transition">
+                      Talk to mel
+                    </button>
+                  </Link>
+                </div>
               </CardHeader>
               <CardContent className="p-4">
                 <OpenAIInterface roomId={roomId} />
