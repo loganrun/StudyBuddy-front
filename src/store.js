@@ -6,6 +6,8 @@ import openaiReducer from './reducers/openaiReducer';
 import conversationReducer from './reducers/conversationReducer';
 import tutorauthReducer from './reducers/tutorauthReducer';
 import lessonsReducer from './reducers/lessonsReducer';
+import docuploadReducer from './reducers/docsuploadreducer';
+
 const store = configureStore({
   reducer: {
     auth: authReducer,
@@ -15,6 +17,7 @@ const store = configureStore({
     conversation: conversationReducer,
     tutorauth: tutorauthReducer,
     lessons: lessonsReducer,
+    docupload: docuploadReducer,
   },
 });
 

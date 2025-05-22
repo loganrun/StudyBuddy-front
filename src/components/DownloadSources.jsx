@@ -13,6 +13,10 @@ import {
 import { Input } from "./Input";
 import { Label } from "./Label";
 import { cn } from "../../lib/utils";
+import { useDispatch } from 'react-redux';
+import { addDocument } from '../reducers/docsuploadreducer';
+import axios from 'axios';
+const docsuploadapi = import.meta.env.VITE_DOCS_UPLOAD_URL;
 
 const DownloadSources = () => {
     const [open, setOpen] = useState(false);
@@ -50,14 +54,12 @@ const DownloadSources = () => {
         formData.append('file', selectedFile);
 
         try {
-            const response = await fetch('/api/upload', {
-                method: 'POST',
-                body: formData,
-            });
+            const response = await axios.post(docsuploadapi, formData);
 
             if (response.ok) {
                 setOpen(false);
                 setSelectedFile(null);
+                dispatch(addDocument(response.data));
                 // You can add a success notification here
             } else {
                 setError('Failed to upload file. Please try again.');
