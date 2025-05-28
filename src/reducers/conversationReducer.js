@@ -3,6 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
   messages: [],
+  conversationId: null,
 };
 
 const conversationSlice = createSlice({
@@ -16,9 +17,11 @@ const conversationSlice = createSlice({
       state.messages = [];
     },
     updateLastMessage: (state, action) => {
+      console.log(action.payload)
       const lastMessage = state.messages[state.messages.length - 1];
       if (lastMessage && lastMessage.type === 'response') {
         lastMessage.text += action.payload.text;
+        state.conversationId = action.payload.conversationId;
       }
     },
   },
