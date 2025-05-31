@@ -44,13 +44,13 @@ const SimpleVoiceAssistant = () => {
         }, [agentTranscriptions, userTranscriptions]);
 
     return (
-            <div className="voice-assistant-container">
-            <div className="conversation">
+            <div className="flex flex-col items-center w-full max-w-[1200px] mx-auto p-5 h-full">
+            <div className="p-5 max-h-[300px] overflow-y-scroll w-full h-full rounded-lg mt-5 ">
                 {messages.map((msg, index) => (
                     <Message key={msg.id || index} type={msg.type} text={msg.text} />
                 ))}
             </div>
-            <div className="">
+            <div className="w-full max-w-[800px] h-[300px] mx-auto">
                 <BarVisualizer state={state} barCount={7} trackRef={audioTrack} />
             </div>
             {/* <div className="control-section">
