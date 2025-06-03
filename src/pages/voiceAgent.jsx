@@ -78,14 +78,14 @@ export default function VoiceAgentPage() {
 
 
   return (
-    <main className="flex items-center justify-center min-h-screen bg-slate-900">
+    <main className="flex items-center justify-center min-h-screen">
       <RoomContext.Provider value={room}>
-        <div className="w-full max-w-md mx-auto flex flex-col items-center p-4 bg-white/5 rounded-lg shadow-md space-y-6 pb-32">
+        <div className="w-full max-w-md mx-auto flex flex-col items-center p-4 rounded-lg  space-y-6 pb-32">
           <RoomAudioRenderer muted={isMuted} />
           {/* SimpleVoiceAssistant in its own card/box */}
-          <div className="">
-            <SimpleVoiceAssistant />
-          </div>
+
+          <SimpleVoiceAssistant />
+
           {/* <BarVisualizer
               state={state}
               barCount={5}
@@ -94,53 +94,30 @@ export default function VoiceAgentPage() {
               options={{ minHeight: 12 }}
             /> */}
         </div>
-        {/* Control bar anchored to the bottom */}
-        <div className="fixed bottom-0 left-0 w-full flex justify-center z-50 pointer-events-none">
-          <div className="w-full max-w-md flex flex-row items-center justify-center space-x-8 bg-white/90 dark:bg-gray-900/90 shadow-lg rounded-t-xl py-4 px-2 mb-4 pointer-events-auto">
-            <div className="flex flex-col items-center">
-              <button
-                onClick={onConnectButtonClicked}
-                className={`w-16 h-16 rounded-full flex items-center justify-center transition-colors mb-1 ${isConnected
-                  ? 'bg-red-100 text-red-600 hover:bg-red-200 dark:bg-red-900 dark:text-red-300 dark:hover:bg-red-800'
-                  : 'bg-green-100 text-green-600 hover:bg-green-200 dark:bg-green-900 dark:text-green-300 dark:hover:bg-green-800'
-                  }`}
-              >
-                {isConnected ? <StopCircle size={32} /> : <PlayCircle size={32} />}
-              </button>
-              <span className="text-sm">{isConnected ? 'Disconnect' : 'Connect'}</span>
-            </div>
-            <div className="flex flex-col items-center">
-              <button
-                // onClick={handleToggleListening}
-                disabled={!isConnected}
-                className={`w-16 h-16 rounded-full flex items-center justify-center transition-colors mb-1 ${!isConnected
-                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-gray-700 dark:text-gray-500'
-                  : isListening
-                    ? 'bg-red-100 text-red-600 hover:bg-red-200 dark:bg-red-900 dark:text-red-300 dark:hover:bg-red-800'
-                    : 'bg-blue-100 text-blue-600 hover:bg-blue-200 dark:bg-blue-900 dark:text-blue-300 dark:hover:bg-blue-800'
-                  }`}
-              >
-                {isListening ? <MicOff size={32} /> : <Mic size={32} />}
-              </button>
-              <span className="text-sm">{isListening ? 'Stop Listening' : 'Start Listening'}</span>
-            </div>
-            <div className="flex flex-col items-center">
-              <button
-                onClick={handleToggleMute}
-                disabled={!isConnected}
-                className={`w-16 h-16 rounded-full flex items-center justify-center transition-colors mb-1 ${!isConnected
-                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-gray-700 dark:text-gray-500'
-                  : isMuted
-                    ? 'bg-yellow-100 text-yellow-600 hover:bg-yellow-200 dark:bg-yellow-900 dark:text-yellow-300 dark:hover:bg-yellow-800'
-                    : 'bg-green-100 text-green-600 hover:bg-green-200 dark:bg-green-900 dark:text-green-300 dark:hover:bg-green-800'
-                  }`}
-              >
-                {isMuted ? <VolumeX size={32} /> : <Volume2 size={32} />}
-              </button>
-              <span className="text-sm">{isMuted ? 'Unmute' : 'Mute'}</span>
+        {/* Control panel: centered if not connected, fixed bottom if connected */}
+        {isConnected ? (
+          <div className="fixed bottom-0 left-0 w-full flex justify-center z-50 pointer-events-none">
+            <VoiceAgentControlPanel
+              isConnected={isConnected}
+              isListening={isListening}
+              isMuted={isMuted}
+              onConnectButtonClicked={onConnectButtonClicked}
+              onToggleMute={handleToggleMute}
+            />
+          </div>
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center z-40 pointer-events-none">
+            <div className="pointer-events-auto">
+              <VoiceAgentControlPanel
+                isConnected={isConnected}
+                isListening={isListening}
+                isMuted={isMuted}
+                onConnectButtonClicked={onConnectButtonClicked}
+                onToggleMute={handleToggleMute}
+              />
             </div>
           </div>
-        </div>
+        )}
       </RoomContext.Provider>
     </main>
   );
@@ -230,5 +207,62 @@ function onDeviceFailure(error) {
   // Display a user-friendly alert message.
   alert(
     "Error acquiring camera or microphone permissions. Please make sure you grant the necessary permissions in your browser and reload the tab."
+  );
+}
+
+function VoiceAgentControlPanel({
+  isConnected,
+  isListening,
+  isMuted,
+  onConnectButtonClicked,
+  onToggleMute
+}) {
+  return (
+    <div
+      className={`w-full max-w-md flex flex-row items-center justify-center space-x-8 bg-white/90 dark:bg-gray-900/90 shadow-lg rounded-xl py-4 px-2 pointer-events-auto transition-all duration-300`}
+    >
+      <div className="flex flex-col items-center">
+        <button
+          onClick={onConnectButtonClicked}
+          className={`w-16 h-16 rounded-full flex items-center justify-center transition-colors mb-1 ${isConnected
+            ? 'bg-red-100 text-red-600 hover:bg-red-200 dark:bg-red-900 dark:text-red-300 dark:hover:bg-red-800'
+            : 'bg-green-100 text-green-600 hover:bg-green-200 dark:bg-green-900 dark:text-green-300 dark:hover:bg-green-800'
+            }`}
+        >
+          {isConnected ? <StopCircle size={32} /> : <PlayCircle size={32} />}
+        </button>
+        <span className="text-sm">{isConnected ? 'Disconnect' : 'Connect'}</span>
+      </div>
+      <div className="flex flex-col items-center">
+        <button
+          // onClick={handleToggleListening}
+          disabled={!isConnected}
+          className={`w-16 h-16 rounded-full flex items-center justify-center transition-colors mb-1 ${!isConnected
+            ? 'bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-gray-700 dark:text-gray-500'
+            : isListening
+              ? 'bg-red-100 text-red-600 hover:bg-red-200 dark:bg-red-900 dark:text-red-300 dark:hover:bg-red-800'
+              : 'bg-blue-100 text-blue-600 hover:bg-blue-200 dark:bg-blue-900 dark:text-blue-300 dark:hover:bg-blue-800'
+            }`}
+        >
+          {isListening ? <MicOff size={32} /> : <Mic size={32} />}
+        </button>
+        <span className="text-sm">{isListening ? 'Stop Listening' : 'Start Listening'}</span>
+      </div>
+      <div className="flex flex-col items-center">
+        <button
+          onClick={onToggleMute}
+          disabled={!isConnected}
+          className={`w-16 h-16 rounded-full flex items-center justify-center transition-colors mb-1 ${!isConnected
+            ? 'bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-gray-700 dark:text-gray-500'
+            : isMuted
+              ? 'bg-yellow-100 text-yellow-600 hover:bg-yellow-200 dark:bg-yellow-900 dark:text-yellow-300 dark:hover:bg-yellow-800'
+              : 'bg-green-100 text-green-600 hover:bg-green-200 dark:bg-green-900 dark:text-green-300 dark:hover:bg-green-800'
+            }`}
+        >
+          {isMuted ? <VolumeX size={32} /> : <Volume2 size={32} />}
+        </button>
+        <span className="text-sm">{isMuted ? 'Unmute' : 'Mute'}</span>
+      </div>
+    </div>
   );
 }

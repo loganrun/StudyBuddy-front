@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { addMessage, updateLastMessage } from '../reducers/conversationReducer';
 import ReactMarkdown from 'react-markdown'
+import LoadingSpinner from './LoadingSpinner';
 //import { ScrollArea } from './ScrollArea';
 //import ConversationThread from './ConversationThread';
 //import Message from './Message';
@@ -80,7 +81,7 @@ const OpenAIInterface = () => {
         const data = JSON.parse(event.data)
         console.log(data)
         if (data.content) {
-          console.log(data)
+          //console.log(data)
           dispatch(updateLastMessage({ text: data.content, conversationId: data.conversationId }));
           //console.log(data.content)
         } {
@@ -112,11 +113,11 @@ const OpenAIInterface = () => {
   }, [messages]);
 
   // Loading spinner component
-  const LoadingSpinner = () => (
-    <div className="flex justify-center items-center my-4">
-      <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-rose-600"></div>
-    </div>
-  );
+  // const LoadingSpinner = () => (
+  //   <div className="flex justify-center items-center my-4">
+  //     <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-rose-600"></div>
+  //   </div>
+  // );
 
   return (
     <>
