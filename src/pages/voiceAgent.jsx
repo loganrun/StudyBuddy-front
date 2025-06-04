@@ -152,7 +152,7 @@ function VoiceAgentControlPanel({
 }) {
   return (
     <div
-      className={`w-full max-w-md flex flex-row items-center justify-center space-x-8 bg-white/90 dark:bg-gray-900/90 shadow-lg rounded-xl py-4 px-2 pointer-events-auto transition-all duration-300`}
+      className={`w-full max-w-2xl mx-auto flex flex-row items-center justify-center space-x-8 bg-white/90 dark:bg-gray-900/90 shadow-lg rounded-xl py-4 px-2 pointer-events-auto transition-all duration-300`}
     >
       <div className="flex flex-col items-center">
         <button

@@ -7,7 +7,7 @@ import conversationReducer from './reducers/conversationReducer';
 import tutorauthReducer from './reducers/tutorauthReducer';
 import lessonsReducer from './reducers/lessonsReducer';
 import docuploadReducer from './reducers/docsuploadreducer';
-import aiVoiceReducer from './reducers/agentVoiceReducer';
+
 
 const store = configureStore({
   reducer: {
@@ -19,7 +19,7 @@ const store = configureStore({
     tutorauth: tutorauthReducer,
     lessons: lessonsReducer,
     docupload: docuploadReducer,
-    aiVoice: aiVoiceReducer,
+    
   },
 });
 
