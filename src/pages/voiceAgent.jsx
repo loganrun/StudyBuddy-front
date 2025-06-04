@@ -15,7 +15,7 @@ import { Room, RoomEvent } from "livekit-client";
 import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { Mic, MicOff, Settings, Volume2, VolumeX, PlayCircle, StopCircle } from 'lucide-react';
-import SimpleVoiceAssistant from "../components/SimpleVoiceAssistant";
+
 
 const voiceAgentUrl = import.meta.env.VITE_VOICE_AGENT_URL
 
@@ -27,6 +27,7 @@ export default function VoiceAgentPage() {
   const [isListening, setIsListening] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [settingsData, setSettingsData] = useState({
     voiceType: 'neutral',
     responseSpeed: 1,
@@ -42,9 +43,11 @@ export default function VoiceAgentPage() {
       await room.disconnect(); // Correct: disconnect from the LiveKit room instance
       setIsConnected(false); // Update the connection state.  
       setIsListening(false); // Update the listening state.
+      setIsLoading(false);
     } else {
       try {
         // Fetch connection details (server URL, token) from the API route.
+        setIsLoading(true);
         const response = await axios.get(voiceAgentUrl)
         // Check if the response is valid and contains the expected data.
         const connectionDetailsData = await response.data;
@@ -80,19 +83,19 @@ export default function VoiceAgentPage() {
   return (
     <main className="flex items-center justify-center min-h-screen">
       <RoomContext.Provider value={room}>
-        <div className="w-full max-w-md mx-auto flex flex-col items-center p-4 rounded-lg  space-y-6 pb-32">
+        <div className="w-full max-w-2xl mx-auto flex flex-col items-center p-4 rounded-lg space-y-6">
           <RoomAudioRenderer muted={isMuted} />
-          {/* SimpleVoiceAssistant in its own card/box */}
-
-          <SimpleVoiceAssistant />
-
-          {/* <BarVisualizer
-              state={state}
-              barCount={5}
-              trackRef={audioTrack}
-              className="agent-visualizer w-24 gap-2"
-              options={{ minHeight: 12 }}
-            /> */}
+          {isConnected && (
+            <div
+              className="w-full max-w-2xl flex-1 overflow-y-auto"
+              style={{
+                maxHeight: 'calc(100vh - 10rem)', // 10rem = control panel + paddings, adjust as needed
+                paddingBottom: '6rem', // matches the control panel height
+              }}
+            >
+              <TranscriptionView />
+            </div>
+          )}
         </div>
         {/* Control panel: centered if not connected, fixed bottom if connected */}
         {isConnected ? (
@@ -125,77 +128,7 @@ export default function VoiceAgentPage() {
 
 
 
-// /**
-//  * Component rendering the core voice assistant UI elements.
-//  * @param {object} props - Component props.
-//  * @param {Function} props.onConnectButtonClicked - Callback function to initiate connection.
-//  */
 
-// function SimpleVoiceAssistant({ onConnectButtonClicked }) {
-// //   // Get the current state of the voice assistant from the LiveKit hook.
-//    const { state: agentState } = useVoiceAssistant();
-
-//    return (
-//     <>
-
-//        {/* Container for the transcription view */}
-//        <div className="w-3/4 lg:w-1/2 mx-auto h-full">
-//          <TranscriptionView />
-//        </div>
-
-//        {/* Renders audio tracks from the room */}
-//        <RoomAudioRenderer />
-//        {/* Shows notifications based on agent state */}
-//        <NoAgentNotification state={agentState} />
-//        {/* Fixed container for the control bar at the bottom */}
-//        <div className="fixed bottom-0 w-full px-4 py-2">
-//          <ControlBar />
-//       </div>
-//      </>
-//    );
-//  }
-
-// /**
-//  * Component rendering the bottom control bar with visualizer and buttons.
-//  */
-function ControlBar() {
-
-  const { state: agentState, audioTrack } = useVoiceAssistant();
-
-  return (
-    <div className="relative h-[100px]">
-      {/* Animate the appearance/disappearance of the control bar */}
-      <AnimatePresence>
-        {/* Show control bar only when connected/active */}
-        {agentState !== "disconnected" && agentState !== "connecting" && (
-          <motion.div
-            initial={{ opacity: 0, top: "10px" }}
-            animate={{ opacity: 1, top: 0 }}
-            exit={{ opacity: 0, top: "-10px" }}
-            transition={{ duration: 0.4, ease: [0.09, 1.04, 0.245, 1.055] }}
-            className="flex absolute w-full h-full justify-between px-8 sm:px-4"
-          >
-            {/* Audio visualizer for the agent's track */}
-            <BarVisualizer
-              state={agentState}
-              barCount={5}
-              trackRef={audioTrack} // Pass the agent's audio track
-              className="agent-visualizer w-24 gap-2"
-              options={{ minHeight: 12 }}
-            />
-            {/* Container for control buttons */}
-            <div className="flex items-center">
-              <VoiceAssistantControlBar controls={{ leave: false }} />
-              <DisconnectButton>
-                <CloseIcon />
-              </DisconnectButton>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-}
 
 /**
  * Handles errors related to accessing media devices (microphone/camera).
