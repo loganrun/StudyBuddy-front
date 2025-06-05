@@ -5,7 +5,7 @@ import axios from 'axios';
 import { deleteLecture } from '../reducers/lecturesSlice';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/Card'
 import { Button } from '../components/Button';
-import { Play, ChevronDown, Trash2 } from 'lucide-react';
+import { Play, ChevronDown, Trash2, MoreVertical } from 'lucide-react';
 import AudioPlayer from './AudioPlayer';
 
 const baseDeleteUrl = import.meta.env.VITE_DELETE_URL;
@@ -31,6 +31,9 @@ function DisplayLecture({ data }) {
   const [showModal, setShowModal] = useState(false);
   const dispatch = useDispatch();
   const [gradient, setGradient] = useState(gradientClasses[0]);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [isRenaming, setIsRenaming] = useState(false);
+  const [newSubject, setNewSubject] = useState(subject);
 
   useEffect(() => {
     setGradient(gradientClasses[Math.floor(Math.random() * gradientClasses.length)]);
@@ -50,10 +53,57 @@ function DisplayLecture({ data }) {
   return (
     <Card className={`w-full max-w-xs md:max-w-sm h-64 mx-auto mb-6 relative p-4 flex flex-col justify-between items-center aspect-[4/3] ${gradient}`}>
 
-      <CardHeader className="flex flex-col items-center justify-center space-y-2 pb-2 px-4 w-full">
-        <CardTitle className="text-lg md:text-xl font-medium line-clamp-2 w-full text-center text-white drop-shadow-md">
-          {subject}
-        </CardTitle>
+      <CardHeader className="flex flex-col items-center justify-center space-y-2 pb-2 px-4 w-full relative">
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="absolute top-0 right-0"
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
+          <MoreVertical className="h-4 w-4" />
+        </Button>
+        {menuOpen && (
+          <div className="absolute top-8 right-0 bg-white dark:bg-gray-800 rounded-md shadow-lg z-10 w-32">
+            <button 
+              className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
+              onClick={() => {
+                setIsRenaming(true);
+                setMenuOpen(false);
+              }}
+            >
+              Rename
+            </button>
+            <button 
+              className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-red-500"
+              onClick={() => {
+                setShowModal(true);
+                setMenuOpen(false);
+              }}
+            >
+              Delete
+            </button>
+          </div>
+        )}
+        {isRenaming ? (
+          <input
+            type="text"
+            value={newSubject}
+            onChange={(e) => setNewSubject(e.target.value)}
+            onBlur={() => setIsRenaming(false)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') setIsRenaming(false);
+            }}
+            className="text-lg md:text-xl font-medium w-full text-center bg-transparent text-white border-b border-white focus:outline-none"
+            autoFocus
+          />
+        ) : (
+          <CardTitle 
+            className="text-lg md:text-xl font-medium line-clamp-2 w-full text-center text-white drop-shadow-md"
+            onClick={() => setIsRenaming(true)}
+          >
+            {newSubject}
+          </CardTitle>
+        )}
         <div className="text-sm md:text-base text-white/90 bg-black/20 px-2 py-1 rounded-full text-center w-auto">
           {date}
         </div>
