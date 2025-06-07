@@ -30,7 +30,7 @@ export default function TranscriptionView() {
   // Render the list of transcriptions
   return (
     // Container div: full height, column layout, gap between items, vertical scroll
-    <div className="h-full flex flex-col gap-2 overflow-y-auto p-2"> {/* Added padding for better spacing */}
+    <div className="max-h-[calc(100vh-21rem)] flex flex-col gap-2 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] p-2"> {/* Added padding for better spacing */}
       {/* Map over the transcriptions array to render each segment */}
       {combinedTranscriptions.map((segment) => (
         // Each segment is a div with a unique ID and key

@@ -76,7 +76,7 @@ function study() {
               </CardHeader>
               <CardContent className="p-4">
                 <div className="flex items-center space-x-2 mb-4">
-                  <DownloadSources />
+                  {/* <DownloadSources /> */}
                   <AudioPlayer audioUrl={url} />
                 </div>
                 <div className="space-y-2">
