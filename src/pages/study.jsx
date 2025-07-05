@@ -14,6 +14,7 @@ import { Link } from 'react-router-dom'
 import Alert from '../components/Alert'
 import OpenAIInterface from '../components/OpenAiInterface'
 import DownloadSources from '../components/DownloadSources'
+import HomeworkUploader from '../components/HomeworkUploader';
 
 const notesApi = import.meta.env.VITE_NOTES_URL
 
@@ -145,7 +146,22 @@ function study() {
                 <CardTitle className="text-lg text-white">Notes</CardTitle>
               </CardHeader>
               <CardContent className="p-4">
-                {/* Add your notes content here */}
+                <Sheet>
+                  <SheetTrigger>
+                    <Button variant="outline" className="w-full justify-between hover:bg-slate-700 text-white border-slate-600">
+                      <h1 className='text-lg'>Upload Homework</h1>
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent side="right">
+                    <SheetHeader>
+                      <SheetTitle>Upload your homework</SheetTitle>
+                    </SheetHeader>
+                    <HomeworkUploader />
+                    <SheetFooter>
+                      <SheetClose>Close</SheetClose>
+                    </SheetFooter>
+                  </SheetContent>
+                </Sheet>
               </CardContent>
             </Card>
           </div>

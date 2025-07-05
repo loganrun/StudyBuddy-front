@@ -39,10 +39,13 @@
     "groq-sdk": "^0.3.3",
     "livekit-client": "^2.11.2",
     "lucide-react": "^0.428.0",
+    "mammoth": "^1.9.1",
+    "pdfjs-dist": "^5.3.31",
     "quill": "^2.0.2",
     "react": "^18.2.0",
     "react-cookie": "^7.1.0",
     "react-dom": "^18.2.0",
+    "react-dropzone": "^14.3.8",
     "react-icons": "^5.2.1",
     "react-markdown": "^9.0.3",
     "react-quilljs": "^2.0.0",
@@ -53,9 +56,11 @@
     "socket.io-client": "^4.7.5",
     "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7",
+    "tesseract.js": "^6.0.1",
     "tmp": "^0.2.3",
     "uuidv4": "^6.2.13",
-    "vite-plugin-node-polyfills": "^0.22.0"
+    "vite-plugin-node-polyfills": "^0.22.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@tailwindcss/forms": "^0.5.7",
@@ -69,6 +74,7 @@
     "eslint-plugin-react-refresh": "^0.4.6",
     "postcss": "^8.4.38",
     "tailwindcss": "^3.4.1",
-    "vite": "^5.2.0"
+    "vite": "^5.2.0",
+    "vite-plugin-static-copy": "^3.1.0"
   }
 }
