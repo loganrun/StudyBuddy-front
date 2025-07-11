@@ -184,15 +184,7 @@ const Study = () => {
       chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages]);
 
-  // const handleSendMessage = () => {
-  //   if (message.trim()) {
-  //     setMessages([...messages, 
-  //       { type: 'user', text: message },
-  //       { type: 'bot', text: "That's a great question! Let me help you with that... 📚" }
-  //     ]);
-  //     setMessage('');
-  //   }
-  // };
+ 
 
   const currentBg = backgrounds[background];
   const currentChar = characters[tysonCharacter];
@@ -238,7 +230,9 @@ const Study = () => {
       {/* Header */}
       <div className="relative z-10 flex items-center justify-between p-4 bg-white/20 backdrop-blur-md border-b border-white/30">
         <div className="flex items-center space-x-3">
+          <Link to="/dashboard">
           <ChevronLeft className="h-6 w-6 text-white cursor-pointer hover:scale-110 transition-transform" />
+          </Link>
           <div className="flex items-center space-x-2">
             <span className="text-4xl">{currentChar.emoji}</span>
             <div>

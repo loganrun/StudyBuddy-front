@@ -12,16 +12,13 @@ const baseDeleteUrl = import.meta.env.VITE_DELETE_URL;
 
 const gradientClasses = [
   "bg-gradient-to-r from-[#09203F] to-[#537895]",
-  //"bg-gradient-to-r from-[#FF6B6B] to-[#FFE66D]",
   "bg-gradient-to-r from-[#0F3460] to-[#16537e]",
   "bg-gradient-to-r from-[#FF8A80] to-[#FF5722]",
   "bg-gradient-to-r from-[#4A90E2] to-[#7BB3F0]",
-  // "bg-gradient-to-r from-pink-500 to-yellow-500",
   "bg-gradient-to-r from-green-400 to-blue-500",
   "bg-gradient-to-r from-purple-500 to-pink-500",
-  //"bg-gradient-to-r from-yellow-400 via-red-500 to-pink-500",
   "bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500",
-  // Add more as you like!
+
 ];
 
 function DisplayLecture({ data }) {
