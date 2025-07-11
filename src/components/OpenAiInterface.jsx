@@ -81,9 +81,9 @@ const OpenAIInterface = () => {
         const data = JSON.parse(event.data)
         console.log(data)
         if (data.content) {
-          //console.log(data)
+          console.log(data)
           dispatch(updateLastMessage({ text: data.content, conversationId: data.conversationId }));
-          //console.log(data.content)
+          console.log(data.content)
         } {
           if (data.done) {
             setInput("")

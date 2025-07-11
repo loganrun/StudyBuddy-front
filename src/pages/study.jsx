@@ -39,9 +39,9 @@ const Study = () => {
    const { url, subject, transcript, date, _id, notes, summary, roomId } = params.state;
   const dispatch = useDispatch();
   const chatEndRef = useRef(null);
-  // const [messages, setMessages] = useState([
-  //   { type: 'bot', text: "Hi! I'm Tyson, your learning buddy! What would you like to learn about today? 🚀" },
-  // ]);
+  const [welcome, setWelcome] = useState([
+    { type: 'bot', text: "Hi! I'm Tyson, your learning buddy! What would you like to learn about today? 🚀" },
+  ]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // Background themes
@@ -443,7 +443,7 @@ const Study = () => {
             </div>
           </div>
           
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] p-4 space-y-4">
             {messages.map((message, index) => (
               <div key={index} className={`flex ${message.type === 'question' ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-xs ${styles.borderRadius} ${styles.panelPadding} ${
@@ -451,15 +451,16 @@ const Study = () => {
                     ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white' 
                     : 'bg-gradient-to-r from-gray-100 to-gray-200 text-gray-800'
                 } shadow-lg`}>
-                  {message.type === 'bot' ? (
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-lg">{currentChar.emoji}</span>
-                      <span className="font-semibold text-sm">Tyson</span>
-                    </div>
-                  ) : (
+                  {message.type === 'question' ? (
                     <div className="flex items-center gap-2 mb-2 justify-end">
                       <span className="font-semibold text-sm text-white">You</span>
                       <span className="text-lg">{currentUser.emoji}</span>
+                    </div>
+                    
+                  ) : (
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-lg">{currentChar.emoji}</span>
+                      <span className="font-semibold text-sm">Tyson</span>
                     </div>
                   )}
                   <ReactMarkdown components={components}>{message.text}</ReactMarkdown>
@@ -473,11 +474,10 @@ const Study = () => {
             <div className="flex gap-2">
               <input
                 type="text"
-                value={message}
+                value={input}
                 onChange={(e) => setInput(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                                     placeholder={ageGroup === '1-5' ? "Ask me anything! 😊" : "What would you like to learn?"}
-                className={`flex-1 ${styles.borderRadius} px-4 py-3 border-2 border-gray-300 focus:border-blue-500 focus:outline-none ${styles.fontSize}`}
+                className={`flex-1 ${styles.borderRadius} text-black px-4 py-3 border-2 border-gray-300 focus:border-blue-500 focus:outline-none ${styles.fontSize}`}
               />
               <button
                 onClick={handleSubmit}
@@ -570,40 +570,41 @@ const Study = () => {
                 </div>
               </div>
               
-              <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                {messages.map((msg, index) => (
-                  <div key={index} className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`max-w-xs ${styles.borderRadius} ${styles.panelPadding} ${
-                      msg.type === 'user' 
-                        ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white' 
-                        : 'bg-gradient-to-r from-gray-100 to-gray-200 text-gray-800'
-                    } shadow-lg`}>
-                      {msg.type === 'bot' ? (
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="text-lg">{currentChar.emoji}</span>
-                          <span className="font-semibold text-sm">Tyson</span>
-                        </div>
-                      ) : (
-                        <div className="flex items-center gap-2 mb-2 justify-end">
-                          <span className="font-semibold text-sm text-white">You</span>
-                          <span className="text-lg">{currentUser.emoji}</span>
-                        </div>
-                      )}
-                      <p className={styles.fontSize}>{msg.text}</p>
+                <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] p-4 space-y-4">
+            {messages.map((message, index) => (
+              <div key={index} className={`flex ${message.type === 'question' ? 'justify-end' : 'justify-start'}`}>
+                <div className={`max-w-xs ${styles.borderRadius} ${styles.panelPadding} ${
+                  message.type === 'question' 
+                    ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white' 
+                    : 'bg-gradient-to-r from-gray-100 to-gray-200 text-gray-800'
+                } shadow-lg`}>
+                  {message.type === 'question' ? (
+                    <div className="flex items-center gap-2 mb-2 justify-end">
+                      <span className="font-semibold text-sm text-white">You</span>
+                      <span className="text-lg">{currentUser.emoji}</span>
                     </div>
-                  </div>
-                ))}
+                    
+                  ) : (
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-lg">{currentChar.emoji}</span>
+                      <span className="font-semibold text-sm">Tyson</span>
+                    </div>
+                  )}
+                  <ReactMarkdown components={components}>{message.text}</ReactMarkdown>
+                </div>
               </div>
+            ))}
+          </div>
+          <div ref={chatEndRef} />
               
               <div className={`${styles.panelPadding} border-t border-gray-200`}>
                 <div className="flex gap-2">
                   <input
                     type="text"
-                    value={message}
+                    value={input}
                     onChange={(e) => setInput(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                     placeholder={ageGroup === '1-5' ? "Ask me anything! 😊" : "What would you like to learn?"}
-                    className={`flex-1 ${styles.borderRadius} px-4 py-3 border-2 border-gray-300 focus:border-blue-500 focus:outline-none ${styles.fontSize}`}
+                    className={`flex-1 ${styles.borderRadius} text-black px-4 py-3 border-2 border-gray-300 focus:border-blue-500 focus:outline-none ${styles.fontSize}`}
                   />
                   <button
                     onClick={handleSubmit}
