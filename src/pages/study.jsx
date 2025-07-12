@@ -18,6 +18,7 @@ import ReactMarkdown from 'react-markdown'
 import LoadingSpinner from '../components/LoadingSpinner';
 import { useLocation } from 'react-router-dom'
 import { Link } from 'react-router-dom'
+import HomeworkUploader from '../components/HomeworkUploader';
 
 const openUrl = import.meta.env.VITE_OPENAI_URL
 
@@ -43,6 +44,9 @@ const Study = () => {
     { type: 'bot', text: "Hi! I'm Tyson, your learning buddy! What would you like to learn about today? 🚀" },
   ]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showUploader, setShowUploader] = useState(false);
+
+  
 
   // Background themes
   const backgrounds = {
@@ -339,6 +343,7 @@ const Study = () => {
 
       {/* Desktop Layout */}
       <div className="hidden lg:flex relative z-10 h-[calc(100vh-80px)] gap-4 p-4">
+       
         {/* Left Panel - Transcripts & Notes */}
         <div className={`w-1/4 bg-white/90 backdrop-blur-md ${styles.borderRadius} ${styles.panelPadding} shadow-xl border border-white/50 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]`}>
           <h2 className={`${styles.titleSize} font-bold text-gray-800 mb-4 flex items-center gap-2`}>
@@ -420,10 +425,12 @@ const Study = () => {
                 Chat with Tyson
               </h2>
               <div className="flex gap-2">
-                <button className={`${styles.buttonSize} ${styles.borderRadius} bg-gradient-to-r from-orange-400 to-red-500 text-white font-medium hover:scale-105 transition-transform shadow-lg flex items-center gap-2`}>
+                <button className={`${styles.buttonSize} ${styles.borderRadius} bg-gradient-to-r from-orange-400 to-red-500 text-white font-medium hover:scale-105 transition-transform shadow-lg flex items-center gap-2`}
+                onClick={ () => setShowUploader(!showUploader) }>
                   <Upload className="h-5 w-5" />
                   {ageGroup === '1-5' ? 'Homework Helper' : 'Homework Helper'}
                 </button>
+                
               <Link to="/voiceAgent">
                 <button 
                   disabled
@@ -434,6 +441,7 @@ const Study = () => {
               </Link>
                 
               </div>
+              
             </div>
           </div>
           
@@ -551,7 +559,10 @@ const Study = () => {
                   Tyson
                 </h2>
                 <div className="flex gap-2">
-                  <button className={`${styles.buttonSize} ${styles.borderRadius} bg-gradient-to-r from-orange-400 to-red-500 text-white font-medium hover:scale-105 transition-transform shadow-lg flex items-center gap-2`}>
+                  <button 
+                    className={`${styles.buttonSize} ${styles.borderRadius} bg-gradient-to-r from-orange-400 to-red-500 text-white font-medium hover:scale-105 transition-transform shadow-lg flex items-center gap-2`}
+                    onClick={() => setShowUploader(!showUploader)}
+                  >
                     <Upload className="h-4 w-4" />
                     {ageGroup === '1-5' ? 'Homework Helper' : 'Homework Helper'}
                   </button>
@@ -706,6 +717,29 @@ const Study = () => {
           )}
         </div>
       </div>
+
+      {/* HomeworkUploader Modal */}
+      {showUploader && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
+          <div className="relative w-full h-full max-w-6xl max-h-[90vh] m-4 bg-white rounded-lg shadow-2xl overflow-hidden">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white">
+              <h2 className="text-2xl font-bold text-gray-800">Homework Helper</h2>
+              <button
+                onClick={() => setShowUploader(false)}
+                className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+              >
+                <X className="h-6 w-6 text-gray-600" />
+              </button>
+            </div>
+            
+            {/* Modal Content */}
+            <div className="overflow-y-auto h-full pb-16">
+              <HomeworkUploader />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
