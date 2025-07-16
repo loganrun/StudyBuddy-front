@@ -20,6 +20,7 @@ import { useLocation } from 'react-router-dom'
 import { Link } from 'react-router-dom'
 import HomeworkUploader from '../components/HomeworkUploader';
 
+
 const openUrl = import.meta.env.VITE_OPENAI_URL
 
 
@@ -32,10 +33,10 @@ const Study = () => {
   const [message, setMessage] = useState('');
   const params = useLocation()
   const [input, setInput] = useState('');
-    const messages = useSelector((state) => state.conversation.messages);
-    const conversationId = useSelector((state) => state.conversation.conversationId);
-    const user = useSelector((state) => state.auth.user.payload.user);
-    const [response, setResponse] = useState('');
+  const messages = useSelector((state) => state.conversation.messages);
+  const conversationId = useSelector((state) => state.conversation.conversationId);
+  const user = useSelector((state) => state.auth.user.payload.user);
+  const [response, setResponse] = useState('');
   const [isLoading, setIsLoading] = useState(false);
    const { url, subject, transcript, date, _id, notes, summary, roomId } = params.state;
   const dispatch = useDispatch();

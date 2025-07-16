@@ -15,6 +15,8 @@ import {
   Menu,
   X
 } from 'lucide-react';
+import AddNotebook from '../components/AddNotebook';
+import { useDispatch, useSelector } from 'react-redux'
 
 const StudentDashboard = () => {
   const [darkMode, setDarkMode] = useState(false);
@@ -23,6 +25,8 @@ const StudentDashboard = () => {
   const [userAvatar, setUserAvatar] = useState('student');
   const [userName, setUserName] = useState('Alex'); // Added user name
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showAddNotebook, setShowAddNotebook] = useState(false);
+  const user = useSelector((state) => state.auth.user.payload.user);
 
   // Background themes
   const backgrounds = {
@@ -138,7 +142,7 @@ const StudentDashboard = () => {
   };
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br ${currentBg.gradient} relative overflow-hidden`}>
+    <div className={`min-h-screen bg-gradient-to-br ${currentBg.gradient} relative overflow-hidden `}>
       {/* Decorative Pattern Overlay */}
       <div className="absolute inset-0 opacity-10">
         <div className="text-6xl animate-pulse grid grid-cols-6 gap-8 p-8">
@@ -282,7 +286,7 @@ const StudentDashboard = () => {
         <div className={`${currentTheme.cardBg} backdrop-blur-md ${styles.borderRadius} ${styles.cardPadding} shadow-lg border ${currentTheme.panelBorder} mb-6`}>
           <div className="text-center">
             <h2 className={`${styles.titleSize} font-bold ${currentTheme.textPrimary} mb-2`}>
-              {ageGroup === '1-5' ? `Welcome back, ${userName}! 🌟` : `Welcome back, ${userName}!`}
+              {ageGroup === '1-5' ? `Welcome back, ${user.firstName}! 🌟` : `Welcome back, ${user.firstName}!`}
             </h2>
             <p className={`${currentTheme.textSecondary} ${styles.fontSize}`}>
               {ageGroup === '1-5' 
@@ -317,7 +321,7 @@ const StudentDashboard = () => {
         {/* Subjects Section */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
-            <h2 className={`${styles.titleSize} font-bold ${currentTheme.textPrimary}`}>My Subjects</h2>
+            <h2 className={`${styles.titleSize} font-bold ${currentTheme.textPrimary}`}>My WorkBooks</h2>
           </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -372,7 +376,10 @@ const StudentDashboard = () => {
             })}
             
             {/* Add New Subject Card */}
-            <div className={`${styles.borderRadius} ${currentTheme.cardBg} backdrop-blur-md border-2 border-dashed ${currentTheme.panelBorder} shadow-lg hover:scale-105 transition-all cursor-pointer group`}>
+            <div 
+              className={`${styles.borderRadius} ${currentTheme.cardBg} backdrop-blur-md border-2 border-dashed ${currentTheme.panelBorder} shadow-lg hover:scale-105 transition-all cursor-pointer group`}
+              onClick={() => setShowAddNotebook(true)}
+            >
               <div className={`${styles.cardPadding} text-center h-full flex flex-col justify-center items-center`}>
                 <Plus className={`h-12 w-12 ${currentTheme.textTertiary} group-hover:${currentTheme.textSecondary} transition-colors mb-4`} />
                 <h3 className={`${styles.cardTitleSize} font-bold ${currentTheme.textPrimary} mb-2`}>
@@ -406,6 +413,12 @@ const StudentDashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* AddNotebook Modal */}
+      <AddNotebook 
+        isOpen={showAddNotebook} 
+        onClose={() => setShowAddNotebook(false)} 
+      />
     </div>
   );
 };
