@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { X, BookOpen, User } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { addNotebook } from '../reducers/authReducer';
+import axios from 'axios';
 
 const AddNotebook = ({ isOpen, onClose }) => {
   const [formData, setFormData] = useState({
@@ -10,10 +13,14 @@ const AddNotebook = ({ isOpen, onClose }) => {
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.auth.user.payload.user);
+  const addNotebookUrl = import.meta.env.VITE_ADDNOTEBOOK_URL;
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     console.log('Input change:', { name, value }); // Debug log
+    
     setFormData(prev => {
       const newData = {
         ...prev,
@@ -28,6 +35,14 @@ const AddNotebook = ({ isOpen, onClose }) => {
       setErrors(prev => ({
         ...prev,
         [name]: ''
+      }));
+    }
+    
+    // Clear submit error when user makes changes
+    if (errors.submit) {
+      setErrors(prev => ({
+        ...prev,
+        submit: ''
       }));
     }
   };
@@ -47,7 +62,7 @@ const AddNotebook = ({ isOpen, onClose }) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!validateForm()) {
@@ -56,9 +71,30 @@ const AddNotebook = ({ isOpen, onClose }) => {
     
     setIsSubmitting(true);
     
-    // Simulate submission delay
-    setTimeout(() => {
-      // Navigate to study.jsx with the form data
+    try {
+      // Prepare submission data
+      const submissionData = {
+        name: formData.name,
+        subject: formData.subject,
+        owner: user.id
+      };
+
+      // Submit to backend
+      const response = await axios.post(addNotebookUrl, submissionData, {
+        // headers: {
+        //   'Content-Type': 'application/json',
+        //   'Accept': 'application/json',
+        // },
+        // withCredentials: true,
+        // timeout: 10000 // 10 second timeout
+      });
+
+      // Update Redux state - add new notebook to user.notebooks
+      const newNotebook = response.data;
+      console.log(newNotebook)
+      dispatch(addNotebook(newNotebook));
+
+      // Navigate to study page with the new notebook data
       navigate('/study', {
         state: {
           subject: formData.subject,
@@ -66,7 +102,7 @@ const AddNotebook = ({ isOpen, onClose }) => {
           url: '',
           transcript: '',
           date: new Date().toLocaleDateString(),
-          _id: `notebook_${Date.now()}`,
+          _id: newNotebook._id || `notebook_${Date.now()}`,
           notes: '',
           summary: '',
           roomId: `room_${Date.now()}`
@@ -78,7 +114,20 @@ const AddNotebook = ({ isOpen, onClose }) => {
       setErrors({});
       setIsSubmitting(false);
       onClose();
-    }, 500);
+
+    } catch (error) {
+      console.error('Error creating notebook:', error);
+      
+      if (error.code === 'ERR_NETWORK' || error.message.includes('CORS')) {
+        setErrors({ submit: 'CORS error: Please configure backend CORS settings or use a proxy.' });
+      } else if (error.response) {
+        setErrors({ submit: `Server error: ${error.response.data?.message || 'Failed to create notebook'}` });
+      } else {
+        setErrors({ submit: 'Network error: Please check your connection and try again.' });
+      }
+      
+      setIsSubmitting(false);
+    }
   };
 
   const handleClose = () => {
@@ -177,7 +226,17 @@ const AddNotebook = ({ isOpen, onClose }) => {
                   <button
                     key={subject}
                     type="button"
-                    onClick={() => setFormData(prev => ({ ...prev, subject }))}
+                    onClick={() => {
+                      setFormData(prev => ({ ...prev, subject }));
+                      // Clear subject error when selecting from suggestions
+                      if (errors.subject) {
+                        setErrors(prev => ({ ...prev, subject: '' }));
+                      }
+                      // Clear submit error when user makes changes
+                      if (errors.submit) {
+                        setErrors(prev => ({ ...prev, submit: '' }));
+                      }
+                    }}
                     className="px-3 py-1 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-full text-sm transition-colors"
                   >
                     {subject}
@@ -185,6 +244,16 @@ const AddNotebook = ({ isOpen, onClose }) => {
                 ))}
               </div>
             </div>
+
+            {/* Submission Error */}
+            {errors.submit && (
+              <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+                <p className="text-red-600 flex items-center gap-2">
+                  <span className="font-medium">⚠️</span>
+                  {errors.submit}
+                </p>
+              </div>
+            )}
           </form>
         </div>
 

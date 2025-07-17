@@ -13,7 +13,16 @@ import {
   Target,
   Clock,
   Menu,
-  X
+  X,
+  Languages,
+  Microscope,
+  Atom,
+  MapPin,
+  Landmark,
+  Camera,
+  Gamepad2,
+  Computer,
+  Dumbbell
 } from 'lucide-react';
 import AddNotebook from '../components/AddNotebook';
 import { useDispatch, useSelector } from 'react-redux'
@@ -123,13 +132,108 @@ const StudentDashboard = () => {
 
   const styles = ageStyles[ageGroup];
 
-  // Sample subjects with different colors
-  const subjects = [
-    { name: 'Math', icon: Calculator, gradient: 'from-blue-400 to-blue-600', date: 'Aug 26, 2024', progress: 85 },
-    { name: 'Reading', icon: BookOpen, gradient: 'from-orange-400 to-red-500', date: 'May 16, 2024', progress: 92 },
-    { name: 'Science', icon: Beaker, gradient: 'from-purple-400 to-pink-500', date: 'May 16, 2024', progress: 78 },
-    { name: 'Geography', icon: Globe, gradient: 'from-green-400 to-blue-500', date: 'May 16, 2024', progress: 65 },
-  ];
+  // Icon mapping for different subjects
+  const subjectIconMap = {
+    'Math': Calculator,
+    'Mathematics': Calculator,
+    'Algebra': Calculator,
+    'Geometry': Calculator,
+    'Calculus': Calculator,
+    'Statistics': Calculator,
+    'Reading': BookOpen,
+    'Literature': BookOpen,
+    'English': BookOpen,
+    'Language Arts': Languages,
+    'Spanish': Languages,
+    'French': Languages,
+    'German': Languages,
+    'Science': Beaker,
+    'Chemistry': Beaker,
+    'Physics': Atom,
+    'Biology': Microscope,
+    'Anatomy': Microscope,
+    'Botany': Microscope,
+    'Geography': Globe,
+    'History': Landmark,
+    'Social Studies': Globe,
+    'Civics': Landmark,
+    'Government': Landmark,
+    'Art': Palette,
+    'Drawing': Palette,
+    'Painting': Palette,
+    'Photography': Camera,
+    'Music': Music,
+    'Band': Music,
+    'Orchestra': Music,
+    'Computer Science': Computer,
+    'Programming': Computer,
+    'Technology': Computer,
+    'Physical Education': Dumbbell,
+    'PE': Dumbbell,
+    'Health': Dumbbell,
+    'Fitness': Dumbbell,
+    'Games': Gamepad2,
+    'Recreation': Gamepad2,
+    'default': BookOpen
+  };
+
+  // Gradient colors for different subjects
+  const subjectGradientMap = {
+    'Math': 'from-blue-400 to-blue-600',
+    'Mathematics': 'from-blue-400 to-blue-600',
+    'Algebra': 'from-blue-500 to-indigo-600',
+    'Geometry': 'from-cyan-400 to-blue-500',
+    'Calculus': 'from-indigo-400 to-blue-600',
+    'Statistics': 'from-blue-400 to-purple-500',
+    'Reading': 'from-orange-400 to-red-500',
+    'Literature': 'from-orange-400 to-red-500',
+    'English': 'from-orange-400 to-red-500',
+    'Language Arts': 'from-red-400 to-pink-500',
+    'Spanish': 'from-yellow-400 to-red-500',
+    'French': 'from-blue-400 to-purple-500',
+    'German': 'from-red-400 to-yellow-500',
+    'Science': 'from-purple-400 to-pink-500',
+    'Chemistry': 'from-purple-400 to-pink-500',
+    'Physics': 'from-indigo-400 to-purple-600',
+    'Biology': 'from-green-400 to-emerald-500',
+    'Anatomy': 'from-red-400 to-pink-500',
+    'Botany': 'from-green-400 to-teal-500',
+    'Geography': 'from-green-400 to-blue-500',
+    'History': 'from-yellow-400 to-orange-500',
+    'Social Studies': 'from-yellow-400 to-orange-500',
+    'Civics': 'from-blue-400 to-indigo-500',
+    'Government': 'from-slate-400 to-gray-600',
+    'Art': 'from-pink-400 to-purple-500',
+    'Drawing': 'from-purple-400 to-pink-500',
+    'Painting': 'from-pink-400 to-rose-500',
+    'Photography': 'from-gray-400 to-slate-600',
+    'Music': 'from-indigo-400 to-purple-600',
+    'Band': 'from-purple-400 to-indigo-600',
+    'Orchestra': 'from-violet-400 to-purple-600',
+    'Computer Science': 'from-cyan-400 to-blue-600',
+    'Programming': 'from-green-400 to-cyan-500',
+    'Technology': 'from-slate-400 to-blue-500',
+    'Physical Education': 'from-orange-400 to-red-600',
+    'PE': 'from-orange-400 to-red-600',
+    'Health': 'from-emerald-400 to-teal-500',
+    'Fitness': 'from-red-400 to-orange-500',
+    'Games': 'from-purple-400 to-indigo-600',
+    'Recreation': 'from-teal-400 to-cyan-500',
+    'default': 'from-gray-400 to-gray-600'
+  };
+
+  // Transform user.notebooks into subjects format
+  const subjects = user.notebooks ? user.notebooks.map(notebook => ({
+    name: notebook.name,
+    icon: subjectIconMap[notebook.subject] || subjectIconMap.default,
+    gradient: subjectGradientMap[notebook.subject] || subjectGradientMap.default,
+    date: new Date().toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric' 
+    }),
+    progress: Math.floor(Math.random() * 40) + 60 // Random progress between 60-100%
+  })) : [];
 
   const handleStartTutoring = (subject) => {
     console.log(`Starting tutoring for ${subject}`);
