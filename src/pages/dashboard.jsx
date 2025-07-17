@@ -25,7 +25,11 @@ import {
   Dumbbell
 } from 'lucide-react';
 import AddNotebook from '../components/AddNotebook';
-import { useDispatch, useSelector } from 'react-redux'
+import DeleteConfirmationDialog from '../components/DeleteConfirmationDialog';
+import { useDispatch, useSelector } from 'react-redux';
+import { deleteNotebook } from '../reducers/authReducer';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const StudentDashboard = () => {
   const [darkMode, setDarkMode] = useState(false);
@@ -35,6 +39,11 @@ const StudentDashboard = () => {
   const [userName, setUserName] = useState('Alex'); // Added user name
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showAddNotebook, setShowAddNotebook] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [notebookToDelete, setNotebookToDelete] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user.payload.user);
 
   // Background themes
@@ -225,6 +234,9 @@ const StudentDashboard = () => {
   // Transform user.notebooks into subjects format
   const subjects = user.notebooks ? user.notebooks.map(notebook => ({
     name: notebook.name,
+    subject: notebook.subject,
+    _id: notebook._id,
+    owner: notebook.owner,
     icon: subjectIconMap[notebook.subject] || subjectIconMap.default,
     gradient: subjectGradientMap[notebook.subject] || subjectGradientMap.default,
     date: new Date().toLocaleDateString('en-US', { 
@@ -232,12 +244,77 @@ const StudentDashboard = () => {
       month: 'short', 
       day: 'numeric' 
     }),
-    progress: Math.floor(Math.random() * 40) + 60 // Random progress between 60-100%
+    progress: Math.floor(Math.random() * 40) + 60, // Random progress between 60-100%
+    // Additional data for study page
+    url: notebook.url || '',
+    transcript: notebook.transcript || '',
+    notes: notebook.notes || '',
+    summary: notebook.summary || '',
+    roomId: notebook.roomId || `room_${notebook._id}_${Date.now()}`
   })) : [];
+
+  const handleCardClick = (subjectData) => {
+    console.log(`Opening notebook: ${subjectData.name}`);
+    // Navigate to study page with all notebook data
+    navigate('/study', {
+      state: {
+        subject: subjectData.subject,
+        name: subjectData.name,
+        url: subjectData.url,
+        transcript: subjectData.transcript,
+        date: subjectData.date,
+        _id: subjectData._id,
+        notes: subjectData.notes,
+        summary: subjectData.summary,
+        roomId: subjectData.roomId,
+        owner: subjectData.owner,
+        progress: subjectData.progress
+      }
+    });
+  };
 
   const handleStartTutoring = (subject) => {
     console.log(`Starting tutoring for ${subject}`);
     // Navigate to the Ask Tyson interface
+  };
+
+  const handleDeleteClick = (e, subject) => {
+    e.stopPropagation();
+    setNotebookToDelete(subject);
+    setShowDeleteDialog(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!notebookToDelete) return;
+    
+    setIsDeleting(true);
+    
+    try {
+      // TODO: Add API call to delete notebook from backend
+      // const deleteUrl = import.meta.env.VITE_DELETE_NOTEBOOK_URL;
+      // await axios.delete(`${deleteUrl}/${notebookToDelete._id}`);
+      
+      // Update Redux state
+      dispatch(deleteNotebook(notebookToDelete._id));
+      
+      // Close dialog and reset state
+      setShowDeleteDialog(false);
+      setNotebookToDelete(null);
+      setIsDeleting(false);
+      
+      console.log(`Notebook "${notebookToDelete.name}" deleted successfully`);
+      
+    } catch (error) {
+      console.error('Error deleting notebook:', error);
+      setIsDeleting(false);
+      // TODO: Show error message to user
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    setShowDeleteDialog(false);
+    setNotebookToDelete(null);
+    setIsDeleting(false);
   };
 
   const handleLogout = () => {
@@ -271,13 +348,14 @@ const StudentDashboard = () => {
         
         <div className="flex items-center gap-3">
           {/* Start Tutoring Button */}
-          <button 
-            onClick={() => handleStartTutoring('General')}
-            className={`px-4 py-2 text-base ${styles.borderRadius} bg-gradient-to-r from-blue-500 to-purple-600 text-white font-medium hover:scale-105 transition-transform shadow-lg flex items-center gap-2`}
-          >
-            <Target className="h-4 w-4" />
-            Start Tutoring
-          </button>
+          <Link to="/joinsession">
+            <button 
+              className={`px-4 py-2 text-base ${styles.borderRadius} bg-gradient-to-r from-blue-500 to-purple-600 text-white font-medium hover:scale-105 transition-transform shadow-lg flex items-center gap-2`}
+            >
+              <Target className="h-4 w-4" />
+              Start Tutoring
+            </button>
+          </Link>
 
           {/* Settings Menu */}
           <button 
@@ -436,13 +514,17 @@ const StudentDashboard = () => {
                 <div
                   key={index}
                   className={`${styles.borderRadius} bg-gradient-to-br ${subject.gradient} text-white shadow-lg hover:scale-105 transition-transform cursor-pointer relative overflow-hidden`}
-                  onClick={() => handleStartTutoring(subject.name)}
+                  onClick={() => handleCardClick(subject)}
                 >
                   <div className={`relative z-10 ${styles.cardPadding}`}>
                     <div className="flex items-center justify-between mb-4">
                       <IconComponent className="h-8 w-8" />
-                      <button className="p-1 rounded-full bg-white/20 hover:bg-white/30 transition-colors">
-                        <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                      <button 
+                        className="p-1 rounded-full bg-white/20 hover:bg-red-500/80 transition-colors group"
+                        onClick={(e) => handleDeleteClick(e, subject)}
+                        title="Delete notebook"
+                      >
+                        <svg className="h-4 w-4 group-hover:text-white" fill="currentColor" viewBox="0 0 20 20">
                           <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
                         </svg>
                       </button>
@@ -469,7 +551,7 @@ const StudentDashboard = () => {
                       className={`w-full ${styles.borderRadius} bg-white/20 hover:bg-white/30 text-white font-medium py-2 transition-colors`}
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleStartTutoring(subject.name);
+                        handleCardClick(subject);
                       }}
                     >
                       Start Learning
@@ -522,6 +604,15 @@ const StudentDashboard = () => {
       <AddNotebook 
         isOpen={showAddNotebook} 
         onClose={() => setShowAddNotebook(false)} 
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <DeleteConfirmationDialog
+        isOpen={showDeleteDialog}
+        onClose={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
+        notebookName={notebookToDelete?.name || ''}
+        isDeleting={isDeleting}
       />
     </div>
   );

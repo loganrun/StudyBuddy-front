@@ -33,8 +33,15 @@ const authSlice = createSlice({
         state.user.payload.user.notebooks.push(action.payload);
       }
     },
+    deleteNotebook: (state, action) => {
+      if (state.user && state.user.payload && state.user.payload.user && state.user.payload.user.notebooks) {
+        state.user.payload.user.notebooks = state.user.payload.user.notebooks.filter(
+          notebook => notebook._id !== action.payload
+        );
+      }
+    },
   },
 });
 
-export const { loginSuccess, loginError, logoutSuccess, logoutError, addNotebook } = authSlice.actions;
+export const { loginSuccess, loginError, logoutSuccess, logoutError, addNotebook, deleteNotebook } = authSlice.actions;
 export default authSlice.reducer;
