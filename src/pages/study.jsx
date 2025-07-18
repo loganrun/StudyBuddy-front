@@ -13,7 +13,7 @@ import {
   Smile
 } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux'
-import { addMessage, updateLastMessage } from '../reducers/conversationReducer';
+import { addMessage, updateLastMessage, clearMessages } from '../reducers/conversationReducer';
 import ReactMarkdown from 'react-markdown'
 import LoadingSpinner from '../components/LoadingSpinner';
 import { useLocation } from 'react-router-dom'
@@ -30,6 +30,7 @@ const Study = () => {
   const [background, setBackground] = useState('forest');
   const [tysonCharacter, setTysonCharacter] = useState('robot');
   const [userAvatar, setUserAvatar] = useState('student');
+  const [darkMode, setDarkMode] = useState(false);
   const [message, setMessage] = useState('');
   const params = useLocation()
   const [input, setInput] = useState('');
@@ -41,9 +42,6 @@ const Study = () => {
    const { url, subject, transcript, date, _id, notes, summary, roomId } = params.state;
   const dispatch = useDispatch();
   const chatEndRef = useRef(null);
-  const [welcome, setWelcome] = useState([
-    { type: 'bot', text: "Hi! I'm Tyson, your learning buddy! What would you like to learn about today? 🚀" },
-  ]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showUploader, setShowUploader] = useState(false);
 
@@ -96,6 +94,44 @@ const Study = () => {
     astronaut: { emoji: "👨‍🚀", name: "Astronaut", color: "text-purple-600" },
     superhero: { emoji: "🦸", name: "Superhero", color: "text-red-500" }
   };
+
+  // Dark mode theme configuration
+  const theme = {
+    light: {
+      panelBg: 'bg-white/90',
+      panelBorder: 'border-white/50',
+      headerBg: 'bg-white/95',
+      textPrimary: 'text-gray-800',
+      textSecondary: 'text-gray-600',
+      textTertiary: 'text-gray-500',
+      cardBg: 'bg-white/80',
+      settingsBg: 'bg-white/95',
+      settingsPanel: 'bg-gray-100',
+      settingsSelected: 'bg-blue-500 text-white',
+      chatBg: 'bg-white/90',
+      inputBg: 'bg-white',
+      inputBorder: 'border-gray-300',
+      inputText: 'text-black',
+    },
+    dark: {
+      panelBg: 'bg-gray-800/90',
+      panelBorder: 'border-gray-700/50',
+      headerBg: 'bg-gray-800/95',
+      textPrimary: 'text-white',
+      textSecondary: 'text-gray-300',
+      textTertiary: 'text-gray-400',
+      cardBg: 'bg-gray-700/80',
+      settingsBg: 'bg-gray-800/95',
+      settingsPanel: 'bg-gray-700',
+      settingsSelected: 'bg-blue-600 text-white',
+      chatBg: 'bg-gray-800/90',
+      inputBg: 'bg-gray-700',
+      inputBorder: 'border-gray-600',
+      inputText: 'text-white',
+    }
+  };
+
+  const currentTheme = darkMode ? theme.dark : theme.light;
 
   const components = {
     // Headings
@@ -189,6 +225,34 @@ const Study = () => {
       chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages]);
 
+    // Add greeting message when component loads if no messages exist or only has old greeting
+    useEffect(() => {
+      const hasGreeting = messages.some(msg => 
+        msg.type === 'response' && msg.text.includes("I'm Tyson, your friendly learning buddy")
+      );
+      
+      if (messages.length === 0 || (!hasGreeting && messages.length > 0)) {
+        // Clear existing messages if they don't contain our greeting
+        if (messages.length > 0 && !hasGreeting) {
+          dispatch(clearMessages());
+        }
+        
+        const greetingMessages = [
+          `Hi there! I'm Tyson, your friendly learning buddy! 🤖`,
+          `I see we're working on ${subject || 'something awesome'} today - that's fantastic! 📚`,
+          `I'm here to help you learn, answer questions, and make studying fun! What would you like to explore first? 🚀`
+        ];
+        
+        // Add greeting messages with a slight delay for natural feel
+        setTimeout(() => {
+          dispatch(addMessage({ 
+            type: 'response', 
+            text: greetingMessages.join('\n\n')
+          }));
+        }, 500);
+      }
+    }, [dispatch, messages, subject]);
+
  
 
   const currentBg = backgrounds[background];
@@ -233,16 +297,16 @@ const Study = () => {
       </div>
 
       {/* Header */}
-      <div className="relative z-10 flex items-center justify-between p-4 bg-white/20 backdrop-blur-md border-b border-white/30">
+      <div className={`relative z-10 flex items-center justify-between p-4 ${darkMode ? 'bg-slate-800/95' : 'bg-slate-100/95'} backdrop-blur-md border-b ${currentTheme.panelBorder}`}>
         <div className="flex items-center space-x-3">
           <Link to="/dashboard">
-          <ChevronLeft className="h-6 w-6 text-white cursor-pointer hover:scale-110 transition-transform" />
+          <ChevronLeft className={`h-6 w-6 ${currentTheme.textPrimary} cursor-pointer hover:scale-110 transition-transform`} />
           </Link>
           <div className="flex items-center space-x-2">
             <span className="text-4xl">{currentChar.emoji}</span>
             <div>
-              <h1 className={`${styles.titleSize} font-bold text-white`}>Ask Tyson</h1>
-              <p className="text-white/80 text-sm">Your Learning Buddy</p>
+              <h1 className={`${styles.titleSize} font-bold ${currentTheme.textPrimary}`}>Ask Tyson</h1>
+              <p className={`${currentTheme.textSecondary} text-sm`}>Your Learning Buddy</p>
             </div>
           </div>
         </div>
@@ -250,33 +314,53 @@ const Study = () => {
         {/* Settings Menu */}
         <button 
           onClick={() => setIsMenuOpen(!isMenuOpen)}
-          className="p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
+          className={`p-2 rounded-full ${currentTheme.panelBg} hover:scale-105 transition-all shadow-lg`}
         >
-          <Menu className="h-5 w-5 text-white" />
+          <Menu className={`h-5 w-5 ${currentTheme.textPrimary}`} />
         </button>
       </div>
 
       {/* Settings Panel */}
       {isMenuOpen && (
-        <div className="absolute top-0 right-0 w-80 h-full bg-white/95 backdrop-blur-md z-50 p-6 overflow-y-auto">
+        <div className={`absolute top-0 right-0 w-80 h-full ${currentTheme.settingsBg} backdrop-blur-md z-50 p-6 overflow-y-auto`}>
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-bold">Settings</h2>
+            <h2 className={`text-xl font-bold ${currentTheme.textPrimary}`}>Settings</h2>
             <button onClick={() => setIsMenuOpen(false)}>
-              <X className="h-6 w-6" />
+              <X className={`h-6 w-6 ${currentTheme.textPrimary}`} />
             </button>
+          </div>
+          
+          {/* Dark Mode Toggle */}
+          <div className="mb-6">
+            <h3 className={`font-semibold mb-3 ${currentTheme.textPrimary}`}>Theme</h3>
+            <div className="flex items-center justify-between">
+              <span className={currentTheme.textSecondary}>Dark Mode</span>
+              <button
+                onClick={() => setDarkMode(!darkMode)}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                  darkMode ? 'bg-blue-600' : 'bg-gray-300'
+                }`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    darkMode ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </div>
           </div>
           
           {/* Age Group Selection */}
           <div className="mb-6">
-            <h3 className="font-semibold mb-3">Age Group</h3>
+            <h3 className={`font-semibold mb-3 ${currentTheme.textPrimary}`}>Age Group</h3>
             <div className="space-y-2">
               {['1-5', '6-8'].map(age => (
                 <button
                   key={age}
                   onClick={() => setAgeGroup(age)}
                   className={`w-full p-3 rounded-xl text-left ${
-                    ageGroup === age ? 'bg-blue-500 text-white' : 'bg-gray-100'
-                  }`}
+                    ageGroup === age ? currentTheme.settingsSelected : currentTheme.settingsPanel
+                  } ${ageGroup === age ? '' : currentTheme.textPrimary}`}
                 >
                   Grades {age}
                 </button>
@@ -286,7 +370,7 @@ const Study = () => {
 
           {/* Background Selection */}
           <div className="mb-6">
-            <h3 className="font-semibold mb-3">Background Theme</h3>
+            <h3 className={`font-semibold mb-3 ${currentTheme.textPrimary}`}>Background Theme</h3>
             <div className="grid grid-cols-2 gap-2">
               {Object.entries(backgrounds).map(([key, bg]) => (
                 <button
@@ -304,18 +388,18 @@ const Study = () => {
 
           {/* Character Selection */}
           <div className="mb-6">
-            <h3 className="font-semibold mb-3">Choose Tyson</h3>
+            <h3 className={`font-semibold mb-3 ${currentTheme.textPrimary}`}>Choose Tyson</h3>
             <div className="grid grid-cols-2 gap-2">
               {Object.entries(characters).map(([key, char]) => (
                 <button
                   key={key}
                   onClick={() => setTysonCharacter(key)}
-                  className={`p-3 rounded-xl bg-gray-100 text-center ${
+                  className={`p-3 rounded-xl ${currentTheme.settingsPanel} text-center ${
                     tysonCharacter === key ? 'ring-4 ring-blue-500 bg-blue-50' : ''
                   }`}
                 >
                   <div className="text-2xl mb-1">{char.emoji}</div>
-                  <div className="text-xs font-medium">{char.name}</div>
+                  <div className={`text-xs font-medium ${currentTheme.textPrimary}`}>{char.name}</div>
                 </button>
               ))}
             </div>
@@ -323,18 +407,18 @@ const Study = () => {
 
           {/* User Avatar Selection */}
           <div className="mb-6">
-            <h3 className="font-semibold mb-3">Choose Your Avatar</h3>
+            <h3 className={`font-semibold mb-3 ${currentTheme.textPrimary}`}>Choose Your Avatar</h3>
             <div className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto">
               {Object.entries(userAvatars).map(([key, avatar]) => (
                 <button
                   key={key}
                   onClick={() => setUserAvatar(key)}
-                  className={`p-3 rounded-xl bg-gray-100 text-center ${
+                  className={`p-3 rounded-xl ${currentTheme.settingsPanel} text-center ${
                     userAvatar === key ? 'ring-4 ring-green-500 bg-green-50' : ''
                   }`}
                 >
                   <div className="text-2xl mb-1">{avatar.emoji}</div>
-                  <div className="text-xs font-medium">{avatar.name}</div>
+                  <div className={`text-xs font-medium ${currentTheme.textPrimary}`}>{avatar.name}</div>
                 </button>
               ))}
             </div>
@@ -346,15 +430,15 @@ const Study = () => {
       <div className="hidden lg:flex relative z-10 h-[calc(100vh-80px)] gap-4 p-4">
        
         {/* Left Panel - Transcripts & Notes */}
-        <div className={`w-1/4 bg-white/90 backdrop-blur-md ${styles.borderRadius} ${styles.panelPadding} shadow-xl border border-white/50 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]`}>
-          <h2 className={`${styles.titleSize} font-bold text-gray-800 mb-4 flex items-center gap-2`}>
+        <div className={`w-1/4 ${currentTheme.panelBg} backdrop-blur-md ${styles.borderRadius} ${styles.panelPadding} shadow-xl border ${currentTheme.panelBorder} overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]`}>
+          <h2 className={`${styles.titleSize} font-bold ${currentTheme.textPrimary} mb-4 flex items-center gap-2`}>
             <FileText className={styles.iconSize} />
             Resources
           </h2>
           
           <div className={styles.spacing}>
             <div className="space-y-3">
-              <h3 className="font-semibold text-gray-700 flex items-center gap-2">
+              <h3 className={`font-semibold ${currentTheme.textSecondary} flex items-center gap-2`}>
                 <BookOpen className="h-5 w-5" />
                 References
               </h3>
@@ -372,11 +456,11 @@ const Study = () => {
                   >
                     <div className="flex items-center gap-2 mb-1">
                       <span className="text-lg">{item.emoji}</span>
-                      <span className={`font-medium text-gray-800 ${ageGroup === '1-5' ? 'text-sm' : 'text-xs'}`}>
+                      <span className={`font-medium ${currentTheme.textPrimary} ${ageGroup === '1-5' ? 'text-sm' : 'text-xs'}`}>
                         {item.title}
                       </span>
                     </div>
-                    <div className={`text-gray-500 ${ageGroup === '1-5' ? 'text-xs' : 'text-xs'}`}>
+                    <div className={`${currentTheme.textSecondary} ${ageGroup === '1-5' ? 'text-xs' : 'text-xs'}`}>
                       {item.date}
                     </div>
                   </button>
@@ -385,7 +469,7 @@ const Study = () => {
             </div>
 
             <div className="space-y-3">
-              <h3 className="font-semibold text-gray-700 flex items-center gap-2">
+              <h3 className={`font-semibold ${currentTheme.textSecondary} flex items-center gap-2`}>
                 <BookOpen className="h-5 w-5" />
                 Notes
               </h3>
@@ -403,11 +487,11 @@ const Study = () => {
                   >
                     <div className="flex items-center gap-2 mb-1">
                       <span className="text-lg">{item.emoji}</span>
-                      <span className={`font-medium text-gray-800 ${ageGroup === '1-5' ? 'text-sm' : 'text-xs'}`}>
+                      <span className={`font-medium ${currentTheme.textPrimary} ${ageGroup === '1-5' ? 'text-sm' : 'text-xs'}`}>
                         {item.title}
                       </span>
                     </div>
-                    <div className={`text-gray-500 ${ageGroup === '1-5' ? 'text-xs' : 'text-xs'}`}>
+                    <div className={`${currentTheme.textSecondary} ${ageGroup === '1-5' ? 'text-xs' : 'text-xs'}`}>
                       {item.date}
                     </div>
                   </button>
@@ -418,10 +502,10 @@ const Study = () => {
         </div>
 
         {/* Center Panel - Chat */}
-        <div className={`w-1/2 bg-white/90 backdrop-blur-md ${styles.borderRadius} shadow-xl border border-white/50 flex flex-col`}>
-          <div className={`${styles.panelPadding} border-b border-gray-200`}>
+        <div className={`w-1/2 ${currentTheme.chatBg} backdrop-blur-md ${styles.borderRadius} shadow-xl border ${currentTheme.panelBorder} flex flex-col`}>
+          <div className={`${styles.panelPadding} border-b ${currentTheme.panelBorder}`}>
             <div className="flex items-center justify-between">
-              <h2 className={`${styles.titleSize} font-bold text-gray-800 flex items-center gap-2`}>
+              <h2 className={`${styles.titleSize} font-bold ${currentTheme.textPrimary} flex items-center gap-2`}>
                 <span className="text-2xl">{currentChar.emoji}</span>
                 Chat with Tyson
               </h2>
@@ -473,14 +557,14 @@ const Study = () => {
           </div>
           <div ref={chatEndRef} />
           
-          <div className={`${styles.panelPadding} border-t border-gray-200`}>
+          <div className={`${styles.panelPadding} border-t ${currentTheme.panelBorder}`}>
             <div className="flex gap-2">
               <input
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                                     placeholder={ageGroup === '1-5' ? "Ask me anything! 😊" : "What would you like to learn?"}
-                className={`flex-1 ${styles.borderRadius} text-black px-4 py-3 border-2 border-gray-300 focus:border-blue-500 focus:outline-none ${styles.fontSize}`}
+                className={`flex-1 ${styles.borderRadius} ${currentTheme.inputText} ${currentTheme.inputBg} px-4 py-3 border-2 ${currentTheme.inputBorder} focus:border-blue-500 focus:outline-none ${styles.fontSize}`}
               />
               <button
                 onClick={handleSubmit}
@@ -493,8 +577,8 @@ const Study = () => {
         </div>
 
         {/* Right Panel - Progress & Rewards */}
-        <div className={`w-1/4 bg-white/90 backdrop-blur-md ${styles.borderRadius} ${styles.panelPadding} shadow-xl border border-white/50`}>
-          <h2 className={`${styles.titleSize} font-bold text-gray-800 mb-4 flex items-center gap-2`}>
+        <div className={`w-1/4 ${currentTheme.panelBg} backdrop-blur-md ${styles.borderRadius} ${styles.panelPadding} shadow-xl border ${currentTheme.panelBorder}`}>
+          <h2 className={`${styles.titleSize} font-bold ${currentTheme.textPrimary} mb-4 flex items-center gap-2`}>
             <Star className={styles.iconSize} />
             {ageGroup === '1-5' ? 'My Progress' : 'Achievement Center'}
           </h2>
@@ -526,7 +610,7 @@ const Study = () => {
       {/* Mobile/Tablet Layout */}
       <div className="lg:hidden relative z-10 h-[calc(100vh-80px)]">
         {/* Tab Navigation */}
-        <div className="bg-white/90 backdrop-blur-md flex border-b border-white/30">
+        <div className={`${currentTheme.panelBg} backdrop-blur-md flex border-b ${currentTheme.panelBorder}`}>
           {[
             { id: 'chat', label: 'Chat', icon: currentChar.emoji },
             { id: 'resources', label: 'Resources', icon: '📚' },
@@ -538,7 +622,7 @@ const Study = () => {
               className={`flex-1 ${styles.panelPadding} text-center transition-all ${
                 activePanel === tab.id 
                   ? 'bg-blue-500 text-white shadow-lg' 
-                  : 'text-gray-600 hover:bg-white/50'
+                  : `${currentTheme.textSecondary} hover:${currentTheme.panelBg}`
               }`}
             >
               <div className="text-2xl mb-1">{tab.icon}</div>
@@ -553,9 +637,9 @@ const Study = () => {
         <div className="h-full overflow-hidden">
           {/* Chat Panel */}
           {activePanel === 'chat' && (
-            <div className="h-full bg-white/90 backdrop-blur-md flex flex-col">
-              <div className={`${styles.panelPadding} border-b border-gray-200 flex justify-between items-center`}>
-                <h2 className={`${styles.titleSize} font-bold text-gray-800 flex items-center gap-2`}>
+            <div className={`h-full ${currentTheme.chatBg} backdrop-blur-md flex flex-col`}>
+              <div className={`${styles.panelPadding} border-b ${currentTheme.panelBorder} flex justify-between items-center`}>
+                <h2 className={`${styles.titleSize} font-bold ${currentTheme.textPrimary} flex items-center gap-2`}>
                   <span className="text-2xl">{currentChar.emoji}</span>
                   Tyson
                 </h2>
@@ -603,14 +687,14 @@ const Study = () => {
           </div>
           <div ref={chatEndRef} />
               
-              <div className={`${styles.panelPadding} border-t border-gray-200`}>
+              <div className={`${styles.panelPadding} border-t ${currentTheme.panelBorder}`}>
                 <div className="flex gap-2">
                   <input
                     type="text"
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     placeholder={ageGroup === '1-5' ? "Ask me anything! 😊" : "What would you like to learn?"}
-                    className={`flex-1 ${styles.borderRadius} text-black px-4 py-3 border-2 border-gray-300 focus:border-blue-500 focus:outline-none ${styles.fontSize}`}
+                    className={`flex-1 ${styles.borderRadius} ${currentTheme.inputText} ${currentTheme.inputBg} px-4 py-3 border-2 ${currentTheme.inputBorder} focus:border-blue-500 focus:outline-none ${styles.fontSize}`}
                   />
                   <button
                     onClick={handleSubmit}
@@ -625,10 +709,10 @@ const Study = () => {
 
           {/* Resources Panel */}
           {activePanel === 'resources' && (
-            <div className={`h-full bg-white/90 backdrop-blur-md ${styles.panelPadding} overflow-y-auto`}>
+            <div className={`h-full ${currentTheme.panelBg} backdrop-blur-md ${styles.panelPadding} overflow-y-auto`}>
               <div className={styles.spacing}>
                 <div className="space-y-4">
-                  <h3 className="font-bold text-gray-700 flex items-center gap-2">
+                  <h3 className={`font-bold ${currentTheme.textPrimary} flex items-center gap-2`}>
                     <BookOpen className="h-6 w-6" />
                     Transcripts
                   </h3>
@@ -646,11 +730,11 @@ const Study = () => {
                       >
                         <div className="flex items-center gap-2 mb-1">
                           <span className="text-lg">{item.emoji}</span>
-                          <span className={`font-medium text-gray-800 ${ageGroup === '1-5' ? 'text-base' : 'text-sm'}`}>
+                          <span className={`font-medium ${currentTheme.textPrimary} ${ageGroup === '1-5' ? 'text-base' : 'text-sm'}`}>
                             {item.title}
                           </span>
                         </div>
-                        <div className={`text-gray-500 ${ageGroup === '1-5' ? 'text-sm' : 'text-xs'}`}>
+                        <div className={`${currentTheme.textSecondary} ${ageGroup === '1-5' ? 'text-sm' : 'text-xs'}`}>
                           {item.date}
                         </div>
                       </button>
@@ -659,7 +743,7 @@ const Study = () => {
                 </div>
 
                 <div className="space-y-4">
-                  <h3 className="font-bold text-gray-700 flex items-center gap-2">
+                  <h3 className={`font-bold ${currentTheme.textPrimary} flex items-center gap-2`}>
                     <BookOpen className="h-6 w-6" />
                     Notes
                   </h3>
@@ -677,11 +761,11 @@ const Study = () => {
                       >
                         <div className="flex items-center gap-2 mb-1">
                           <span className="text-lg">{item.emoji}</span>
-                          <span className={`font-medium text-gray-800 ${ageGroup === '1-5' ? 'text-base' : 'text-sm'}`}>
+                          <span className={`font-medium ${currentTheme.textPrimary} ${ageGroup === '1-5' ? 'text-base' : 'text-sm'}`}>
                             {item.title}
                           </span>
                         </div>
-                        <div className={`text-gray-500 ${ageGroup === '1-5' ? 'text-sm' : 'text-xs'}`}>
+                        <div className={`${currentTheme.textSecondary} ${ageGroup === '1-5' ? 'text-sm' : 'text-xs'}`}>
                           {item.date}
                         </div>
                       </button>
@@ -694,7 +778,7 @@ const Study = () => {
 
           {/* Progress Panel */}
           {activePanel === 'progress' && (
-            <div className={`h-full bg-white/90 backdrop-blur-md ${styles.panelPadding} overflow-y-auto`}>
+            <div className={`h-full ${currentTheme.panelBg} backdrop-blur-md ${styles.panelPadding} overflow-y-auto`}>
               <div className={styles.spacing}>
                 <div className={`${styles.borderRadius} bg-gradient-to-r from-yellow-400 to-orange-500 text-white p-4 text-center`}>
                   <Award className="h-8 w-8 mx-auto mb-2" />
