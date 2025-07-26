@@ -268,7 +268,8 @@ const StudentDashboard = () => {
         summary: subjectData.summary,
         roomId: subjectData.roomId,
         owner: subjectData.owner,
-        progress: subjectData.progress
+        progress: subjectData.progress,
+        userId: user.id
       }
     });
   };

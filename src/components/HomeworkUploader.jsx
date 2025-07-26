@@ -4,11 +4,15 @@ import * as pdfjsLib from 'pdfjs-dist';
 import * as mammoth from 'mammoth';
 import * as XLSX from 'xlsx';
 import Tesseract from 'tesseract.js';
+import axios from 'axios';
+import HomeworkDetailsDialog from './HomeworkDetailsDialog';
+import { useDispatch, useSelector } from 'react-redux'
+import { addMessage, updateLastMessage, clearMessages } from '../reducers/conversationReducer';
 
 // Set up PDF.js worker locally
 pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
 
-const HomeworkUploader = () => {
+const HomeworkUploader = (props) => {
   const [extractedText, setExtractedText] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState('');
@@ -16,6 +20,14 @@ const HomeworkUploader = () => {
   const [fileType, setFileType] = useState('');
   const [ocrProgress, setOcrProgress] = useState(0);
   const [processingStep, setProcessingStep] = useState('');
+  const [showDetailsDialog, setShowDetailsDialog] = useState(false);
+  const [isSubmittingHomework, setIsSubmittingHomework] = useState(false);
+  const [homeworkResult, setHomeworkResult] = useState(null);
+  const [uploadedFile, setUploadedFile] = useState(null);
+  const addHomeworkUrl = import.meta.env.VITE_ADDHOMEWORK_URL ;
+  const {id, userId} = props
+  const dispatch = useDispatch();
+  
 
   // Extract text from PDF files (with OCR fallback for image-based PDFs)
   const extractTextFromPDF = async (file) => {
@@ -199,6 +211,7 @@ const HomeworkUploader = () => {
 
       setFileType(detectedFileType);
       setExtractedText(extractedText);
+      setUploadedFile(file);
       setProcessingStep('Complete!');
       
     } catch (err) {
@@ -253,6 +266,46 @@ const HomeworkUploader = () => {
     maxSize: 2 * 1024 * 1024 
   });
 
+  const handleHomeworkSubmit = async (submissionData) => {
+    //console.log(submissionData);
+    setIsSubmittingHomework(true);
+    
+    try {
+      // Create JSON payload with all necessary data
+      const payload = {
+        studentInfo: submissionData.studentInfo,
+        llmPrompt: submissionData.llmPrompt,
+        userId: userId, 
+      };
+
+      //console.log(payload)
+      
+      const notebookId = id;
+      
+      // Send JSON payload to backend
+      const response = await axios.post(`${addHomeworkUrl}/${notebookId}`, payload, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      //console.log(response.data.data.content);
+      const data = response.data;
+      // console.log(data);
+
+      if (data && data.content) {
+        dispatch(addMessage({ type: 'response', text: data.content, conversationId: data.conversationId, origin: 'homework'}));
+        setShowDetailsDialog(false);
+      }
+
+    } catch (err) {
+      console.log('Error submitting homework:', err);
+      setError('Failed to process homework. Please try again.');
+      setShowDetailsDialog(false);
+    } finally {
+      setIsSubmittingHomework(false);
+    }
+  };
+
   const clearResults = () => {
     setExtractedText('');
     setError('');
@@ -260,6 +313,9 @@ const HomeworkUploader = () => {
     setFileType('');
     setOcrProgress(0);
     setProcessingStep('');
+    setShowDetailsDialog(false);
+    setHomeworkResult(null);
+    setUploadedFile(null);
   };
 
   const getSupportedFormats = () => {
@@ -275,7 +331,46 @@ const HomeworkUploader = () => {
 
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white">
-      <h1 className="text-3xl font-bold text-gray-800 mb-6">Universal Document Text Extractor</h1>
+      <h1 className="text-3xl font-bold text-gray-800 mb-6">Homework Helper</h1>
+      
+      {/* Homework Result Display */}
+      {homeworkResult && (
+        <div className="mb-6 p-6 bg-green-50 border border-green-200 rounded-lg">
+          <h2 className="text-xl font-semibold text-green-800 mb-4 flex items-center gap-2">
+            <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+            </svg>
+            Homework Help Ready!
+          </h2>
+          
+          <div className="bg-white p-4 rounded-lg mb-4">
+            <h3 className="font-semibold text-gray-800 mb-2">AI Response:</h3>
+            <p className="text-gray-700 mb-4">{homeworkResult.response}</p>
+            
+            <div className="bg-gray-50 p-3 rounded text-sm">
+            
+              {/* <p><strong>Subject:</strong> {homeworkResult.submissionData.studentInfo.subject}</p> */}
+              <p><strong>Grade:</strong> {homeworkResult.submissionData.studentInfo.gradeLevel}</p>
+              <p><strong>Help Type:</strong> {homeworkResult.submissionData.studentInfo.helpType}</p>
+            </div>
+          </div>
+          
+          <div className="flex gap-2">
+            <button
+              onClick={() => setHomeworkResult(null)}
+              className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+            >
+              Get More Help
+            </button>
+            <button
+              onClick={clearResults}
+              className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
+            >
+              Start Over
+            </button>
+          </div>
+        </div>
+      )}
       
       {/* Supported formats info */}
       <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
@@ -349,6 +444,7 @@ const HomeworkUploader = () => {
         <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
           <p className="text-red-700">{error}</p>
         </div>
+        
       )}
 
       {/* Results */}
@@ -376,13 +472,13 @@ const HomeworkUploader = () => {
           </div>
           
           <div className="mt-4 flex gap-2">
-            <button
+            {/* <button
               onClick={() => navigator.clipboard.writeText(extractedText)}
               className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
             >
               Copy to Clipboard
-            </button>
-            <button
+            </button> */}
+            {/* <button
               onClick={() => {
                 const blob = new Blob([extractedText], { type: 'text/plain' });
                 const url = URL.createObjectURL(blob);
@@ -394,11 +490,28 @@ const HomeworkUploader = () => {
               }}
               className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
             >
-              Download
+              Download Text
+            </button> */}
+            <button
+              onClick={() => setShowDetailsDialog(true)}
+              className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors font-semibold"
+            >
+              Get Homework Help
             </button>
           </div>
         </div>
       )}
+      
+      {/* Homework Details Dialog */}
+      <HomeworkDetailsDialog
+        isOpen={showDetailsDialog}
+        onClose={() => setShowDetailsDialog(false)}
+        onSubmit={handleHomeworkSubmit}
+        extractedText={extractedText}
+        fileName={fileName}
+        fileType={fileType}
+        isSubmitting={isSubmittingHomework}
+      />
     </div>
   );
 };

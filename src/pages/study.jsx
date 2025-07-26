@@ -22,6 +22,8 @@ import HomeworkUploader from '../components/HomeworkUploader';
 
 
 const openUrl = import.meta.env.VITE_OPENAI_URL
+const addHomeworkUrl = import.meta.env.VITE_ADDHOMEWORK_URL ;
+
 
 
 const Study = () => {
@@ -36,14 +38,20 @@ const Study = () => {
   const [input, setInput] = useState('');
   const messages = useSelector((state) => state.conversation.messages);
   const conversationId = useSelector((state) => state.conversation.conversationId);
+  const origin = useSelector((state) => state.conversation.origin);
   const user = useSelector((state) => state.auth.user.payload.user);
   const [response, setResponse] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-   const { url, subject, transcript, date, _id, notes, summary, roomId } = params.state;
+   const { url, subject, transcript, date, _id, notes, summary, roomId, userId } = params.state;
   const dispatch = useDispatch();
   const chatEndRef = useRef(null);
+  const chatContainerRef = useRef(null);
+  const mobileChatContainerRef = useRef(null);
+  const greetingInitialized = useRef(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showUploader, setShowUploader] = useState(false);
+  
+  //console.log(_id)
 
   
 
@@ -185,25 +193,28 @@ const Study = () => {
       e.preventDefault();
       setIsLoading(true);
       dispatch(addMessage({ type: 'question', text: input }));
+      
+    if(origin === 'homework') {
+      // Add empty response message for homework streaming to update
       dispatch(addMessage({ type: 'response', text: '' }));
-  
-  
       try {
-        const eventSource = new EventSource(`${openUrl}?prompt=${encodeURIComponent(input)}&userId=${encodeURIComponent(user.id)}&conversationId=${encodeURIComponent(conversationId)}  `);
+        const eventSource = new EventSource(`${addHomeworkUrl}/?prompt=${encodeURIComponent(input)}&userId=${encodeURIComponent(user.id)}&conversationId=${encodeURIComponent(conversationId)}  `);
         eventSource.onmessage = (event) => {
           const data = JSON.parse(event.data)
           console.log(data)
           if (data.content) {
             //console.log(data)
-            dispatch(updateLastMessage({ text: data.content, conversationId: data.conversationId }));
+            dispatch(updateLastMessage({ text: data.content, conversationId: data.conversationId, origin: 'homework'  }));
+            // Scroll to bottom during streaming
+            setTimeout(() => {
+              scrollToBottom();
+            }, 50);
             //console.log(data.content)
-          } {
-            if (data.done) {
-              setInput("")
-              eventSource.close();
-              setIsLoading(false);
-  
-            }
+          }
+          if (data.done) {
+            setInput("")
+            eventSource.close();
+            setIsLoading(false);
           }
         };
   
@@ -218,40 +229,94 @@ const Study = () => {
         setIsLoading(false);
   
       }
-      setInput('')
-    };
+    } else {
+      // Add empty response message for regular streaming to update
+      dispatch(addMessage({ type: 'response', text: '' }));
+      try {
+        const eventSource = new EventSource(`${openUrl}?prompt=${encodeURIComponent(input)}&userId=${encodeURIComponent(user.id)}&conversationId=${encodeURIComponent(conversationId)}  `);
+        eventSource.onmessage = (event) => {
+          const data = JSON.parse(event.data)
+          console.log(data)
+          if (data.content) {
+            //console.log(data)
+            dispatch(updateLastMessage({ text: data.content, conversationId: data.conversationId }));
+            // Scroll to bottom during streaming
+            setTimeout(() => {
+              scrollToBottom();
+            }, 50);
+            //console.log(data.content)
+          }
+          if (data.done) {
+            setInput("")
+            eventSource.close();
+            setIsLoading(false);
+          }
+        };
   
-    useEffect(() => {
-      chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, [messages]);
-
-    // Add greeting message when component loads if no messages exist or only has old greeting
-    useEffect(() => {
-      const hasGreeting = messages.some(msg => 
-        msg.type === 'response' && msg.text.includes("I'm Tyson, your friendly learning buddy")
-      );
-      
-      if (messages.length === 0 || (!hasGreeting && messages.length > 0)) {
-        // Clear existing messages if they don't contain our greeting
-        if (messages.length > 0 && !hasGreeting) {
-          dispatch(clearMessages());
+        eventSource.onerror = (error) => {
+          console.error('EventSource failed:', error);
+          eventSource.close();
+          setIsLoading(false);
         }
         
+      } catch (error) {
+        console.error('Error sending message:', error);
+        setIsLoading(false); 
+      }
+      setInput('')
+    
+    }
+  } 
+
+  useEffect(() => {
+    if (origin === 'homework') {
+      setShowUploader(false)
+    }
+  }, [origin]);
+
+  const scrollToBottom = () => {
+    // Scroll desktop chat container
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+    // Scroll mobile chat container  
+    if (mobileChatContainerRef.current) {
+      mobileChatContainerRef.current.scrollTop = mobileChatContainerRef.current.scrollHeight;
+    }
+  };
+
+  useEffect(() => {
+    // Scroll to bottom when messages change
+    const timeoutId = setTimeout(() => {
+      scrollToBottom();
+    }, 100);
+    
+    return () => clearTimeout(timeoutId);
+  }, [messages]);
+
+    // Clear messages and add greeting when component mounts
+    useEffect(() => {
+      // Only run once when component mounts
+      if (greetingInitialized.current) return;
+      greetingInitialized.current = true;
+      
+      // Clear any existing messages first
+      dispatch(clearMessages());
+      
+      // Add greeting after a short delay
+      setTimeout(() => {
         const greetingMessages = [
           `Hi there! I'm Tyson, your friendly learning buddy! 🤖`,
           `I see we're working on ${subject || 'something awesome'} today - that's fantastic! 📚`,
           `I'm here to help you learn, answer questions, and make studying fun! What would you like to explore first? 🚀`
         ];
         
-        // Add greeting messages with a slight delay for natural feel
-        setTimeout(() => {
-          dispatch(addMessage({ 
-            type: 'response', 
-            text: greetingMessages.join('\n\n')
-          }));
-        }, 500);
-      }
-    }, [dispatch, messages, subject]);
+        dispatch(addMessage({ 
+          type: 'response', 
+          text: greetingMessages.join('\n\n')
+        }));
+      }, 500);
+    }, []); // Empty dependency array - only run on mount
 
  
 
@@ -299,7 +364,7 @@ const Study = () => {
       {/* Header */}
       <div className={`relative z-10 flex items-center justify-between p-4 ${darkMode ? 'bg-slate-800/95' : 'bg-slate-100/95'} backdrop-blur-md border-b ${currentTheme.panelBorder}`}>
         <div className="flex items-center space-x-3">
-          <Link to="/dashboard">
+          <Link to="/dashboard" onClick={() => dispatch(clearMessages())}>
           <ChevronLeft className={`h-6 w-6 ${currentTheme.textPrimary} cursor-pointer hover:scale-110 transition-transform`} />
           </Link>
           <div className="flex items-center space-x-2">
@@ -530,7 +595,7 @@ const Study = () => {
             </div>
           </div>
           
-          <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] p-4 space-y-4">
+          <div ref={chatContainerRef} className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] p-4 space-y-4">
             {messages.map((message, index) => (
               <div key={index} className={`flex ${message.type === 'question' ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-xs ${styles.borderRadius} ${styles.panelPadding} ${
@@ -660,7 +725,7 @@ const Study = () => {
                 </div>
               </div>
               
-                <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] p-4 space-y-4">
+                <div ref={mobileChatContainerRef} className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] p-4 space-y-4">
             {messages.map((message, index) => (
               <div key={index} className={`flex ${message.type === 'question' ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-xs ${styles.borderRadius} ${styles.panelPadding} ${
@@ -820,7 +885,7 @@ const Study = () => {
             
             {/* Modal Content */}
             <div className="overflow-y-auto h-full pb-16">
-              <HomeworkUploader />
+              <HomeworkUploader id={_id} userId={userId} />
             </div>
           </div>
         </div>
@@ -830,4 +895,3 @@ const Study = () => {
 };
 
 export default Study;
-
