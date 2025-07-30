@@ -583,8 +583,8 @@ const Study = () => {
                 
               <Link to="/voiceAgent">
                 <button 
-                  disabled
-                  className={`${styles.buttonSize} ${styles.borderRadius} bg-gray-400 text-white font-medium cursor-not-allowed opacity-60 flex items-center gap-2`}
+                  
+                  className={`${styles.buttonSize} ${styles.borderRadius} bg-rose-600 text-white font-medium  opacity-60 flex items-center gap-2`}
                 >
                   🎤 Talk to Mel
                 </button>
