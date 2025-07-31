@@ -716,12 +716,14 @@ const Study = () => {
                     <Upload className="h-4 w-4" />
                     {ageGroup === '1-5' ? 'Homework Helper' : 'Homework Helper'}
                   </button>
+                  <Link to="/voiceAgent">
                   <button 
                     
                     className={`${styles.buttonSize} ${styles.borderRadius} bg-rose-600 text-white font-medium  opacity-60 flex items-center gap-2 text-sm`}
                   >
                     🎤 Talk to Mel
                   </button>
+                  </Link>
                 </div>
               </div>
               
