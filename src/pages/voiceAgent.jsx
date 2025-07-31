@@ -14,7 +14,19 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Room, RoomEvent } from "livekit-client";
 import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
-import { Mic, MicOff, Settings, Volume2, VolumeX, PlayCircle, StopCircle } from 'lucide-react';
+import { 
+  Mic, 
+  MicOff, 
+  Settings, 
+  Volume2, 
+  VolumeX, 
+  PlayCircle, 
+  StopCircle, 
+  ChevronLeft,
+  Menu,
+  X 
+} from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 
 const voiceAgentUrl = import.meta.env.VITE_VOICE_AGENT_URL
@@ -34,16 +46,118 @@ export default function VoiceAgentPage() {
     autoConnect: false,
   });
 
+  // Theme and styling state (matching study.jsx)
+  const [darkMode, setDarkMode] = useState(false);
+  const [ageGroup, setAgeGroup] = useState('1-5');
+  const [background, setBackground] = useState('forest');
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  
+  // Voice visualization state
+  const [isAgentSpeaking, setIsAgentSpeaking] = useState(false);
+  const [voiceIntensity, setVoiceIntensity] = useState(0);
+  
+  // Reset voice states when disconnected
+  useEffect(() => {
+    if (!isConnected) {
+      setIsAgentSpeaking(false);
+      setVoiceIntensity(0);
+    }
+  }, [isConnected]);
+
+  // Background themes (matching study.jsx and dashboard.jsx)
+  const backgrounds = {
+    forest: {
+      name: "Magical Forest",
+      gradient: "from-green-400 via-blue-500 to-purple-600",
+      pattern: "🌲🌟🦋",
+    },
+    ocean: {
+      name: "Ocean Adventure", 
+      gradient: "from-blue-400 via-cyan-500 to-teal-600",
+      pattern: "🌊🐠🏝️",
+    },
+    space: {
+      name: "Space Explorer",
+      gradient: "from-purple-600 via-pink-500 to-red-500",
+      pattern: "🚀⭐🪐",
+    },
+    garden: {
+      name: "Secret Garden",
+      gradient: "from-pink-400 via-purple-500 to-indigo-600", 
+      pattern: "🌸🦋🌈",
+    }
+  };
+
+  // Dark mode theme configuration (matching study.jsx)
+  const theme = {
+    light: {
+      panelBg: 'bg-white/90',
+      panelBorder: 'border-white/50',
+      headerBg: 'bg-white/95',
+      textPrimary: 'text-gray-800',
+      textSecondary: 'text-gray-600',
+      textTertiary: 'text-gray-500',
+      cardBg: 'bg-white/80',
+      settingsBg: 'bg-white/95',
+      settingsPanel: 'bg-gray-100',
+      settingsSelected: 'bg-blue-500 text-white',
+    },
+    dark: {
+      panelBg: 'bg-gray-800/90',
+      panelBorder: 'border-gray-700/50',
+      headerBg: 'bg-gray-800/95',
+      textPrimary: 'text-white',
+      textSecondary: 'text-gray-300',
+      textTertiary: 'text-gray-400',
+      cardBg: 'bg-gray-700/80',
+      settingsBg: 'bg-gray-800/95',
+      settingsPanel: 'bg-gray-700',
+      settingsSelected: 'bg-blue-600 text-white',
+    }
+  };
+
+  // Age-appropriate styling (matching study.jsx)
+  const ageStyles = {
+    '1-5': {
+      fontSize: 'text-lg',
+      buttonSize: 'px-6 py-4 text-lg',
+      panelPadding: 'p-6',
+      borderRadius: 'rounded-3xl',
+      iconSize: 'h-8 w-8',
+      titleSize: 'text-2xl',
+      spacing: 'space-y-6'
+    },
+    '6-8': {
+      fontSize: 'text-base',
+      buttonSize: 'px-4 py-3 text-base',
+      panelPadding: 'p-4',
+      borderRadius: 'rounded-2xl',
+      iconSize: 'h-6 w-6',
+      titleSize: 'text-xl',
+      spacing: 'space-y-4'
+    }
+  };
+
+  const currentBg = backgrounds[background];
+  const currentTheme = darkMode ? theme.dark : theme.light;
+  const styles = ageStyles[ageGroup];
+
   const handleToggleMute = () => {
     setIsMuted(!isMuted);
   };
 
   const onConnectButtonClicked = useCallback(async () => {
     if (isConnected) {
-      await room.disconnect(); // Correct: disconnect from the LiveKit room instance
-      setIsConnected(false); // Update the connection state.  
-      setIsListening(false); // Update the listening state.
-      setIsLoading(false);
+      try {
+        setIsLoading(true);
+        await room.disconnect(); // Correct: disconnect from the LiveKit room instance
+        setIsConnected(false); // Update the connection state.  
+        setIsListening(false); // Update the listening state.
+      } catch (error) {
+        console.error("Failed to disconnect from LiveKit room:", error);
+      } finally {
+        setIsLoading(false);
+      }
     } else {
       try {
         // Fetch connection details (server URL, token) from the API route.
@@ -62,67 +176,273 @@ export default function VoiceAgentPage() {
         console.error("Failed to connect to LiveKit room:", error);
         // Optionally, display an error message to the user here.
         alert(`Failed to start the conversation: ${error.message}`);
+      } finally {
+        setIsLoading(false);
       }
     }
   }, [room, isConnected]); // Add isConnected to dependencies
 
   /**
-   * useEffect hook to handle LiveKit media device errors.
+   * useEffect hook to handle LiveKit media device errors and voice activity.
    */
   useEffect(() => {
     // Register the error handler function for media device errors.
     room.on(RoomEvent.MediaDevicesError, onDeviceFailure);
 
+    // Register event listeners for AI agent voice activity detection
+    room.on(RoomEvent.TrackSubscribed, (track, publication, participant) => {
+      if (track.kind === 'audio' && !participant.isLocal) {
+        // This is the AI agent's audio track
+        console.log('AI Agent audio track subscribed:', participant.identity);
+        
+        // Get the audio track's MediaStreamTrack
+        const mediaStreamTrack = track.mediaStreamTrack;
+        
+        if (mediaStreamTrack) {
+          // Create audio context for real-time analysis
+          const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+          const stream = new MediaStream([mediaStreamTrack]);
+          const source = audioContext.createMediaStreamSource(stream);
+          const analyser = audioContext.createAnalyser();
+          
+          analyser.fftSize = 256;
+          analyser.smoothingTimeConstant = 0.8;
+          source.connect(analyser);
+          
+          const dataArray = new Uint8Array(analyser.frequencyBinCount);
+          let animationId;
+          
+          // Monitor AI agent's voice levels
+          const checkAIVoiceLevel = () => {
+            analyser.getByteFrequencyData(dataArray);
+            
+            // Calculate average volume
+            const average = dataArray.reduce((sum, value) => sum + value, 0) / dataArray.length;
+            const intensity = Math.min(average / 128, 1); // Normalize to 0-1
+            
+            // Update states based on AI voice activity
+            const isAISpeaking = intensity > 0.05; // Lower threshold for AI detection
+            
+            // Debug logging for AI speech detection
+            if (isAISpeaking && intensity > 0.1) {
+              console.log(`AI speaking detected - intensity: ${intensity.toFixed(3)}`);
+            }
+            
+            setVoiceIntensity(intensity);
+            setIsAgentSpeaking(isAISpeaking);
+            
+            if (isConnected) {
+              animationId = requestAnimationFrame(checkAIVoiceLevel);
+            }
+          };
+          
+          // Start monitoring
+          checkAIVoiceLevel();
+          
+          // Store cleanup function
+          track.on('ended', () => {
+            if (animationId) {
+              cancelAnimationFrame(animationId);
+            }
+            audioContext.close();
+            setIsAgentSpeaking(false);
+            setVoiceIntensity(0);
+          });
+        }
+      }
+    });
+
+    room.on(RoomEvent.TrackUnsubscribed, (track, publication, participant) => {
+      if (track.kind === 'audio' && !participant.isLocal) {
+        console.log('AI Agent audio track unsubscribed');
+        setIsAgentSpeaking(false);
+        setVoiceIntensity(0);
+      }
+    });
+
+    room.on(RoomEvent.ParticipantDisconnected, (participant) => {
+      if (participant.isAgent) {
+        setIsAgentSpeaking(false);
+        setVoiceIntensity(0);
+      }
+    });
+
     // Cleanup function: Unregister the error handler when the component unmounts.
     return () => {
       room.off(RoomEvent.MediaDevicesError, onDeviceFailure);
+      setIsAgentSpeaking(false);
+      setVoiceIntensity(0);
     };
-  }, [room]); // Dependency array includes 'room'
+  }, [room, isConnected]); // Dependency array includes 'room' and 'isConnected'
 
 
   return (
-    <main className="flex items-center justify-center min-h-screen">
-      <RoomContext.Provider value={room}>
-        <div className="w-full max-w-2xl mx-auto flex flex-col items-center p-4 rounded-lg space-y-6">
-          <RoomAudioRenderer muted={isMuted} />
-          {isConnected && (
-            <div
-              className="w-full max-w-2xl flex-1 overflow-y-auto"
-              style={{
-                maxHeight: 'calc(100vh - 10rem)', // 10rem = control panel + paddings, adjust as needed
-                paddingBottom: '6rem', // matches the control panel height
-              }}
-            >
-              <TranscriptionView />
+    <div className={`min-h-screen bg-gradient-to-br ${currentBg.gradient} relative overflow-hidden`}>
+      {/* Decorative Pattern Overlay */}
+      <div className="absolute inset-0 opacity-10">
+        <div className="text-6xl animate-pulse grid grid-cols-6 gap-8 p-8">
+          {Array.from({length: 24}).map((_, i) => (
+            <div key={i} className="transform rotate-12">
+              {currentBg.pattern.split('')[i % 3]}
             </div>
-          )}
+          ))}
         </div>
-        {/* Control panel: centered if not connected, fixed bottom if connected */}
-        {isConnected ? (
-          <div className="fixed bottom-0 left-0 w-full flex justify-center z-50 pointer-events-none">
-            <VoiceAgentControlPanel
-              isConnected={isConnected}
-              isListening={isListening}
-              isMuted={isMuted}
-              onConnectButtonClicked={onConnectButtonClicked}
-              onToggleMute={handleToggleMute}
-            />
+      </div>
+
+      {/* Header */}
+      <div className={`relative z-10 flex items-center justify-between p-4 ${darkMode ? 'bg-slate-800/95' : 'bg-slate-100/95'} backdrop-blur-md border-b ${currentTheme.panelBorder}`}>
+        <div className="flex items-center space-x-3">
+          <Link to="/dashboard">
+            <ChevronLeft className={`h-6 w-6 ${currentTheme.textPrimary} cursor-pointer hover:scale-110 transition-transform`} />
+          </Link>
+          <div className="flex items-center space-x-2">
+            <span className="text-4xl">🎤</span>
+            <div>
+              <h1 className={`${styles.titleSize} font-bold ${currentTheme.textPrimary}`}>Talk to Mel</h1>
+              <p className={`${currentTheme.textSecondary} text-sm`}>Voice Assistant</p>
+            </div>
           </div>
-        ) : (
-          <div className="absolute inset-0 flex items-center justify-center z-40 pointer-events-none">
-            <div className="pointer-events-auto">
+        </div>
+        
+        {/* Settings Menu */}
+        <button 
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          className={`p-2 rounded-full ${currentTheme.panelBg} hover:scale-105 transition-all shadow-lg`}
+        >
+          <Menu className={`h-5 w-5 ${currentTheme.textPrimary}`} />
+        </button>
+      </div>
+
+      {/* Settings Panel */}
+      {isMenuOpen && (
+        <div className={`absolute top-0 right-0 w-80 h-full ${currentTheme.settingsBg} backdrop-blur-md z-50 p-6 overflow-y-auto`}>
+          <div className="flex justify-between items-center mb-6">
+            <h2 className={`text-xl font-bold ${currentTheme.textPrimary}`}>Settings</h2>
+            <button onClick={() => setIsMenuOpen(false)}>
+              <X className={`h-6 w-6 ${currentTheme.textPrimary}`} />
+            </button>
+          </div>
+          
+          {/* Dark Mode Toggle */}
+          <div className="mb-6">
+            <h3 className={`font-semibold mb-3 ${currentTheme.textPrimary}`}>Theme</h3>
+            <div className="flex items-center justify-between">
+              <span className={currentTheme.textSecondary}>Dark Mode</span>
+              <button
+                onClick={() => setDarkMode(!darkMode)}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                  darkMode ? 'bg-blue-600' : 'bg-gray-300'
+                }`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    darkMode ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </div>
+          </div>
+          
+          {/* Age Group Selection */}
+          <div className="mb-6">
+            <h3 className={`font-semibold mb-3 ${currentTheme.textPrimary}`}>Age Group</h3>
+            <div className="space-y-2">
+              {['1-5', '6-8'].map(age => (
+                <button
+                  key={age}
+                  onClick={() => setAgeGroup(age)}
+                  className={`w-full p-3 rounded-xl text-left ${
+                    ageGroup === age ? currentTheme.settingsSelected : currentTheme.settingsPanel
+                  } ${ageGroup === age ? '' : currentTheme.textPrimary}`}
+                >
+                  Grades {age}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Background Selection */}
+          <div className="mb-6">
+            <h3 className={`font-semibold mb-3 ${currentTheme.textPrimary}`}>Background Theme</h3>
+            <div className="grid grid-cols-2 gap-2">
+              {Object.entries(backgrounds).map(([key, bg]) => (
+                <button
+                  key={key}
+                  onClick={() => setBackground(key)}
+                  className={`p-3 rounded-xl bg-gradient-to-br ${bg.gradient} text-white text-sm font-medium ${
+                    background === key ? 'ring-4 ring-blue-500' : ''
+                  }`}
+                >
+                  {bg.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      <main className="relative z-10 flex items-center justify-center min-h-[calc(100vh-80px)]">
+        <RoomContext.Provider value={room}>
+          <div className={`w-full max-w-2xl mx-auto flex flex-col items-center p-4 ${styles.borderRadius} ${currentTheme.panelBg} backdrop-blur-md shadow-xl border ${currentTheme.panelBorder} ${styles.spacing}`}>
+            <RoomAudioRenderer muted={isMuted} />
+            
+            {/* Pulsing Avatar Visualization */}
+            <div className="flex flex-col items-center mb-6">
+              <PulsingAvatar 
+                isConnected={isConnected}
+                isListening={isListening}
+                isAgentSpeaking={isAgentSpeaking}
+                voiceIntensity={voiceIntensity}
+                styles={styles}
+                currentTheme={currentTheme}
+              />
+            </div>
+            
+            {isConnected && (
+              <div
+                className={`w-full max-w-2xl flex-1 overflow-y-auto ${styles.borderRadius} ${currentTheme.cardBg} p-4`}
+                style={{
+                  maxHeight: 'calc(100vh - 25rem)', // Adjusted for avatar space
+                  paddingBottom: '2rem',
+                }}
+              >
+                <TranscriptionView />
+              </div>
+            )}
+          </div>
+          {/* Control panel: centered if not connected, fixed bottom if connected */}
+          {isConnected ? (
+            <div className="fixed bottom-4 left-0 w-full flex justify-center z-50 pointer-events-none">
               <VoiceAgentControlPanel
                 isConnected={isConnected}
                 isListening={isListening}
                 isMuted={isMuted}
                 onConnectButtonClicked={onConnectButtonClicked}
                 onToggleMute={handleToggleMute}
+                styles={styles}
+                currentTheme={currentTheme}
+                isLoading={isLoading}
               />
             </div>
-          </div>
-        )}
-      </RoomContext.Provider>
-    </main>
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center z-40 pointer-events-none">
+              <div className="pointer-events-auto">
+                <VoiceAgentControlPanel
+                  isConnected={isConnected}
+                  isListening={isListening}
+                  isMuted={isMuted}
+                  onConnectButtonClicked={onConnectButtonClicked}
+                  onToggleMute={handleToggleMute}
+                  styles={styles}
+                  currentTheme={currentTheme}
+                  isLoading={isLoading}
+                />
+              </div>
+            </div>
+          )}
+        </RoomContext.Provider>
+      </main>
+    </div>
   );
 }
 
@@ -143,58 +463,211 @@ function onDeviceFailure(error) {
   );
 }
 
+function PulsingAvatar({ isConnected, isListening, isAgentSpeaking, voiceIntensity, styles, currentTheme }) {
+  // Avatar emoji based on state - focused on AI agent status
+  const getAvatarEmoji = () => {
+    if (!isConnected) return '🎤';
+    if (isAgentSpeaking) return '🗣️'; // AI is speaking
+    if (isListening) return '👂';     // AI is listening to user
+    return '🤖';                      // AI is ready/idle
+  };
+
+  // Dynamic styling based on voice activity
+  const getAvatarStyles = () => {
+    const baseSize = styles.borderRadius.includes('3xl') ? 'w-32 h-32' : 'w-24 h-24';
+    
+    if (!isConnected) {
+      return {
+        size: baseSize,
+        animation: 'animate-pulse',
+        glow: 'shadow-lg',
+        bg: 'bg-gradient-to-r from-gray-400 to-gray-500'
+      };
+    }
+    
+    if (isAgentSpeaking) {
+      const intensity = Math.max(0.3, voiceIntensity);
+      return {
+        size: baseSize,
+        animation: 'animate-bounce',
+        glow: `shadow-2xl shadow-green-500/50`,
+        bg: 'bg-gradient-to-r from-green-400 to-green-600',
+        scale: intensity > 0.5 ? 'scale-110' : 'scale-105'
+      };
+    }
+    
+    if (isListening) {
+      return {
+        size: baseSize,
+        animation: 'animate-pulse',
+        glow: 'shadow-xl shadow-blue-500/50',
+        bg: 'bg-gradient-to-r from-blue-400 to-blue-600',
+        scale: 'scale-105'
+      };
+    }
+    
+    return {
+      size: baseSize,
+      animation: '',
+      glow: 'shadow-lg',
+      bg: 'bg-gradient-to-r from-purple-400 to-purple-600'
+    };
+  };
+
+  const avatarStyles = getAvatarStyles();
+  
+  return (
+    <div className="flex flex-col items-center space-y-4">
+      {/* Main Avatar */}
+      <div className="relative">
+        {/* Outer glow rings */}
+        {(isListening || isAgentSpeaking) && (
+          <>
+            <div className={`absolute inset-0 ${avatarStyles.size} ${styles.borderRadius} ${avatarStyles.bg} opacity-20 ${avatarStyles.animation} scale-125`}></div>
+            <div className={`absolute inset-0 ${avatarStyles.size} ${styles.borderRadius} ${avatarStyles.bg} opacity-30 ${avatarStyles.animation} scale-110`}></div>
+          </>
+        )}
+        
+        {/* Main avatar circle */}
+        <div className={`
+          ${avatarStyles.size} 
+          ${styles.borderRadius} 
+          ${avatarStyles.bg} 
+          ${avatarStyles.glow}
+          ${avatarStyles.scale || ''}
+          ${avatarStyles.animation}
+          flex items-center justify-center
+          text-4xl
+          transition-all duration-300
+          relative z-10
+        `}>
+          <span className="filter drop-shadow-lg">
+            {getAvatarEmoji()}
+          </span>
+        </div>
+        
+        {/* Voice intensity particles */}
+        {isAgentSpeaking && voiceIntensity > 0.3 && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div
+                key={i}
+                className={`absolute w-2 h-2 bg-white rounded-full opacity-60 animate-ping`}
+                style={{
+                  transform: `rotate(${i * 60}deg) translateY(-${40 + voiceIntensity * 20}px)`,
+                  animationDelay: `${i * 0.1}s`,
+                  animationDuration: '1s'
+                }}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+      
+      {/* Status text */}
+      <div className="text-center">
+        <p className={`${styles.fontSize} font-semibold ${currentTheme.textPrimary}`}>
+          {!isConnected && 'Ready to Connect'}
+          {isConnected && !isListening && !isAgentSpeaking && 'Mel is Ready'}
+          {isListening && !isAgentSpeaking && 'Mel is Listening...'}
+          {isAgentSpeaking && 'Mel is Speaking'}
+        </p>
+        
+        {/* Voice activity indicator */}
+        {(isListening || isAgentSpeaking) && (
+          <div className="mt-2 flex justify-center space-x-1">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div
+                key={i}
+                className={`w-1 h-4 ${currentTheme.panelBg} rounded-full transition-all duration-150 ${
+                  voiceIntensity * 5 > i ? 'bg-gradient-to-t from-blue-400 to-blue-600' : 'bg-gray-300'
+                }`}
+                style={{
+                  height: `${8 + (voiceIntensity * 5 > i ? voiceIntensity * 16 : 0)}px`
+                }}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function VoiceAgentControlPanel({
   isConnected,
   isListening,
   isMuted,
   onConnectButtonClicked,
-  onToggleMute
+  onToggleMute,
+  styles,
+  currentTheme,
+  isLoading
 }) {
   return (
     <div
-      className={`w-full max-w-2xl mx-auto flex flex-row items-center justify-center space-x-8 bg-white/90 dark:bg-gray-900/90 shadow-lg rounded-xl py-4 px-2 pointer-events-auto transition-all duration-300`}
+      className={`w-full max-w-2xl mx-auto flex flex-row items-center justify-center space-x-8 ${currentTheme.panelBg} backdrop-blur-md shadow-xl ${styles.borderRadius} ${styles.panelPadding} border ${currentTheme.panelBorder} pointer-events-auto transition-all duration-300`}
     >
       <div className="flex flex-col items-center">
         <button
           onClick={onConnectButtonClicked}
-          className={`w-16 h-16 rounded-full flex items-center justify-center transition-colors mb-1 ${isConnected
-            ? 'bg-red-100 text-red-600 hover:bg-red-200 dark:bg-red-900 dark:text-red-300 dark:hover:bg-red-800'
-            : 'bg-green-100 text-green-600 hover:bg-green-200 dark:bg-green-900 dark:text-green-300 dark:hover:bg-green-800'
-            }`}
+          disabled={isLoading}
+          className={`w-16 h-16 ${styles.borderRadius} flex items-center justify-center transition-all duration-300 mb-2 shadow-lg hover:scale-105 ${
+            isLoading 
+              ? 'bg-gray-400 text-white cursor-not-allowed opacity-60'
+              : isConnected
+                ? 'bg-gradient-to-r from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700'
+                : 'bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700'
+          }`}
         >
-          {isConnected ? <StopCircle size={32} /> : <PlayCircle size={32} />}
+          {isLoading ? (
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+          ) : isConnected ? (
+            <StopCircle size={28} />
+          ) : (
+            <PlayCircle size={28} />
+          )}
         </button>
-        <span className="text-sm">{isConnected ? 'Disconnect' : 'Connect'}</span>
+        <span className={`${styles.fontSize} font-medium ${currentTheme.textPrimary}`}>
+          {isLoading ? 'Connecting...' : isConnected ? 'Disconnect' : 'Connect'}
+        </span>
       </div>
+      
       <div className="flex flex-col items-center">
         <button
-          // onClick={handleToggleListening}
           disabled={!isConnected}
-          className={`w-16 h-16 rounded-full flex items-center justify-center transition-colors mb-1 ${!isConnected
-            ? 'bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-gray-700 dark:text-gray-500'
-            : isListening
-              ? 'bg-red-100 text-red-600 hover:bg-red-200 dark:bg-red-900 dark:text-red-300 dark:hover:bg-red-800'
-              : 'bg-blue-100 text-blue-600 hover:bg-blue-200 dark:bg-blue-900 dark:text-blue-300 dark:hover:bg-blue-800'
-            }`}
+          className={`w-16 h-16 ${styles.borderRadius} flex items-center justify-center transition-all duration-300 mb-2 shadow-lg ${
+            !isConnected
+              ? 'bg-gray-400 text-gray-300 cursor-not-allowed opacity-60'
+              : isListening
+                ? 'bg-gradient-to-r from-red-500 to-red-600 text-white hover:scale-105'
+                : 'bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:scale-105'
+          }`}
         >
-          {isListening ? <MicOff size={32} /> : <Mic size={32} />}
+          {isListening ? <MicOff size={28} /> : <Mic size={28} />}
         </button>
-        <span className="text-sm">{isListening ? 'Stop Listening' : 'Start Listening'}</span>
+        <span className={`${styles.fontSize} font-medium ${currentTheme.textPrimary}`}>
+          {isListening ? 'Listening' : 'Microphone'}
+        </span>
       </div>
+      
       <div className="flex flex-col items-center">
         <button
           onClick={onToggleMute}
           disabled={!isConnected}
-          className={`w-16 h-16 rounded-full flex items-center justify-center transition-colors mb-1 ${!isConnected
-            ? 'bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-gray-700 dark:text-gray-500'
-            : isMuted
-              ? 'bg-yellow-100 text-yellow-600 hover:bg-yellow-200 dark:bg-yellow-900 dark:text-yellow-300 dark:hover:bg-yellow-800'
-              : 'bg-green-100 text-green-600 hover:bg-green-200 dark:bg-green-900 dark:text-green-300 dark:hover:bg-green-800'
-            }`}
+          className={`w-16 h-16 ${styles.borderRadius} flex items-center justify-center transition-all duration-300 mb-2 shadow-lg ${
+            !isConnected
+              ? 'bg-gray-400 text-gray-300 cursor-not-allowed opacity-60'
+              : isMuted
+                ? 'bg-gradient-to-r from-yellow-500 to-orange-500 text-white hover:scale-105'
+                : 'bg-gradient-to-r from-green-500 to-green-600 text-white hover:scale-105'
+          }`}
         >
-          {isMuted ? <VolumeX size={32} /> : <Volume2 size={32} />}
+          {isMuted ? <VolumeX size={28} /> : <Volume2 size={28} />}
         </button>
-        <span className="text-sm">{isMuted ? 'Unmute' : 'Mute'}</span>
+        <span className={`${styles.fontSize} font-medium ${currentTheme.textPrimary}`}>
+          {isMuted ? 'Unmute' : 'Audio'}
+        </span>
       </div>
     </div>
   );
