@@ -51,6 +51,18 @@ export default function VoiceAgentPage() {
   const [ageGroup, setAgeGroup] = useState('1-5');
   const [background, setBackground] = useState('forest');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  
+  // Voice visualization state
+  const [isAgentSpeaking, setIsAgentSpeaking] = useState(false);
+  const [voiceIntensity, setVoiceIntensity] = useState(0);
+  
+  // Reset voice states when disconnected
+  useEffect(() => {
+    if (!isConnected) {
+      setIsAgentSpeaking(false);
+      setVoiceIntensity(0);
+    }
+  }, [isConnected]);
 
   // Background themes (matching study.jsx and dashboard.jsx)
   const backgrounds = {
@@ -171,17 +183,97 @@ export default function VoiceAgentPage() {
   }, [room, isConnected]); // Add isConnected to dependencies
 
   /**
-   * useEffect hook to handle LiveKit media device errors.
+   * useEffect hook to handle LiveKit media device errors and voice activity.
    */
   useEffect(() => {
     // Register the error handler function for media device errors.
     room.on(RoomEvent.MediaDevicesError, onDeviceFailure);
 
+    // Register event listeners for AI agent voice activity detection
+    room.on(RoomEvent.TrackSubscribed, (track, publication, participant) => {
+      if (track.kind === 'audio' && !participant.isLocal) {
+        // This is the AI agent's audio track
+        console.log('AI Agent audio track subscribed:', participant.identity);
+        
+        // Get the audio track's MediaStreamTrack
+        const mediaStreamTrack = track.mediaStreamTrack;
+        
+        if (mediaStreamTrack) {
+          // Create audio context for real-time analysis
+          const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+          const stream = new MediaStream([mediaStreamTrack]);
+          const source = audioContext.createMediaStreamSource(stream);
+          const analyser = audioContext.createAnalyser();
+          
+          analyser.fftSize = 256;
+          analyser.smoothingTimeConstant = 0.8;
+          source.connect(analyser);
+          
+          const dataArray = new Uint8Array(analyser.frequencyBinCount);
+          let animationId;
+          
+          // Monitor AI agent's voice levels
+          const checkAIVoiceLevel = () => {
+            analyser.getByteFrequencyData(dataArray);
+            
+            // Calculate average volume
+            const average = dataArray.reduce((sum, value) => sum + value, 0) / dataArray.length;
+            const intensity = Math.min(average / 128, 1); // Normalize to 0-1
+            
+            // Update states based on AI voice activity
+            const isAISpeaking = intensity > 0.05; // Lower threshold for AI detection
+            
+            // Debug logging for AI speech detection
+            if (isAISpeaking && intensity > 0.1) {
+              console.log(`AI speaking detected - intensity: ${intensity.toFixed(3)}`);
+            }
+            
+            setVoiceIntensity(intensity);
+            setIsAgentSpeaking(isAISpeaking);
+            
+            if (isConnected) {
+              animationId = requestAnimationFrame(checkAIVoiceLevel);
+            }
+          };
+          
+          // Start monitoring
+          checkAIVoiceLevel();
+          
+          // Store cleanup function
+          track.on('ended', () => {
+            if (animationId) {
+              cancelAnimationFrame(animationId);
+            }
+            audioContext.close();
+            setIsAgentSpeaking(false);
+            setVoiceIntensity(0);
+          });
+        }
+      }
+    });
+
+    room.on(RoomEvent.TrackUnsubscribed, (track, publication, participant) => {
+      if (track.kind === 'audio' && !participant.isLocal) {
+        console.log('AI Agent audio track unsubscribed');
+        setIsAgentSpeaking(false);
+        setVoiceIntensity(0);
+      }
+    });
+
+    room.on(RoomEvent.ParticipantDisconnected, (participant) => {
+      if (participant.isAgent) {
+        setIsAgentSpeaking(false);
+        setVoiceIntensity(0);
+      }
+    });
+
     // Cleanup function: Unregister the error handler when the component unmounts.
     return () => {
       room.off(RoomEvent.MediaDevicesError, onDeviceFailure);
+      setIsAgentSpeaking(false);
+      setVoiceIntensity(0);
     };
-  }, [room]); // Dependency array includes 'room'
+  }, [room, isConnected]); // Dependency array includes 'room' and 'isConnected'
 
 
   return (
@@ -200,7 +292,7 @@ export default function VoiceAgentPage() {
       {/* Header */}
       <div className={`relative z-10 flex items-center justify-between p-4 ${darkMode ? 'bg-slate-800/95' : 'bg-slate-100/95'} backdrop-blur-md border-b ${currentTheme.panelBorder}`}>
         <div className="flex items-center space-x-3">
-          <Link to="/study">
+          <Link to="/dashboard">
             <ChevronLeft className={`h-6 w-6 ${currentTheme.textPrimary} cursor-pointer hover:scale-110 transition-transform`} />
           </Link>
           <div className="flex items-center space-x-2">
@@ -293,11 +385,24 @@ export default function VoiceAgentPage() {
         <RoomContext.Provider value={room}>
           <div className={`w-full max-w-2xl mx-auto flex flex-col items-center p-4 ${styles.borderRadius} ${currentTheme.panelBg} backdrop-blur-md shadow-xl border ${currentTheme.panelBorder} ${styles.spacing}`}>
             <RoomAudioRenderer muted={isMuted} />
+            
+            {/* Pulsing Avatar Visualization */}
+            <div className="flex flex-col items-center mb-6">
+              <PulsingAvatar 
+                isConnected={isConnected}
+                isListening={isListening}
+                isAgentSpeaking={isAgentSpeaking}
+                voiceIntensity={voiceIntensity}
+                styles={styles}
+                currentTheme={currentTheme}
+              />
+            </div>
+            
             {isConnected && (
               <div
                 className={`w-full max-w-2xl flex-1 overflow-y-auto ${styles.borderRadius} ${currentTheme.cardBg} p-4`}
                 style={{
-                  maxHeight: 'calc(100vh - 20rem)', // Adjusted for new header
+                  maxHeight: 'calc(100vh - 25rem)', // Adjusted for avatar space
                   paddingBottom: '2rem',
                 }}
               >
@@ -355,6 +460,137 @@ function onDeviceFailure(error) {
   // Display a user-friendly alert message.
   alert(
     "Error acquiring camera or microphone permissions. Please make sure you grant the necessary permissions in your browser and reload the tab."
+  );
+}
+
+function PulsingAvatar({ isConnected, isListening, isAgentSpeaking, voiceIntensity, styles, currentTheme }) {
+  // Avatar emoji based on state - focused on AI agent status
+  const getAvatarEmoji = () => {
+    if (!isConnected) return '🎤';
+    if (isAgentSpeaking) return '🗣️'; // AI is speaking
+    if (isListening) return '👂';     // AI is listening to user
+    return '🤖';                      // AI is ready/idle
+  };
+
+  // Dynamic styling based on voice activity
+  const getAvatarStyles = () => {
+    const baseSize = styles.borderRadius.includes('3xl') ? 'w-32 h-32' : 'w-24 h-24';
+    
+    if (!isConnected) {
+      return {
+        size: baseSize,
+        animation: 'animate-pulse',
+        glow: 'shadow-lg',
+        bg: 'bg-gradient-to-r from-gray-400 to-gray-500'
+      };
+    }
+    
+    if (isAgentSpeaking) {
+      const intensity = Math.max(0.3, voiceIntensity);
+      return {
+        size: baseSize,
+        animation: 'animate-bounce',
+        glow: `shadow-2xl shadow-green-500/50`,
+        bg: 'bg-gradient-to-r from-green-400 to-green-600',
+        scale: intensity > 0.5 ? 'scale-110' : 'scale-105'
+      };
+    }
+    
+    if (isListening) {
+      return {
+        size: baseSize,
+        animation: 'animate-pulse',
+        glow: 'shadow-xl shadow-blue-500/50',
+        bg: 'bg-gradient-to-r from-blue-400 to-blue-600',
+        scale: 'scale-105'
+      };
+    }
+    
+    return {
+      size: baseSize,
+      animation: '',
+      glow: 'shadow-lg',
+      bg: 'bg-gradient-to-r from-purple-400 to-purple-600'
+    };
+  };
+
+  const avatarStyles = getAvatarStyles();
+  
+  return (
+    <div className="flex flex-col items-center space-y-4">
+      {/* Main Avatar */}
+      <div className="relative">
+        {/* Outer glow rings */}
+        {(isListening || isAgentSpeaking) && (
+          <>
+            <div className={`absolute inset-0 ${avatarStyles.size} ${styles.borderRadius} ${avatarStyles.bg} opacity-20 ${avatarStyles.animation} scale-125`}></div>
+            <div className={`absolute inset-0 ${avatarStyles.size} ${styles.borderRadius} ${avatarStyles.bg} opacity-30 ${avatarStyles.animation} scale-110`}></div>
+          </>
+        )}
+        
+        {/* Main avatar circle */}
+        <div className={`
+          ${avatarStyles.size} 
+          ${styles.borderRadius} 
+          ${avatarStyles.bg} 
+          ${avatarStyles.glow}
+          ${avatarStyles.scale || ''}
+          ${avatarStyles.animation}
+          flex items-center justify-center
+          text-4xl
+          transition-all duration-300
+          relative z-10
+        `}>
+          <span className="filter drop-shadow-lg">
+            {getAvatarEmoji()}
+          </span>
+        </div>
+        
+        {/* Voice intensity particles */}
+        {isAgentSpeaking && voiceIntensity > 0.3 && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div
+                key={i}
+                className={`absolute w-2 h-2 bg-white rounded-full opacity-60 animate-ping`}
+                style={{
+                  transform: `rotate(${i * 60}deg) translateY(-${40 + voiceIntensity * 20}px)`,
+                  animationDelay: `${i * 0.1}s`,
+                  animationDuration: '1s'
+                }}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+      
+      {/* Status text */}
+      <div className="text-center">
+        <p className={`${styles.fontSize} font-semibold ${currentTheme.textPrimary}`}>
+          {!isConnected && 'Ready to Connect'}
+          {isConnected && !isListening && !isAgentSpeaking && 'Mel is Ready'}
+          {isListening && !isAgentSpeaking && 'Mel is Listening...'}
+          {isAgentSpeaking && 'Mel is Speaking'}
+        </p>
+        
+        {/* Voice activity indicator */}
+        {(isListening || isAgentSpeaking) && (
+          <div className="mt-2 flex justify-center space-x-1">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div
+                key={i}
+                className={`w-1 h-4 ${currentTheme.panelBg} rounded-full transition-all duration-150 ${
+                  voiceIntensity * 5 > i ? 'bg-gradient-to-t from-blue-400 to-blue-600' : 'bg-gray-300'
+                }`}
+                style={{
+                  height: `${8 + (voiceIntensity * 5 > i ? voiceIntensity * 16 : 0)}px`
+                }}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
 

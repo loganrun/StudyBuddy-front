@@ -717,8 +717,8 @@ const Study = () => {
                     {ageGroup === '1-5' ? 'Homework Helper' : 'Homework Helper'}
                   </button>
                   <button 
-                    disabled
-                    className={`${styles.buttonSize} ${styles.borderRadius} bg-gray-400 text-white font-medium cursor-not-allowed opacity-60 flex items-center gap-2 text-sm`}
+                    
+                    className={`${styles.buttonSize} ${styles.borderRadius} bg-rose-600 text-white font-medium  opacity-60 flex items-center gap-2 text-sm`}
                   >
                     🎤 Talk to Mel
                   </button>
