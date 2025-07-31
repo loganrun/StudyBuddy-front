@@ -191,6 +191,7 @@ const Study = () => {
 
   const handleSubmit = async (e) => {
       e.preventDefault();
+      if (!input.trim()) return; // Don't submit empty messages
       setIsLoading(true);
       dispatch(addMessage({ type: 'question', text: input }));
       
@@ -623,21 +624,29 @@ const Study = () => {
           <div ref={chatEndRef} />
           
           <div className={`${styles.panelPadding} border-t ${currentTheme.panelBorder}`}>
-            <div className="flex gap-2">
+            <form onSubmit={handleSubmit} className="flex gap-2">
               <input
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                                    placeholder={ageGroup === '1-5' ? "Ask me anything! 😊" : "What would you like to learn?"}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSubmit(e);
+                  }
+                }}
+                placeholder={ageGroup === '1-5' ? "Ask me anything! 😊" : "What would you like to learn?"}
                 className={`flex-1 ${styles.borderRadius} ${currentTheme.inputText} ${currentTheme.inputBg} px-4 py-3 border-2 ${currentTheme.inputBorder} focus:border-blue-500 focus:outline-none ${styles.fontSize}`}
+                disabled={isLoading}
               />
               <button
-                onClick={handleSubmit}
-                className={`${styles.buttonSize} ${styles.borderRadius} bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:scale-105 transition-transform shadow-lg`}
+                type="submit"
+                disabled={isLoading || !input.trim()}
+                className={`${styles.buttonSize} ${styles.borderRadius} bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:scale-105 transition-transform shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100`}
               >
                 <Send className="h-5 w-5" />
               </button>
-            </div>
+            </form>
           </div>
         </div>
 
@@ -673,7 +682,7 @@ const Study = () => {
       </div>
 
       {/* Mobile/Tablet Layout */}
-      <div className="lg:hidden relative z-10 h-[calc(100vh-80px)]">
+      <div className="lg:hidden relative z-10 h-[calc(100vh-80px)] flex flex-col">
         {/* Tab Navigation */}
         <div className={`${currentTheme.panelBg} backdrop-blur-md flex border-b ${currentTheme.panelBorder}`}>
           {[
@@ -699,7 +708,7 @@ const Study = () => {
         </div>
 
         {/* Panel Content */}
-        <div className="h-full overflow-hidden">
+        <div className="flex-1 overflow-hidden">
           {/* Chat Panel */}
           {activePanel === 'chat' && (
             <div className={`h-full ${currentTheme.chatBg} backdrop-blur-md flex flex-col`}>
@@ -727,7 +736,7 @@ const Study = () => {
                 </div>
               </div>
               
-                <div ref={mobileChatContainerRef} className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] p-4 space-y-4">
+                <div ref={mobileChatContainerRef} className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] p-4 space-y-4 pb-24">
             {messages.map((message, index) => (
               <div key={index} className={`flex ${message.type === 'question' ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-xs ${styles.borderRadius} ${styles.panelPadding} ${
@@ -753,30 +762,12 @@ const Study = () => {
             ))}
           </div>
           <div ref={chatEndRef} />
-              
-              <div className={`${styles.panelPadding} border-t ${currentTheme.panelBorder}`}>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    placeholder={ageGroup === '1-5' ? "Ask me anything! 😊" : "What would you like to learn?"}
-                    className={`flex-1 ${styles.borderRadius} ${currentTheme.inputText} ${currentTheme.inputBg} px-4 py-3 border-2 ${currentTheme.inputBorder} focus:border-blue-500 focus:outline-none ${styles.fontSize}`}
-                  />
-                  <button
-                    onClick={handleSubmit}
-                    className={`${styles.buttonSize} ${styles.borderRadius} bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:scale-105 transition-transform shadow-lg`}
-                  >
-                    <Send className="h-5 w-5" />
-                  </button>
-                </div>
-              </div>
             </div>
           )}
 
           {/* Resources Panel */}
           {activePanel === 'resources' && (
-            <div className={`h-full ${currentTheme.panelBg} backdrop-blur-md ${styles.panelPadding} overflow-y-auto`}>
+            <div className={`h-full ${currentTheme.panelBg} backdrop-blur-md ${styles.panelPadding} overflow-y-auto pb-24`}>
               <div className={styles.spacing}>
                 <div className="space-y-4">
                   <h3 className={`font-bold ${currentTheme.textPrimary} flex items-center gap-2`}>
@@ -845,7 +836,7 @@ const Study = () => {
 
           {/* Progress Panel */}
           {activePanel === 'progress' && (
-            <div className={`h-full ${currentTheme.panelBg} backdrop-blur-md ${styles.panelPadding} overflow-y-auto`}>
+            <div className={`h-full ${currentTheme.panelBg} backdrop-blur-md ${styles.panelPadding} overflow-y-auto pb-24`}>
               <div className={styles.spacing}>
                 <div className={`${styles.borderRadius} bg-gradient-to-r from-yellow-400 to-orange-500 text-white p-4 text-center`}>
                   <Award className="h-8 w-8 mx-auto mb-2" />
@@ -867,6 +858,33 @@ const Study = () => {
               </div>
             </div>
           )}
+        </div>
+
+        {/* Fixed Input Field for Mobile/Tablet */}
+        <div className={`fixed bottom-0 left-0 right-0 ${currentTheme.chatBg} backdrop-blur-md border-t ${currentTheme.panelBorder} ${styles.panelPadding} z-20`}>
+          <form onSubmit={handleSubmit} className="flex gap-2">
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSubmit(e);
+                }
+              }}
+              placeholder={ageGroup === '1-5' ? "Ask me anything! 😊" : "What would you like to learn?"}
+              className={`flex-1 ${styles.borderRadius} ${currentTheme.inputText} ${currentTheme.inputBg} px-4 py-3 border-2 ${currentTheme.inputBorder} focus:border-blue-500 focus:outline-none ${styles.fontSize}`}
+              disabled={isLoading}
+            />
+            <button
+              type="submit"
+              disabled={isLoading || !input.trim()}
+              className={`${styles.buttonSize} ${styles.borderRadius} bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:scale-105 transition-transform shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100`}
+            >
+              <Send className="h-5 w-5" />
+            </button>
+          </form>
         </div>
       </div>
 

@@ -29,6 +29,7 @@ import DeleteConfirmationDialog from '../components/DeleteConfirmationDialog';
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteNotebook } from '../reducers/authReducer';
 import { Link, useNavigate } from 'react-router-dom';
+import { logoutSuccess, logoutError } from '../reducers/authReducer';
 import axios from 'axios';
 
 const StudentDashboard = () => {
@@ -319,8 +320,13 @@ const StudentDashboard = () => {
   };
 
   const handleLogout = () => {
-    console.log('Logging out');
-    // Handle logout logic
+    try {
+        dispatch(logoutSuccess())
+        nav('/')
+        
+      } catch (error) {
+        dispatch(logoutError({ error}))
+      }
   };
 
   return (
@@ -347,16 +353,16 @@ const StudentDashboard = () => {
           </div>
         </div>
         
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 mr-4">
           {/* Start Tutoring Button */}
-          <Link to="/joinsession">
+          {/* <Link to="/joinsession">
             <button 
               className={`px-4 py-2 text-base ${styles.borderRadius} bg-gradient-to-r from-blue-500 to-purple-600 text-white font-medium hover:scale-105 transition-transform shadow-lg flex items-center gap-2`}
             >
               <Target className="h-4 w-4" />
               Start Tutoring
             </button>
-          </Link>
+          </Link> */}
 
           {/* Settings Menu */}
           <button 
