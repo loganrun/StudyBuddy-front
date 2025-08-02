@@ -17,31 +17,96 @@ function loginPage() {
         password: ''
     })
 
-    const onChange = (e) =>{
-        setFormData({
-           ...formData,
+    const [errors, setErrors] = useState({})
+    const [isLoading, setIsLoading] = useState(false)
 
-            [e.target.name]: e.target.value
-           
-        })
-        
+    const validateEmail = (email) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+        return emailRegex.test(email)
     }
 
-    const onSubmit = async(e) =>{
+    const validatePassword = (password) => {
+        return password.length >= 6
+    }
+
+    const onChange = (e) => {
+        const { name, value } = e.target
+        const processedValue = name === 'email' ? value.toLowerCase().trim() : value
+        
+        setFormData({
+           ...formData,
+            [name]: processedValue
+        })
+
+        // Clear errors when user starts typing
+        if (errors[name]) {
+            setErrors({
+                ...errors,
+                [name]: ''
+            })
+        }
+    }
+
+    const onSubmit = async(e) => {
         e.preventDefault()
-        //console.log(formData)
+        
+        // Reset errors
+        setErrors({})
+        
+        // Validate form
+        const newErrors = {}
+        
+        if (!formData.email.trim()) {
+            newErrors.email = 'Email is required'
+        } else if (!validateEmail(formData.email)) {
+            newErrors.email = 'Please enter a valid email address'
+        }
+        
+        if (!formData.password) {
+            newErrors.password = 'Password is required'
+        } else if (!validatePassword(formData.password)) {
+            newErrors.password = 'Password must be at least 6 characters long'
+        }
+        
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors)
+            return
+        }
+
+        setIsLoading(true)
+        
         try {
             const response = await axios.post(apiAuth, formData);
             const user = response.data; 
             dispatch(loginSuccess(user));
-            // await login(formData)
             nav('/dashboard')
             
         } catch (error) {
+            setIsLoading(false)
+            
+            // Handle different types of errors
+            if (error.response) {
+                // Server responded with error status
+                const status = error.response.status
+                const message = error.response.data?.message || error.response.data?.error || 'Login failed'
+                
+                if (status === 401 || status === 400) {
+                    setErrors({ general: 'Invalid email or password' })
+                } else if (status === 404) {
+                    setErrors({ general: 'Account not found' })
+                } else {
+                    setErrors({ general: message })
+                }
+            } else if (error.request) {
+                // Network error
+                setErrors({ general: 'Network error. Please check your connection and try again.' })
+            } else {
+                // Other error
+                setErrors({ general: 'An unexpected error occurred. Please try again.' })
+            }
+            
             dispatch(loginError(error.message));
-
         }
-       
     }
   return (
     <>
@@ -56,6 +121,15 @@ function loginPage() {
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
         <form onSubmit={(e)=> onSubmit(e)} className="space-y-6" action="#" method="POST">
+            {/* General Error Message */}
+            {errors.general && (
+                <div className="rounded-md bg-red-50 p-4">
+                    <div className="text-sm text-red-800">
+                        ⚠️ {errors.general}
+                    </div>
+                </div>
+            )}
+
             <div>
             <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
                 Email address
@@ -65,11 +139,16 @@ function loginPage() {
                 id="email"
                 name="email"
                 type="email"
+                value={formData.email}
                 autoComplete="email"
                 onChange={(e) =>{onChange(e)}}
-                required
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ${
+                    errors.email ? 'ring-red-500 focus:ring-red-500' : 'ring-gray-300 focus:ring-indigo-600'
+                } placeholder:text-gray-400 focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6`}
                 />
+                {errors.email && (
+                    <p className="mt-1 text-sm text-red-600">⚠️ {errors.email}</p>
+                )}
             </div>
             </div>
 
@@ -89,21 +168,30 @@ function loginPage() {
                 id="password"
                 name="password"
                 type="password"
+                value={formData.password}
                 autoComplete="current-password"
                 onChange={(e) =>{onChange(e)}}
-                required
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ${
+                    errors.password ? 'ring-red-500 focus:ring-red-500' : 'ring-gray-300 focus:ring-indigo-600'
+                } placeholder:text-gray-400 focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6`}
                 />
+                {errors.password && (
+                    <p className="mt-1 text-sm text-red-600">⚠️ {errors.password}</p>
+                )}
             </div>
             </div>
 
             <div>
             <button
                 type="submit"
-                className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                onClick={(e)=> onSubmit(e)}
+                disabled={isLoading}
+                className={`flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 ${
+                    isLoading 
+                        ? 'bg-gray-400 cursor-not-allowed' 
+                        : 'bg-indigo-600 hover:bg-indigo-500'
+                }`}
             >
-                Login 
+                {isLoading ? 'Logging in...' : 'Login'}
             </button>
             </div>
         </form>
