@@ -1,6 +1,7 @@
 import { CloseIcon } from '../components/CloseIcon';
 import { NoAgentNotification } from "../components/NoAgentNotification"
 import TranscriptionView from "../components/TranscriptionView";
+import AgentAvatar from '../components/AgentAvatar';
 import {
   BarVisualizer,
   DisconnectButton,
@@ -383,33 +384,79 @@ export default function VoiceAgentPage() {
 
       <main className="relative z-10 flex items-center justify-center min-h-[calc(100vh-80px)]">
         <RoomContext.Provider value={room}>
-          <div className={`w-full max-w-2xl mx-auto flex flex-col items-center p-4 ${styles.borderRadius} ${currentTheme.panelBg} backdrop-blur-md shadow-xl border ${currentTheme.panelBorder} ${styles.spacing}`}>
-            <RoomAudioRenderer muted={isMuted} />
-            
-            {/* Pulsing Avatar Visualization */}
-            <div className="flex flex-col items-center mb-6">
-              <PulsingAvatar 
-                isConnected={isConnected}
-                isListening={isListening}
-                isAgentSpeaking={isAgentSpeaking}
-                voiceIntensity={voiceIntensity}
-                styles={styles}
-                currentTheme={currentTheme}
-              />
-            </div>
-            
-            {isConnected && (
-              <div
-                className={`w-full max-w-2xl flex-1 overflow-y-auto ${styles.borderRadius} ${currentTheme.cardBg} p-4`}
+          {/* Only render the main content panel when connected */}
+          {isConnected ? (
+            <div className="w-full max-w-2xl mx-auto flex flex-col items-center p-4">
+              <RoomAudioRenderer muted={isMuted} />
+              
+              {/* Large Agent Avatar Visualization */}
+              <div className="flex flex-col items-center mb-6">
+                <AgentAvatar 
+                  isSpeaking={isAgentSpeaking}
+                  size={ageGroup === '1-5' ? 'xl' : 'large'}
+                  color={isAgentSpeaking ? 'blue' : 'green'}
+                  showSpeakingIndicator={true}
+                  className="mb-4"
+                />
+                
+                {/* Enhanced Status text */}
+                <div className="text-center">
+                  <p className={`${styles.fontSize} font-semibold ${currentTheme.textPrimary} mb-3`}>
+                    {!isListening && !isAgentSpeaking && 'Mel is Ready to Chat'}
+                    {isListening && !isAgentSpeaking && 'Mel is Listening...'}
+                    {isAgentSpeaking && 'Mel is Speaking'}
+                  </p>
+                  
+                  {/* Enhanced Voice activity indicator */}
+                  {(isListening || isAgentSpeaking) && (
+                    <div className="mt-3 flex justify-center space-x-2">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <div
+                          key={i}
+                          className={`w-2 rounded-full transition-all duration-150 ${
+                            voiceIntensity * 5 > i ? 'bg-gradient-to-t from-blue-400 to-blue-600' : 'bg-gray-300'
+                          }`}
+                          style={{
+                            height: `${12 + (voiceIntensity * 5 > i ? voiceIntensity * 20 : 0)}px`
+                          }}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              {/* Expanded Transcription View - Temporarily commented out */}
+              {/* <div
+                className={`w-full flex-1 overflow-y-auto overflow-x-hidden ${styles.borderRadius} ${currentTheme.cardBg} p-4`}
                 style={{
-                  maxHeight: 'calc(100vh - 25rem)', // Adjusted for avatar space
-                  paddingBottom: '2rem',
+                  height: 'calc(100vh - 16rem)', // Fixed height for transcriptions
+                  minHeight: '300px', // Minimum readable height
                 }}
               >
-                <TranscriptionView />
-              </div>
-            )}
-          </div>
+                <div 
+                  className="w-full h-full overflow-y-auto overflow-x-hidden"
+                  style={{
+                    scrollbarWidth: 'thin',
+                    scrollbarColor: '#9CA3AF #F3F4F6'
+                  }}
+                >
+                  <TranscriptionView />
+                </div>
+              </div> */}
+            </div>
+          ) : (
+            /* Welcome screen when not connected */
+            <div className="flex flex-col items-center text-center">
+              <div className="text-6xl mb-4">🎤</div>
+              <p className={`${styles.fontSize} font-semibold ${currentTheme.textPrimary} mb-2`}>
+                Ready to Connect
+              </p>
+              <p className={`text-sm ${currentTheme.textSecondary}`}>
+                Press the connect button below to start talking with Mel
+              </p>
+            </div>
+          )}
           {/* Control panel: centered if not connected, fixed bottom if connected */}
           {isConnected ? (
             <div className="fixed bottom-4 left-0 w-full flex justify-center z-50 pointer-events-none">
@@ -463,136 +510,6 @@ function onDeviceFailure(error) {
   );
 }
 
-function PulsingAvatar({ isConnected, isListening, isAgentSpeaking, voiceIntensity, styles, currentTheme }) {
-  // Avatar emoji based on state - focused on AI agent status
-  const getAvatarEmoji = () => {
-    if (!isConnected) return '🎤';
-    if (isAgentSpeaking) return '🗣️'; // AI is speaking
-    if (isListening) return '👂';     // AI is listening to user
-    return '🤖';                      // AI is ready/idle
-  };
-
-  // Dynamic styling based on voice activity
-  const getAvatarStyles = () => {
-    const baseSize = styles.borderRadius.includes('3xl') ? 'w-32 h-32' : 'w-24 h-24';
-    
-    if (!isConnected) {
-      return {
-        size: baseSize,
-        animation: 'animate-pulse',
-        glow: 'shadow-lg',
-        bg: 'bg-gradient-to-r from-gray-400 to-gray-500'
-      };
-    }
-    
-    if (isAgentSpeaking) {
-      const intensity = Math.max(0.3, voiceIntensity);
-      return {
-        size: baseSize,
-        animation: 'animate-bounce',
-        glow: `shadow-2xl shadow-green-500/50`,
-        bg: 'bg-gradient-to-r from-green-400 to-green-600',
-        scale: intensity > 0.5 ? 'scale-110' : 'scale-105'
-      };
-    }
-    
-    if (isListening) {
-      return {
-        size: baseSize,
-        animation: 'animate-pulse',
-        glow: 'shadow-xl shadow-blue-500/50',
-        bg: 'bg-gradient-to-r from-blue-400 to-blue-600',
-        scale: 'scale-105'
-      };
-    }
-    
-    return {
-      size: baseSize,
-      animation: '',
-      glow: 'shadow-lg',
-      bg: 'bg-gradient-to-r from-purple-400 to-purple-600'
-    };
-  };
-
-  const avatarStyles = getAvatarStyles();
-  
-  return (
-    <div className="flex flex-col items-center space-y-4">
-      {/* Main Avatar */}
-      <div className="relative">
-        {/* Outer glow rings */}
-        {(isListening || isAgentSpeaking) && (
-          <>
-            <div className={`absolute inset-0 ${avatarStyles.size} ${styles.borderRadius} ${avatarStyles.bg} opacity-20 ${avatarStyles.animation} scale-125`}></div>
-            <div className={`absolute inset-0 ${avatarStyles.size} ${styles.borderRadius} ${avatarStyles.bg} opacity-30 ${avatarStyles.animation} scale-110`}></div>
-          </>
-        )}
-        
-        {/* Main avatar circle */}
-        <div className={`
-          ${avatarStyles.size} 
-          ${styles.borderRadius} 
-          ${avatarStyles.bg} 
-          ${avatarStyles.glow}
-          ${avatarStyles.scale || ''}
-          ${avatarStyles.animation}
-          flex items-center justify-center
-          text-4xl
-          transition-all duration-300
-          relative z-10
-        `}>
-          <span className="filter drop-shadow-lg">
-            {getAvatarEmoji()}
-          </span>
-        </div>
-        
-        {/* Voice intensity particles */}
-        {isAgentSpeaking && voiceIntensity > 0.3 && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div
-                key={i}
-                className={`absolute w-2 h-2 bg-white rounded-full opacity-60 animate-ping`}
-                style={{
-                  transform: `rotate(${i * 60}deg) translateY(-${40 + voiceIntensity * 20}px)`,
-                  animationDelay: `${i * 0.1}s`,
-                  animationDuration: '1s'
-                }}
-              />
-            ))}
-          </div>
-        )}
-      </div>
-      
-      {/* Status text */}
-      <div className="text-center">
-        <p className={`${styles.fontSize} font-semibold ${currentTheme.textPrimary}`}>
-          {!isConnected && 'Ready to Connect'}
-          {isConnected && !isListening && !isAgentSpeaking && 'Mel is Ready'}
-          {isListening && !isAgentSpeaking && 'Mel is Listening...'}
-          {isAgentSpeaking && 'Mel is Speaking'}
-        </p>
-        
-        {/* Voice activity indicator */}
-        {(isListening || isAgentSpeaking) && (
-          <div className="mt-2 flex justify-center space-x-1">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <div
-                key={i}
-                className={`w-1 h-4 ${currentTheme.panelBg} rounded-full transition-all duration-150 ${
-                  voiceIntensity * 5 > i ? 'bg-gradient-to-t from-blue-400 to-blue-600' : 'bg-gray-300'
-                }`}
-                style={{
-                  height: `${8 + (voiceIntensity * 5 > i ? voiceIntensity * 16 : 0)}px`
-                }}
-              />
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
 
 function VoiceAgentControlPanel({
   isConnected,
