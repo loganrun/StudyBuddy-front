@@ -28,7 +28,7 @@ import {
   X,
   LogOut 
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { logoutSuccess, logoutError } from '../reducers/authReducer';
 
@@ -39,6 +39,7 @@ export default function VoiceAgentPage() {
   //const {state, audioTrack} = useVoiceAssistant();
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [room] = useState(new Room());
   const [isConnected, setIsConnected] = useState(false);
   const [isListening, setIsListening] = useState(false);
@@ -306,9 +307,9 @@ export default function VoiceAgentPage() {
       {/* Header */}
       <div className={`relative z-10 flex items-center justify-between p-4 ${darkMode ? 'bg-slate-800/95' : 'bg-slate-100/95'} backdrop-blur-md border-b ${currentTheme.panelBorder}`}>
         <div className="flex items-center space-x-3">
-          <Link to="/dashboard">
+          <button onClick={() => navigate(-1)}>
             <ChevronLeft className={`h-6 w-6 ${currentTheme.textPrimary} cursor-pointer hover:scale-110 transition-transform`} />
-          </Link>
+          </button>
           <div className="flex items-center space-x-2">
             <span className="text-4xl">🎤</span>
             <div>
