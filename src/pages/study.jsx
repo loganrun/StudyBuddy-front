@@ -599,7 +599,7 @@ const Study = () => {
           <div ref={chatContainerRef} className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] p-4 space-y-4">
             {messages.map((message, index) => (
               <div key={index} className={`flex ${message.type === 'question' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-xs ${styles.borderRadius} ${styles.panelPadding} ${
+                <div className={` ${styles.borderRadius} ${styles.panelPadding} ${
                   message.type === 'question' 
                     ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white' 
                     : 'bg-gradient-to-r from-gray-100 to-gray-200 text-gray-800'
@@ -620,8 +620,8 @@ const Study = () => {
                 </div>
               </div>
             ))}
+            <div ref={chatEndRef} />
           </div>
-          <div ref={chatEndRef} />
           
           <div className={`${styles.panelPadding} border-t ${currentTheme.panelBorder}`}>
             <form onSubmit={handleSubmit} className="flex gap-2">
