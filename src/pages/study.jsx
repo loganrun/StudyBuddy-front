@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { 
   ChevronLeft, 
+  LogOut, 
   Upload, 
   Send, 
   FileText, 
@@ -14,6 +15,7 @@ import {
 } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux'
 import { addMessage, updateLastMessage, clearMessages } from '../reducers/conversationReducer';
+import { logoutSuccess, logoutError } from '../reducers/authReducer';
 import ReactMarkdown from 'react-markdown'
 import LoadingSpinner from '../components/LoadingSpinner';
 import { useLocation } from 'react-router-dom'
@@ -347,6 +349,16 @@ const Study = () => {
     }
   };
 
+  const handleLogout = () => {
+      try {
+          dispatch(logoutSuccess())
+          nav('/')
+          
+        } catch (error) {
+          dispatch(logoutError({ error}))
+        }
+    };
+
   const styles = ageStyles[ageGroup];
 
   return (
@@ -377,13 +389,21 @@ const Study = () => {
           </div>
         </div>
         
-        {/* Settings Menu */}
-        <button 
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-          className={`p-2 rounded-full ${currentTheme.panelBg} hover:scale-105 transition-all shadow-lg`}
-        >
-          <Menu className={`h-5 w-5 ${currentTheme.textPrimary}`} />
-        </button>
+        {/* Settings Menu and Logout Button */}
+        <div className="flex items-center space-x-2">
+          <button 
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className={`p-2 rounded-full ${currentTheme.panelBg} hover:scale-105 transition-all shadow-lg`}
+          >
+            <Menu className={`h-5 w-5 ${currentTheme.textPrimary}`} />
+          </button>
+          <button 
+            onClick={handleLogout}
+            className={`p-2 rounded-full bg-red-500 hover:bg-red-600 text-white hover:scale-105 transition-all shadow-lg`}
+          >
+            <LogOut className="h-4 w-4" />
+          </button>
+        </div>
       </div>
 
       {/* Settings Panel */}
@@ -739,7 +759,7 @@ const Study = () => {
                 <div ref={mobileChatContainerRef} className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] p-4 space-y-4 pb-24">
             {messages.map((message, index) => (
               <div key={index} className={`flex ${message.type === 'question' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-xs ${styles.borderRadius} ${styles.panelPadding} ${
+                <div className={`${styles.borderRadius} ${styles.panelPadding} ${
                   message.type === 'question' 
                     ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white' 
                     : 'bg-gradient-to-r from-gray-100 to-gray-200 text-gray-800'
@@ -760,8 +780,9 @@ const Study = () => {
                 </div>
               </div>
             ))}
+            <div ref={chatEndRef} />
           </div>
-          <div ref={chatEndRef} />
+          
             </div>
           )}
 

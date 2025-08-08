@@ -255,7 +255,7 @@ const StudentDashboard = () => {
   })) : [];
 
   const handleCardClick = (subjectData) => {
-    console.log(`Opening notebook: ${subjectData.name}`);
+    //console.log(`Opening notebook: ${subjectData.name}`);
     // Navigate to study page with all notebook data
     navigate('/study', {
       state: {

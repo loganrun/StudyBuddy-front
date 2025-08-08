@@ -25,9 +25,12 @@ import {
   StopCircle, 
   ChevronLeft,
   Menu,
-  X 
+  X,
+  LogOut 
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { logoutSuccess, logoutError } from '../reducers/authReducer';
 
 
 const voiceAgentUrl = import.meta.env.VITE_VOICE_AGENT_URL
@@ -35,6 +38,7 @@ const voiceAgentUrl = import.meta.env.VITE_VOICE_AGENT_URL
 export default function VoiceAgentPage() {
   //const {state, audioTrack} = useVoiceAssistant();
 
+  const dispatch = useDispatch();
   const [room] = useState(new Room());
   const [isConnected, setIsConnected] = useState(false);
   const [isListening, setIsListening] = useState(false);
@@ -145,6 +149,15 @@ export default function VoiceAgentPage() {
 
   const handleToggleMute = () => {
     setIsMuted(!isMuted);
+  };
+
+  const handleLogout = () => {
+    try {
+      dispatch(logoutSuccess());
+      // Note: Navigation should be handled by the app's routing logic
+    } catch (error) {
+      dispatch(logoutError({ error }));
+    }
   };
 
   const onConnectButtonClicked = useCallback(async () => {
@@ -305,13 +318,21 @@ export default function VoiceAgentPage() {
           </div>
         </div>
         
-        {/* Settings Menu */}
-        <button 
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-          className={`p-2 rounded-full ${currentTheme.panelBg} hover:scale-105 transition-all shadow-lg`}
-        >
-          <Menu className={`h-5 w-5 ${currentTheme.textPrimary}`} />
-        </button>
+        {/* Settings Menu and Logout Button */}
+        <div className="flex items-center space-x-2">
+          <button 
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className={`p-2 rounded-full ${currentTheme.panelBg} hover:scale-105 transition-all shadow-lg`}
+          >
+            <Menu className={`h-5 w-5 ${currentTheme.textPrimary}`} />
+          </button>
+          <button 
+            onClick={handleLogout}
+            className={`p-2 rounded-full bg-red-500 hover:bg-red-600 text-white hover:scale-105 transition-all shadow-lg`}
+          >
+            <LogOut className="h-4 w-4" />
+          </button>
+        </div>
       </div>
 
       {/* Settings Panel */}

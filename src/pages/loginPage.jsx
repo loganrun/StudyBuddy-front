@@ -78,6 +78,7 @@ function loginPage() {
         try {
             const response = await axios.post(apiAuth, formData);
             const user = response.data; 
+        
             dispatch(loginSuccess(user));
             nav('/dashboard')
             
