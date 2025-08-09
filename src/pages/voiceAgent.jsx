@@ -239,9 +239,9 @@ export default function VoiceAgentPage() {
             const isAISpeaking = intensity > 0.05; // Lower threshold for AI detection
             
             // Debug logging for AI speech detection
-            if (isAISpeaking && intensity > 0.1) {
-              console.log(`AI speaking detected - intensity: ${intensity.toFixed(3)}`);
-            }
+            // if (isAISpeaking && intensity > 0.1) {
+            //   console.log(`AI speaking detected - intensity: ${intensity.toFixed(3)}`);
+            // }
             
             setVoiceIntensity(intensity);
             setIsAgentSpeaking(isAISpeaking);

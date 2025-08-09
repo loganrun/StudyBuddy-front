@@ -11,6 +11,7 @@ import React from "react"; // Standard React import
 export default function TranscriptionView() {
   // Fetch the combined transcriptions using the custom hook
   const combinedTranscriptions = useCombinedTranscriptions();
+  console.log(combinedTranscriptions);
 
   // Create a ref for the scroll container
   const scrollContainerRef = React.useRef(null);
