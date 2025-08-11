@@ -49,6 +49,8 @@ const Study = () => {
   const chatEndRef = useRef(null);
   const chatContainerRef = useRef(null);
   const mobileChatContainerRef = useRef(null);
+  const inputRef = useRef(null);
+  const mobileInputRef = useRef(null);
   const greetingInitialized = useRef(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showUploader, setShowUploader] = useState(false);
@@ -218,6 +220,15 @@ const Study = () => {
             setInput("")
             eventSource.close();
             setIsLoading(false);
+            // Focus the input after submission
+            setTimeout(() => {
+              if (inputRef.current) {
+                inputRef.current.focus();
+              }
+              if (mobileInputRef.current) {
+                mobileInputRef.current.focus();
+              }
+            }, 100);
           }
         };
   
@@ -253,6 +264,15 @@ const Study = () => {
             setInput("")
             eventSource.close();
             setIsLoading(false);
+            // Focus the input after submission
+            setTimeout(() => {
+              if (inputRef.current) {
+                inputRef.current.focus();
+              }
+              if (mobileInputRef.current) {
+                mobileInputRef.current.focus();
+              }
+            }, 100);
           }
         };
   
@@ -646,6 +666,7 @@ const Study = () => {
           <div className={`${styles.panelPadding} border-t ${currentTheme.panelBorder}`}>
             <form onSubmit={handleSubmit} className="flex gap-2">
               <input
+                ref={inputRef}
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
@@ -885,6 +906,7 @@ const Study = () => {
         <div className={`fixed bottom-0 left-0 right-0 ${currentTheme.chatBg} backdrop-blur-md border-t ${currentTheme.panelBorder} ${styles.panelPadding} z-20`}>
           <form onSubmit={handleSubmit} className="flex gap-2">
             <input
+              ref={mobileInputRef}
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}

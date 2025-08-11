@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(pkill:*)",
+      "Bash(npx vite build:*)",
+      "Bash(node:*)",
+      "Bash(ls:*)",
+      "Bash(rm:*)",
+      "Bash(git reset:*)"
+    ],
+    "deny": []
+  }
+}
