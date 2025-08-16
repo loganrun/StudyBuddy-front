@@ -54,6 +54,7 @@ const Study = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showUploader, setShowUploader] = useState(false);
 
+  console.log(messages)
   
   //console.log(_id)
 
