@@ -35,7 +35,6 @@ const Study = () => {
   const [tysonCharacter, setTysonCharacter] = useState('robot');
   const [userAvatar, setUserAvatar] = useState('student');
   const [darkMode, setDarkMode] = useState(false);
-  const [message, setMessage] = useState('');
   const params = useLocation()
   const [input, setInput] = useState('');
   const messages = useSelector((state) => state.conversation.messages);
@@ -54,6 +53,7 @@ const Study = () => {
   const greetingInitialized = useRef(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showUploader, setShowUploader] = useState(false);
+
   
   //console.log(_id)
 
