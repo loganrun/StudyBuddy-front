@@ -18,9 +18,10 @@ import { addMessage, updateLastMessage, clearMessages } from '../reducers/conver
 import { logoutSuccess, logoutError } from '../reducers/authReducer';
 import ReactMarkdown from 'react-markdown'
 import LoadingSpinner from '../components/LoadingSpinner';
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { Link } from 'react-router-dom'
 import HomeworkUploader from '../components/HomeworkUploader';
+import SaveChatDialog from '../components/SaveChatDialog';
 
 
 const openUrl = import.meta.env.VITE_OPENAI_URL
@@ -53,8 +54,11 @@ const Study = () => {
   const greetingInitialized = useRef(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showUploader, setShowUploader] = useState(false);
+  const [showSaveDialog, setShowSaveDialog] = useState(false);
+  const [pendingAction, setPendingAction] = useState(null); // 'logout' or 'navigate'
+  const navigate = useNavigate();
 
-  console.log(messages)
+  //console.log(messages)
   
   //console.log(_id)
 
@@ -207,7 +211,7 @@ const Study = () => {
         const eventSource = new EventSource(`${addHomeworkUrl}/?prompt=${encodeURIComponent(input)}&userId=${encodeURIComponent(user.id)}&conversationId=${encodeURIComponent(conversationId)}  `);
         eventSource.onmessage = (event) => {
           const data = JSON.parse(event.data)
-          console.log(data)
+          //console.log(data)
           if (data.content) {
             //console.log(data)
             dispatch(updateLastMessage({ text: data.content, conversationId: data.conversationId, origin: 'homework'  }));
@@ -251,7 +255,7 @@ const Study = () => {
         const eventSource = new EventSource(`${openUrl}?prompt=${encodeURIComponent(input)}&userId=${encodeURIComponent(user.id)}&conversationId=${encodeURIComponent(conversationId)}  `);
         eventSource.onmessage = (event) => {
           const data = JSON.parse(event.data)
-          console.log(data)
+          //console.log(data)
           if (data.content) {
             //console.log(data)
             dispatch(updateLastMessage({ text: data.content, conversationId: data.conversationId }));
@@ -371,14 +375,58 @@ const Study = () => {
   };
 
   const handleLogout = () => {
-      try {
-          dispatch(logoutSuccess())
-          nav('/')
-          
-        } catch (error) {
-          dispatch(logoutError({ error}))
-        }
-    };
+    if (messages.length > 0) {
+      // Show save dialog
+      setPendingAction('logout');
+      setShowSaveDialog(true);
+    } else {
+      // No messages to save, proceed with logout
+      executeLogout();
+    }
+  };
+
+  const executeLogout = () => {
+    try {
+      dispatch(clearMessages());
+      dispatch(logoutSuccess());
+      navigate('/');
+    } catch (error) {
+      dispatch(logoutError({ error }));
+    }
+  };
+
+  const handleChevronClick = () => {
+    if (messages.length > 0) {
+      // Show save dialog
+      setPendingAction('navigate');
+      setShowSaveDialog(true);
+    } else {
+      // No messages to save, proceed with navigation
+      dispatch(clearMessages());
+      navigate('/dashboard');
+    }
+  };
+
+  const handleSaveDialogConfirm = () => {
+    // Clear messages and execute pending action
+    dispatch(clearMessages());
+    
+    if (pendingAction === 'logout') {
+      executeLogout();
+    } else if (pendingAction === 'navigate') {
+      navigate('/dashboard');
+    }
+    
+    // Reset state
+    setShowSaveDialog(false);
+    setPendingAction(null);
+  };
+
+  const handleSaveDialogClose = () => {
+    // Reset state without executing action
+    setShowSaveDialog(false);
+    setPendingAction(null);
+  };
 
   const styles = ageStyles[ageGroup];
 
@@ -398,9 +446,9 @@ const Study = () => {
       {/* Header */}
       <div className={`relative z-10 flex items-center justify-between p-4 ${darkMode ? 'bg-slate-800/95' : 'bg-slate-100/95'} backdrop-blur-md border-b ${currentTheme.panelBorder}`}>
         <div className="flex items-center space-x-3">
-          <Link to="/dashboard" onClick={() => dispatch(clearMessages())}>
-          <ChevronLeft className={`h-6 w-6 ${currentTheme.textPrimary} cursor-pointer hover:scale-110 transition-transform`} />
-          </Link>
+          <button onClick={handleChevronClick}>
+            <ChevronLeft className={`h-6 w-6 ${currentTheme.textPrimary} cursor-pointer hover:scale-110 transition-transform`} />
+          </button>
           <div className="flex items-center space-x-2">
             <span className="text-4xl">{currentChar.emoji}</span>
             <div>
@@ -954,6 +1002,15 @@ const Study = () => {
           </div>
         </div>
       )}
+
+      {/* Save Chat Dialog */}
+      <SaveChatDialog
+        isOpen={showSaveDialog}
+        onClose={handleSaveDialogClose}
+        onConfirm={handleSaveDialogConfirm}
+        messages={messages}
+        notebookId={_id}
+      />
     </div>
   );
 };
