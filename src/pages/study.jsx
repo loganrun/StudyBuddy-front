@@ -59,6 +59,7 @@ const Study = () => {
   const navigate = useNavigate();
 
   //console.log(messages)
+  //console.log(user)
   
   //console.log(_id)
 
@@ -586,28 +587,26 @@ const Study = () => {
        
         {/* Left Panel - Transcripts & Notes */}
         <div className={`w-1/4 ${currentTheme.panelBg} backdrop-blur-md ${styles.borderRadius} ${styles.panelPadding} shadow-xl border ${currentTheme.panelBorder} overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]`}>
-          <h2 className={`${styles.titleSize} font-bold ${currentTheme.textPrimary} mb-4 flex items-center gap-2`}>
+          <h2 className={`${styles.titleSize} font-bold ${currentTheme.textPrimary} mb-10 flex items-center gap-2`}>
             <FileText className={styles.iconSize} />
             Resources
           </h2>
-          
-          <div className={styles.spacing}>
-            <div className="space-y-3">
+           <div className="space-y-3">
               <h3 className={`font-semibold ${currentTheme.textSecondary} flex items-center gap-2`}>
                 <BookOpen className="h-5 w-5" />
-                References
+                Saved Notes
               </h3>
-              <div className="space-y-2 max-h-48 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+              <div className="space-y-2 max-h-56 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                 {[
-                  { emoji: "🧮", title: "Math: Fractions Basics", date: "Today" },
-                  { emoji: "📖", title: "Reading: Character Analysis", date: "Yesterday" },
-                  { emoji: "🌍", title: "Geography: World Capitals", date: "2 days ago" },
-                  { emoji: "🔬", title: "Science: Water Cycle", date: "3 days ago" },
-                  { emoji: "📚", title: "History: Ancient Egypt", date: "1 week ago" },
+                  { emoji: "📝", title: "Math Practice Notes", date: "Today" },
+                  { emoji: "🎨", title: "Art Project Ideas", date: "Yesterday" },
+                  { emoji: "⭐", title: "Spelling Words List", date: "2 days ago" },
+                  { emoji: "🏃", title: "PE: Fitness Goals", date: "3 days ago" },
+                  { emoji: "🎵", title: "Music: Song Lyrics", date: "1 week ago" },
                 ].map((item, index) => (
                   <button
                     key={index}
-                    className={`w-full text-left ${styles.borderRadius} bg-gradient-to-r from-blue-50 to-purple-50 hover:from-blue-100 hover:to-purple-100 border border-blue-200 p-3 hover:scale-105 transition-all shadow-sm`}
+                    className={`w-full text-left ${styles.borderRadius} bg-gradient-to-r from-purple-50 to-pink-50 hover:from-purple-100 hover:to-pink-100 border border-purple-200 p-3 hover:scale-105 transition-all shadow-sm`}
                   >
                     <div className="flex items-center gap-2 mb-1">
                       <span className="text-lg">{item.emoji}</span>
@@ -622,23 +621,24 @@ const Study = () => {
                 ))}
               </div>
             </div>
-
+          
+          <div className="mt-10">
             <div className="space-y-3">
               <h3 className={`font-semibold ${currentTheme.textSecondary} flex items-center gap-2`}>
                 <BookOpen className="h-5 w-5" />
-                Notes
+                References
               </h3>
-              <div className="space-y-2 max-h-48 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+              <div className="space-y-2 max-h-56 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                 {[
-                  { emoji: "📝", title: "Math Practice Notes", date: "Today" },
-                  { emoji: "🎨", title: "Art Project Ideas", date: "Yesterday" },
-                  { emoji: "⭐", title: "Spelling Words List", date: "2 days ago" },
-                  { emoji: "🏃", title: "PE: Fitness Goals", date: "3 days ago" },
-                  { emoji: "🎵", title: "Music: Song Lyrics", date: "1 week ago" },
+                  { emoji: "🧮", title: "Math: Fractions Basics", date: "Today" },
+                  { emoji: "📖", title: "Reading: Character Analysis", date: "Yesterday" },
+                  { emoji: "🌍", title: "Geography: World Capitals", date: "2 days ago" },
+                  { emoji: "🔬", title: "Science: Water Cycle", date: "3 days ago" },
+                  { emoji: "📚", title: "History: Ancient Egypt", date: "1 week ago" },
                 ].map((item, index) => (
                   <button
                     key={index}
-                    className={`w-full text-left ${styles.borderRadius} bg-gradient-to-r from-purple-50 to-pink-50 hover:from-purple-100 hover:to-pink-100 border border-purple-200 p-3 hover:scale-105 transition-all shadow-sm`}
+                    className={`w-full text-left ${styles.borderRadius} bg-gradient-to-r from-blue-50 to-purple-50 hover:from-blue-100 hover:to-purple-100 border border-blue-200 p-3 hover:scale-105 transition-all shadow-sm`}
                   >
                     <div className="flex items-center gap-2 mb-1">
                       <span className="text-lg">{item.emoji}</span>
@@ -863,19 +863,19 @@ const Study = () => {
                 <div className="space-y-4">
                   <h3 className={`font-bold ${currentTheme.textPrimary} flex items-center gap-2`}>
                     <BookOpen className="h-6 w-6" />
-                    Transcripts
+                    Saved Notes
                   </h3>
                   <div className="space-y-2">
                     {[
-                      { emoji: "🧮", title: "Math: Fractions Basics", date: "Today" },
-                      { emoji: "📖", title: "Reading: Character Analysis", date: "Yesterday" },
-                      { emoji: "🌍", title: "Geography: World Capitals", date: "2 days ago" },
-                      { emoji: "🔬", title: "Science: Water Cycle", date: "3 days ago" },
-                      { emoji: "📚", title: "History: Ancient Egypt", date: "1 week ago" },
+                      { emoji: "📝", title: "Math Practice Notes", date: "Today" },
+                      { emoji: "🎨", title: "Art Project Ideas", date: "Yesterday" },
+                      { emoji: "⭐", title: "Spelling Words List", date: "2 days ago" },
+                      { emoji: "🏃", title: "PE: Fitness Goals", date: "3 days ago" },
+                      { emoji: "🎵", title: "Music: Song Lyrics", date: "1 week ago" },
                     ].map((item, index) => (
                       <button
                         key={index}
-                        className={`w-full text-left ${styles.borderRadius} bg-gradient-to-r from-blue-50 to-purple-50 hover:from-blue-100 hover:to-purple-100 border border-blue-200 p-3 hover:scale-105 transition-all shadow-sm`}
+                        className={`w-full text-left ${styles.borderRadius} bg-gradient-to-r from-purple-50 to-pink-50 hover:from-purple-100 hover:to-pink-100 border border-purple-200 p-3 hover:scale-105 transition-all shadow-sm`}
                       >
                         <div className="flex items-center gap-2 mb-1">
                           <span className="text-lg">{item.emoji}</span>
@@ -890,23 +890,22 @@ const Study = () => {
                     ))}
                   </div>
                 </div>
-
                 <div className="space-y-4">
                   <h3 className={`font-bold ${currentTheme.textPrimary} flex items-center gap-2`}>
                     <BookOpen className="h-6 w-6" />
-                    Notes
+                    References
                   </h3>
                   <div className="space-y-2">
                     {[
-                      { emoji: "📝", title: "Math Practice Notes", date: "Today" },
-                      { emoji: "🎨", title: "Art Project Ideas", date: "Yesterday" },
-                      { emoji: "⭐", title: "Spelling Words List", date: "2 days ago" },
-                      { emoji: "🏃", title: "PE: Fitness Goals", date: "3 days ago" },
-                      { emoji: "🎵", title: "Music: Song Lyrics", date: "1 week ago" },
+                      { emoji: "🧮", title: "Math: Fractions Basics", date: "Today" },
+                      { emoji: "📖", title: "Reading: Character Analysis", date: "Yesterday" },
+                      { emoji: "🌍", title: "Geography: World Capitals", date: "2 days ago" },
+                      { emoji: "🔬", title: "Science: Water Cycle", date: "3 days ago" },
+                      { emoji: "📚", title: "History: Ancient Egypt", date: "1 week ago" },
                     ].map((item, index) => (
                       <button
                         key={index}
-                        className={`w-full text-left ${styles.borderRadius} bg-gradient-to-r from-purple-50 to-pink-50 hover:from-purple-100 hover:to-pink-100 border border-purple-200 p-3 hover:scale-105 transition-all shadow-sm`}
+                        className={`w-full text-left ${styles.borderRadius} bg-gradient-to-r from-blue-50 to-purple-50 hover:from-blue-100 hover:to-purple-100 border border-blue-200 p-3 hover:scale-105 transition-all shadow-sm`}
                       >
                         <div className="flex items-center gap-2 mb-1">
                           <span className="text-lg">{item.emoji}</span>
@@ -951,33 +950,35 @@ const Study = () => {
           )}
         </div>
 
-        {/* Fixed Input Field for Mobile/Tablet */}
-        <div className={`fixed bottom-0 left-0 right-0 ${currentTheme.chatBg} backdrop-blur-md border-t ${currentTheme.panelBorder} ${styles.panelPadding} z-20`}>
-          <form onSubmit={handleSubmit} className="flex gap-2">
-            <input
-              ref={mobileInputRef}
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSubmit(e);
-                }
-              }}
-              placeholder={ageGroup === '1-5' ? "Ask me anything! 😊" : "What would you like to learn?"}
-              className={`flex-1 ${styles.borderRadius} ${currentTheme.inputText} ${currentTheme.inputBg} px-4 py-3 border-2 ${currentTheme.inputBorder} focus:border-blue-500 focus:outline-none ${styles.fontSize}`}
-              disabled={isLoading}
-            />
-            <button
-              type="submit"
-              disabled={isLoading || !input.trim()}
-              className={`${styles.buttonSize} ${styles.borderRadius} bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:scale-105 transition-transform shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100`}
-            >
-              <Send className="h-5 w-5" />
-            </button>
-          </form>
-        </div>
+        {/* Fixed Input Field for Mobile/Tablet - Only show on chat panel */}
+        {activePanel === 'chat' && (
+          <div className={`fixed bottom-0 left-0 right-0 ${currentTheme.chatBg} backdrop-blur-md border-t ${currentTheme.panelBorder} ${styles.panelPadding} z-20`}>
+            <form onSubmit={handleSubmit} className="flex gap-2">
+              <input
+                ref={mobileInputRef}
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSubmit(e);
+                  }
+                }}
+                placeholder={ageGroup === '1-5' ? "Ask me anything! 😊" : "What would you like to learn?"}
+                className={`flex-1 ${styles.borderRadius} ${currentTheme.inputText} ${currentTheme.inputBg} px-4 py-3 border-2 ${currentTheme.inputBorder} focus:border-blue-500 focus:outline-none ${styles.fontSize}`}
+                disabled={isLoading}
+              />
+              <button
+                type="submit"
+                disabled={isLoading || !input.trim()}
+                className={`${styles.buttonSize} ${styles.borderRadius} bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:scale-105 transition-transform shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100`}
+              >
+                <Send className="h-5 w-5" />
+              </button>
+            </form>
+          </div>
+        )}
       </div>
 
       {/* HomeworkUploader Modal */}

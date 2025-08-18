@@ -46,7 +46,7 @@ const StudentDashboard = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user.payload.user);
-  console.log('User data:', user);
+  console.log(user);
 
   // Background themes
   const backgrounds = {
