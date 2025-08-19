@@ -26,4 +26,5 @@ dist-ssr
 CLAUDE.md
 PLANNING.md
 TASKS.md
+.claude/settings.local.json
 
