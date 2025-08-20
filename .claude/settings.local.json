@@ -7,7 +7,10 @@
       "Bash(node:*)",
       "Bash(ls:*)",
       "Bash(rm:*)",
-      "Bash(git reset:*)"
+      "Bash(git reset:*)",
+      "Bash(npm run build:*)",
+      "Bash(timeout 10s npm run dev)",
+      "Bash(true)"
     ],
     "deny": []
   }
