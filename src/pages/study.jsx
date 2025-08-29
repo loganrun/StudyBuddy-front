@@ -507,7 +507,7 @@ const Study = () => {
           </div>
           
           {/* Age Group Selection */}
-          <div className="mb-6">
+          {/* <div className="mb-6">
             <h3 className={`font-semibold mb-3 ${currentTheme.textPrimary}`}>Age Group</h3>
             <div className="space-y-2">
               {['1-5', '6-8'].map(age => (
@@ -522,7 +522,7 @@ const Study = () => {
                 </button>
               ))}
             </div>
-          </div>
+          </div> */}
 
           {/* Background Selection */}
           <div className="mb-6">

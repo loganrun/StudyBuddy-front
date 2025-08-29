@@ -326,7 +326,7 @@ Please provide age-appropriate help for a ${formData.gradeLevel} student studyin
               onChange={handleInputChange}
               placeholder="Any specific questions or areas you'd like us to focus on?"
               rows={3}
-              className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              className="w-full text-black px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
             />
           </div>
 
@@ -341,7 +341,7 @@ Please provide age-appropriate help for a ${formData.gradeLevel} student studyin
               name="difficultyLevel"
               value={formData.difficultyLevel}
               onChange={handleInputChange}
-              className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl text-black focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
             >
               <option value="">Select difficulty level</option>
               {difficultyLevels.map(level => (

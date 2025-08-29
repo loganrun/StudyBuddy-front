@@ -155,7 +155,7 @@ export default function VoiceAgentPage() {
   const handleLogout = () => {
     try {
       dispatch(logoutSuccess());
-      // Note: Navigation should be handled by the app's routing logic
+      navigate('/');
     } catch (error) {
       dispatch(logoutError({ error }));
     }
@@ -367,7 +367,7 @@ export default function VoiceAgentPage() {
           </div>
           
           {/* Age Group Selection */}
-          <div className="mb-6">
+          {/* <div className="mb-6">
             <h3 className={`font-semibold mb-3 ${currentTheme.textPrimary}`}>Age Group</h3>
             <div className="space-y-2">
               {['1-5', '6-8'].map(age => (
@@ -382,7 +382,7 @@ export default function VoiceAgentPage() {
                 </button>
               ))}
             </div>
-          </div>
+          </div> */}
 
           {/* Background Selection */}
           <div className="mb-6">
