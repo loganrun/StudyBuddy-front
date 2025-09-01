@@ -46,7 +46,7 @@ const StudentDashboard = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user.payload.user);
-  console.log(user);
+  
 
   // Background themes
   const backgrounds = {
@@ -271,7 +271,8 @@ const StudentDashboard = () => {
         roomId: subjectData.roomId,
         owner: subjectData.owner,
         progress: subjectData.progress,
-        userId: user.id
+        userId: user.id,
+        
       }
     });
   };
@@ -412,25 +413,7 @@ const StudentDashboard = () => {
               </button>
             </div>
           </div>
-          
-          {/* Age Group Selection */}
-          {/* <div className="mb-6">
-            <h3 className={`font-semibold mb-3 ${currentTheme.textPrimary}`}>Age Group</h3>
-            <div className="space-y-2">
-              {['1-5', '6-8'].map(age => (
-                <button
-                  key={age}
-                  onClick={() => setAgeGroup(age)}
-                  className={`w-full p-3 rounded-xl text-left ${
-                    ageGroup === age ? currentTheme.settingsSelected : currentTheme.settingsPanel
-                  } ${ageGroup === age ? '' : currentTheme.textPrimary}`}
-                >
-                  Grades {age}
-                </button>
-              ))}
-            </div>
-          </div> */}
-
+         
           {/* Background Selection */}
           <div className="mb-6">
             <h3 className={`font-semibold mb-3 ${currentTheme.textPrimary}`}>Background Theme</h3>
@@ -511,7 +494,7 @@ const StudentDashboard = () => {
         {/* Subjects Section */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
-            <h2 className={`${styles.titleSize} font-bold ${currentTheme.textPrimary}`}>My WorkBooks</h2>
+            <h2 className={`${styles.titleSize} font-bold ${currentTheme.textPrimary}`}>My NoteBooks</h2>
           </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

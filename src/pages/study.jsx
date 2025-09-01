@@ -9,9 +9,23 @@ import {
   Menu,
   X,
   Star,
-  Award,
   Heart,
-  Smile
+  Smile,
+  Languages,
+  Microscope,
+  Atom,
+  Landmark,
+  Camera,
+  Gamepad2,
+  Computer,
+  Dumbbell,
+  Calculator, 
+  Beaker, 
+  Globe, 
+  Palette, 
+  Music,
+  Award,
+  
 } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux'
 import { addMessage, updateLastMessage, clearMessages } from '../reducers/conversationReducer';
@@ -44,7 +58,7 @@ const Study = () => {
   const user = useSelector((state) => state.auth.user.payload.user);
   const [response, setResponse] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-   const { url, subject, transcript, date, _id, notes, summary, roomId, userId } = params.state;
+   const { url, subject, transcript, date, _id, notes, summary, roomId, userId} = params.state;
   const dispatch = useDispatch();
   const chatEndRef = useRef(null);
   const chatContainerRef = useRef(null);
@@ -58,7 +72,9 @@ const Study = () => {
   const [pendingAction, setPendingAction] = useState(null); // 'logout' or 'navigate'
   const navigate = useNavigate();
 
-  //console.log(messages)
+  
+
+  console.log(notes)
   //console.log(user)
   
   //console.log(_id)
@@ -89,6 +105,55 @@ const Study = () => {
     }
   };
 
+    const subjectIconMap = {
+    'Math': Calculator,
+    'Mathematics': Calculator,
+    'Algebra': Calculator,
+    'Geometry': Calculator,
+    'Calculus': Calculator,
+    'Statistics': Calculator,
+    'Reading': BookOpen,
+    'Literature': BookOpen,
+    'English': BookOpen,
+    'Language Arts': Languages,
+    'Spanish': Languages,
+    'French': Languages,
+    'German': Languages,
+    'Science': Beaker,
+    'Chemistry': Beaker,
+    'Physics': Atom,
+    'Biology': Microscope,
+    'Anatomy': Microscope,
+    'Botany': Microscope,
+    'Geography': Globe,
+    'History': Landmark,
+    'Social Studies': Globe,
+    'Civics': Landmark,
+    'Government': Landmark,
+    'Art': Palette,
+    'Drawing': Palette,
+    'Painting': Palette,
+    'Photography': Camera,
+    'Music': Music,
+    'Band': Music,
+    'Orchestra': Music,
+    'Computer Science': Computer,
+    'Programming': Computer,
+    'Technology': Computer,
+    'Physical Education': Dumbbell,
+    'PE': Dumbbell,
+    'Health': Dumbbell,
+    'Fitness': Dumbbell,
+    'Games': Gamepad2,
+    'Recreation': Gamepad2,
+    'default': BookOpen
+  };
+
+  //console.log(subject)
+
+  const IconComponent = subjectIconMap[subject] || BookOpen;
+  
+
   // Character options
   const characters = {
     robot: { emoji: "🤖", name: "Robot Tyson", color: "text-blue-400" },
@@ -101,7 +166,7 @@ const Study = () => {
 
   // User avatar options
   const userAvatars = {
-    student: { emoji: "👤", name: "Student", color: "text-gray-600" },
+    student: { emoji: "👤", name: "Student", color: "text-blue-800" },
     explorer: { emoji: "🧭", name: "Explorer", color: "text-blue-500" },
     scientist: { emoji: "🔬", name: "Scientist", color: "text-green-500" },
     artist: { emoji: "🎨", name: "Artist", color: "text-purple-500" },
@@ -120,7 +185,7 @@ const Study = () => {
       panelBorder: 'border-white/50',
       headerBg: 'bg-white/95',
       textPrimary: 'text-gray-800',
-      textSecondary: 'text-gray-600',
+      textSecondary: 'text-blue-800',
       textTertiary: 'text-gray-500',
       cardBg: 'bg-white/80',
       settingsBg: 'bg-white/95',
@@ -180,7 +245,7 @@ const Study = () => {
 
     // Blockquotes
     blockquote: ({ node, ...props }) => (
-      <blockquote className="border-l-4 border-blue-500 pl-4 italic text-gray-600 my-4" {...props} />
+      <blockquote className="border-l-4 border-blue-500 pl-4 italic text-blue-800 my-4" {...props} />
     ),
 
     // Code Blocks & Inline Code
@@ -506,24 +571,6 @@ const Study = () => {
             </div>
           </div>
           
-          {/* Age Group Selection */}
-          {/* <div className="mb-6">
-            <h3 className={`font-semibold mb-3 ${currentTheme.textPrimary}`}>Age Group</h3>
-            <div className="space-y-2">
-              {['1-5', '6-8'].map(age => (
-                <button
-                  key={age}
-                  onClick={() => setAgeGroup(age)}
-                  className={`w-full p-3 rounded-xl text-left ${
-                    ageGroup === age ? currentTheme.settingsSelected : currentTheme.settingsPanel
-                  } ${ageGroup === age ? '' : currentTheme.textPrimary}`}
-                >
-                  Grades {age}
-                </button>
-              ))}
-            </div>
-          </div> */}
-
           {/* Background Selection */}
           <div className="mb-6">
             <h3 className={`font-semibold mb-3 ${currentTheme.textPrimary}`}>Background Theme</h3>
@@ -597,25 +644,21 @@ const Study = () => {
                 Saved Notes
               </h3>
               <div className="space-y-2 max-h-56 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-                {[
-                  { emoji: "📝", title: "Math Practice Notes", date: "Today" },
-                  { emoji: "🎨", title: "Art Project Ideas", date: "Yesterday" },
-                  { emoji: "⭐", title: "Spelling Words List", date: "2 days ago" },
-                  { emoji: "🏃", title: "PE: Fitness Goals", date: "3 days ago" },
-                  { emoji: "🎵", title: "Music: Song Lyrics", date: "1 week ago" },
-                ].map((item, index) => (
+                {notes.map((item, index) => (
                   <button
                     key={index}
                     className={`w-full text-left ${styles.borderRadius} bg-gradient-to-r from-purple-50 to-pink-50 hover:from-purple-100 hover:to-pink-100 border border-purple-200 p-3 hover:scale-105 transition-all shadow-sm`}
                   >
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="text-lg">{item.emoji}</span>
+                      <IconComponent className="h-6 w-6 text-black" />
                       <span className={`font-medium ${currentTheme.textPrimary} ${ageGroup === '1-5' ? 'text-sm' : 'text-xs'}`}>
-                        {item.title}
+                        {item.title.charAt(0).toUpperCase() + item.title.slice(1)}
                       </span>
                     </div>
-                    <div className={`${currentTheme.textSecondary} ${ageGroup === '1-5' ? 'text-xs' : 'text-xs'}`}>
-                      {item.date}
+                    <div className="flex items-center justify-between">
+                      <div className={`text-blue-800 text-bold ${ageGroup === '1-5' ? 'text-sm' : 'text-xs'} bg-white/70 px-2 py-1 rounded-full font-medium`}>
+                         {new Date(item.createdAt).toLocaleDateString()}
+                      </div>
                     </div>
                   </button>
                 ))}
@@ -866,25 +909,21 @@ const Study = () => {
                     Saved Notes
                   </h3>
                   <div className="space-y-2">
-                    {[
-                      { emoji: "📝", title: "Math Practice Notes", date: "Today" },
-                      { emoji: "🎨", title: "Art Project Ideas", date: "Yesterday" },
-                      { emoji: "⭐", title: "Spelling Words List", date: "2 days ago" },
-                      { emoji: "🏃", title: "PE: Fitness Goals", date: "3 days ago" },
-                      { emoji: "🎵", title: "Music: Song Lyrics", date: "1 week ago" },
-                    ].map((item, index) => (
+                    {notes.map((item, index) => (
                       <button
                         key={index}
                         className={`w-full text-left ${styles.borderRadius} bg-gradient-to-r from-purple-50 to-pink-50 hover:from-purple-100 hover:to-pink-100 border border-purple-200 p-3 hover:scale-105 transition-all shadow-sm`}
                       >
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="text-lg">{item.emoji}</span>
+                          <IconComponent className="h-6 w-6 text-black" />
                           <span className={`font-medium ${currentTheme.textPrimary} ${ageGroup === '1-5' ? 'text-base' : 'text-sm'}`}>
-                            {item.title}
+                            {item.title.charAt(0).toUpperCase() + item.title.slice(1)}
                           </span>
                         </div>
-                        <div className={`${currentTheme.textSecondary} ${ageGroup === '1-5' ? 'text-sm' : 'text-xs'}`}>
-                          {item.date}
+                        <div className="flex items-center justify-between">
+                          <div className={`text-blue-800 text-bold ${ageGroup === '1-5' ? 'text-sm' : 'text-xs'} bg-white/70 px-2 py-1 rounded-full font-medium`}>
+                             {new Date(item.createdAt).toLocaleDateString()}
+                          </div>
                         </div>
                       </button>
                     ))}
@@ -992,7 +1031,7 @@ const Study = () => {
                 onClick={() => setShowUploader(false)}
                 className="p-2 rounded-full hover:bg-gray-100 transition-colors"
               >
-                <X className="h-6 w-6 text-gray-600" />
+                <X className="h-6 w-6 text-blue-800" />
               </button>
             </div>
             
