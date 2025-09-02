@@ -70,11 +70,13 @@ const Study = () => {
   const [showUploader, setShowUploader] = useState(false);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [pendingAction, setPendingAction] = useState(null); // 'logout' or 'navigate'
+  const [showConversationDialog, setShowConversationDialog] = useState(false);
+  const [selectedConversation, setSelectedConversation] = useState(null);
   const navigate = useNavigate();
 
   
 
-  console.log(notes)
+  //console.log(notes)
   //console.log(user)
   
   //console.log(_id)
@@ -647,10 +649,14 @@ const Study = () => {
                 {notes.map((item, index) => (
                   <button
                     key={index}
+                    onClick={() => {
+                      setSelectedConversation(item);
+                      setShowConversationDialog(true);
+                    }}
                     className={`w-full text-left ${styles.borderRadius} bg-gradient-to-r from-purple-50 to-pink-50 hover:from-purple-100 hover:to-pink-100 border border-purple-200 p-3 hover:scale-105 transition-all shadow-sm`}
                   >
                     <div className="flex items-center gap-2 mb-1">
-                      <IconComponent className="h-6 w-6 text-black" />
+                      <IconComponent className="h-6 w-6 text-blue-800" />
                       <span className={`font-medium ${currentTheme.textPrimary} ${ageGroup === '1-5' ? 'text-sm' : 'text-xs'}`}>
                         {item.title.charAt(0).toUpperCase() + item.title.slice(1)}
                       </span>
@@ -912,10 +918,14 @@ const Study = () => {
                     {notes.map((item, index) => (
                       <button
                         key={index}
+                        onClick={() => {
+                          setSelectedConversation(item);
+                          setShowConversationDialog(true);
+                        }}
                         className={`w-full text-left ${styles.borderRadius} bg-gradient-to-r from-purple-50 to-pink-50 hover:from-purple-100 hover:to-pink-100 border border-purple-200 p-3 hover:scale-105 transition-all shadow-sm`}
                       >
                         <div className="flex items-center gap-2 mb-1">
-                          <IconComponent className="h-6 w-6 text-black" />
+                          <IconComponent className="h-6 w-6 text-blue-800" />
                           <span className={`font-medium ${currentTheme.textPrimary} ${ageGroup === '1-5' ? 'text-base' : 'text-sm'}`}>
                             {item.title.charAt(0).toUpperCase() + item.title.slice(1)}
                           </span>
@@ -1051,6 +1061,65 @@ const Study = () => {
         messages={messages}
         notebookId={_id}
       />
+
+      {/* Conversation Dialog */}
+      {showConversationDialog && selectedConversation && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
+          <div className="relative w-full h-full max-w-4xl max-h-[90vh] m-4 bg-white rounded-lg shadow-2xl overflow-hidden">
+            {/* Dialog Header */}
+            <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-500 to-purple-600">
+              <div className="flex items-center gap-3">
+                <IconComponent className="h-6 w-6 text-white" />
+                <div>
+                  <h2 className="text-xl font-bold text-white">
+                    {selectedConversation.title.charAt(0).toUpperCase() + selectedConversation.title.slice(1)}
+                  </h2>
+                  <p className="text-blue-100 text-sm">
+                    📅 {new Date(selectedConversation.createdAt).toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => {
+                  setShowConversationDialog(false);
+                  setSelectedConversation(null);
+                }}
+                className="p-2 rounded-full hover:bg-white/20 transition-colors"
+              >
+                <X className="h-6 w-6 text-white" />
+              </button>
+            </div>
+            
+            {/* Dialog Content - Conversation */}
+            <div className="overflow-y-auto h-full pb-16 p-4 bg-gradient-to-br from-blue-50 to-purple-50">
+              <div className="space-y-4 max-w-3xl mx-auto">
+                {selectedConversation.content && selectedConversation.content.map((message, index) => (
+                  <div key={index} className={`flex ${message.type === 'question' ? 'justify-end' : 'justify-start'}`}>
+                    <div className={`${styles.borderRadius} ${styles.panelPadding} max-w-[80%] ${
+                      message.type === 'question' 
+                        ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white' 
+                        : 'bg-gradient-to-r from-gray-100 to-gray-200 text-gray-800'
+                    } shadow-lg`}>
+                      {message.type === 'question' ? (
+                        <div className="flex items-center gap-2 mb-2 justify-end">
+                          <span className="font-semibold text-sm text-white">You</span>
+                          <span className="text-lg">{currentUser.emoji}</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-lg">{currentChar.emoji}</span>
+                          <span className="font-semibold text-sm">Tyson</span>
+                        </div>
+                      )}
+                      <ReactMarkdown components={components}>{message.text}</ReactMarkdown>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
