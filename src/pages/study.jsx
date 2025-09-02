@@ -11,19 +11,6 @@ import {
   Star,
   Heart,
   Smile,
-  Languages,
-  Microscope,
-  Atom,
-  Landmark,
-  Camera,
-  Gamepad2,
-  Computer,
-  Dumbbell,
-  Calculator, 
-  Beaker, 
-  Globe, 
-  Palette, 
-  Music,
   Award,
   
 } from 'lucide-react';
@@ -37,12 +24,10 @@ import { Link } from 'react-router-dom'
 import HomeworkUploader from '../components/HomeworkUploader';
 import SaveChatDialog from '../components/SaveChatDialog';
 import SettingsPanel, { theme, backgrounds, defaultUserAvatars, defaultCharacters } from '../components/SettingsPanel';
-
+import { getSubjectIcon } from '../utils/subjectIcons';
 
 const openUrl = import.meta.env.VITE_OPENAI_URL
 const addHomeworkUrl = import.meta.env.VITE_ADDHOMEWORK_URL ;
-
-
 
 const Study = () => {
   const [activePanel, setActivePanel] = useState('chat');
@@ -75,64 +60,13 @@ const Study = () => {
   const [selectedConversation, setSelectedConversation] = useState(null);
   const navigate = useNavigate();
 
-  
-
   //console.log(notes)
-  //console.log(user)
-  
+  //console.log(user)  
   //console.log(_id)
 
+  // Using shared subject icon utility
+  const IconComponent = getSubjectIcon(subject);
   
-
-  const subjectIconMap = {
-    'Math': Calculator,
-    'Mathematics': Calculator,
-    'Algebra': Calculator,
-    'Geometry': Calculator,
-    'Calculus': Calculator,
-    'Statistics': Calculator,
-    'Reading': BookOpen,
-    'Literature': BookOpen,
-    'English': BookOpen,
-    'Language Arts': Languages,
-    'Spanish': Languages,
-    'French': Languages,
-    'German': Languages,
-    'Science': Beaker,
-    'Chemistry': Beaker,
-    'Physics': Atom,
-    'Biology': Microscope,
-    'Anatomy': Microscope,
-    'Botany': Microscope,
-    'Geography': Globe,
-    'History': Landmark,
-    'Social Studies': Globe,
-    'Civics': Landmark,
-    'Government': Landmark,
-    'Art': Palette,
-    'Drawing': Palette,
-    'Painting': Palette,
-    'Photography': Camera,
-    'Music': Music,
-    'Band': Music,
-    'Orchestra': Music,
-    'Computer Science': Computer,
-    'Programming': Computer,
-    'Technology': Computer,
-    'Physical Education': Dumbbell,
-    'PE': Dumbbell,
-    'Health': Dumbbell,
-    'Fitness': Dumbbell,
-    'Games': Gamepad2,
-    'Recreation': Gamepad2,
-    'default': BookOpen
-  };
-
-  //console.log(subject)
-
-  const IconComponent = subjectIconMap[subject] || BookOpen;
-  
-
   // Using imported characters and user avatars from SettingsPanel
   const characters = defaultCharacters;
   const userAvatars = defaultUserAvatars;

@@ -2,26 +2,13 @@ import React, { useState } from 'react';
 import { 
   Plus, 
   LogOut, 
-  BookOpen, 
-  Calculator, 
-  Beaker, 
-  Globe, 
-  Palette, 
-  Music,
   Award,
   Target,
   Clock,
-  Menu,
-  Languages,
-  Microscope,
-  Atom,
-  Landmark,
-  Camera,
-  Gamepad2,
-  Computer,
-  Dumbbell
+  Menu
 } from 'lucide-react';
 import AddNotebook from '../components/AddNotebook';
+import { getSubjectIcon } from '../utils/subjectIcons';
 import DeleteConfirmationDialog from '../components/DeleteConfirmationDialog';
 import SettingsPanel, { theme, backgrounds, defaultUserAvatars } from '../components/SettingsPanel';
 import { useDispatch, useSelector } from 'react-redux';
@@ -44,14 +31,11 @@ const StudentDashboard = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user.payload.user);
   
-
-
   // Use imported defaultUserAvatars as userAvatars
   const userAvatars = defaultUserAvatars;
 
   const currentBg = backgrounds[background];
   const currentUser = userAvatars[userAvatar];
-
 
   const currentTheme = darkMode ? theme.dark : theme.light;
 
@@ -79,50 +63,6 @@ const StudentDashboard = () => {
 
   const styles = ageStyles[ageGroup];
 
-  // Icon mapping for different subjects
-  const subjectIconMap = {
-    'Math': Calculator,
-    'Mathematics': Calculator,
-    'Algebra': Calculator,
-    'Geometry': Calculator,
-    'Calculus': Calculator,
-    'Statistics': Calculator,
-    'Reading': BookOpen,
-    'Literature': BookOpen,
-    'English': BookOpen,
-    'Language Arts': Languages,
-    'Spanish': Languages,
-    'French': Languages,
-    'German': Languages,
-    'Science': Beaker,
-    'Chemistry': Beaker,
-    'Physics': Atom,
-    'Biology': Microscope,
-    'Anatomy': Microscope,
-    'Botany': Microscope,
-    'Geography': Globe,
-    'History': Landmark,
-    'Social Studies': Globe,
-    'Civics': Landmark,
-    'Government': Landmark,
-    'Art': Palette,
-    'Drawing': Palette,
-    'Painting': Palette,
-    'Photography': Camera,
-    'Music': Music,
-    'Band': Music,
-    'Orchestra': Music,
-    'Computer Science': Computer,
-    'Programming': Computer,
-    'Technology': Computer,
-    'Physical Education': Dumbbell,
-    'PE': Dumbbell,
-    'Health': Dumbbell,
-    'Fitness': Dumbbell,
-    'Games': Gamepad2,
-    'Recreation': Gamepad2,
-    'default': BookOpen
-  };
 
   // Gradient colors for different subjects
   const subjectGradientMap = {
@@ -175,7 +115,7 @@ const StudentDashboard = () => {
     subject: notebook.subject,
     _id: notebook._id,
     owner: notebook.owner,
-    icon: subjectIconMap[notebook.subject] || subjectIconMap.default,
+    icon: getSubjectIcon(notebook.subject),
     gradient: subjectGradientMap[notebook.subject] || subjectGradientMap.default,
     date: new Date().toLocaleDateString('en-US', { 
       year: 'numeric', 
