@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { 
   Plus, 
-  User, 
   LogOut, 
   BookOpen, 
   Calculator, 
@@ -13,11 +12,9 @@ import {
   Target,
   Clock,
   Menu,
-  X,
   Languages,
   Microscope,
   Atom,
-  MapPin,
   Landmark,
   Camera,
   Gamepad2,
@@ -26,11 +23,11 @@ import {
 } from 'lucide-react';
 import AddNotebook from '../components/AddNotebook';
 import DeleteConfirmationDialog from '../components/DeleteConfirmationDialog';
+import SettingsPanel, { theme, backgrounds, defaultUserAvatars } from '../components/SettingsPanel';
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteNotebook } from '../reducers/authReducer';
 import { Link, useNavigate } from 'react-router-dom';
 import { logoutSuccess, logoutError } from '../reducers/authReducer';
-import axios from 'axios';
 
 const StudentDashboard = () => {
   const [darkMode, setDarkMode] = useState(false);
@@ -48,74 +45,13 @@ const StudentDashboard = () => {
   const user = useSelector((state) => state.auth.user.payload.user);
   
 
-  // Background themes
-  const backgrounds = {
-    forest: {
-      name: "Magical Forest",
-      gradient: "from-green-400 via-blue-500 to-purple-600",
-      pattern: "🌲🌟🦋",
-    },
-    ocean: {
-      name: "Ocean Adventure", 
-      gradient: "from-blue-400 via-cyan-500 to-teal-600",
-      pattern: "🌊🐠🏝️",
-    },
-    space: {
-      name: "Space Explorer",
-      gradient: "from-purple-600 via-pink-500 to-red-500",
-      pattern: "🚀⭐🪐",
-    },
-    garden: {
-      name: "Secret Garden",
-      gradient: "from-pink-400 via-purple-500 to-indigo-600", 
-      pattern: "🌸🦋🌈",
-    }
-  };
 
-  // User avatar options
-  const userAvatars = {
-    student: { emoji: "👤", name: "Student" },
-    explorer: { emoji: "🧭", name: "Explorer" },
-    scientist: { emoji: "🔬", name: "Scientist" },
-    artist: { emoji: "🎨", name: "Artist" },
-    athlete: { emoji: "⚽", name: "Athlete" },
-    musician: { emoji: "🎵", name: "Musician" },
-    chef: { emoji: "👨‍🍳", name: "Chef" },
-    detective: { emoji: "🕵️", name: "Detective" },
-    astronaut: { emoji: "👨‍🚀", name: "Astronaut" },
-    superhero: { emoji: "🦸", name: "Superhero" }
-  };
+  // Use imported defaultUserAvatars as userAvatars
+  const userAvatars = defaultUserAvatars;
 
   const currentBg = backgrounds[background];
   const currentUser = userAvatars[userAvatar];
 
-  // Dark mode theme configuration
-  const theme = {
-    light: {
-      panelBg: 'bg-white/90',
-      panelBorder: 'border-white/50',
-      headerBg: 'bg-white/95',
-      textPrimary: 'text-gray-800',
-      textSecondary: 'text-gray-600',
-      textTertiary: 'text-gray-500',
-      cardBg: 'bg-white/80',
-      settingsBg: 'bg-white/95',
-      settingsPanel: 'bg-gray-100',
-      settingsSelected: 'bg-blue-500 text-white',
-    },
-    dark: {
-      panelBg: 'bg-gray-800/90',
-      panelBorder: 'border-gray-700/50',
-      headerBg: 'bg-gray-800/95',
-      textPrimary: 'text-white',
-      textSecondary: 'text-gray-300',
-      textTertiary: 'text-gray-400',
-      cardBg: 'bg-gray-700/80',
-      settingsBg: 'bg-gray-800/95',
-      settingsPanel: 'bg-gray-700',
-      settingsSelected: 'bg-blue-600 text-white',
-    }
-  };
 
   const currentTheme = darkMode ? theme.dark : theme.light;
 
@@ -324,7 +260,7 @@ const StudentDashboard = () => {
   const handleLogout = () => {
     try {
         dispatch(logoutSuccess())
-        nav('/')
+        navigate('/')
         
       } catch (error) {
         dispatch(logoutError({ error}))
@@ -385,73 +321,19 @@ const StudentDashboard = () => {
       </div>
 
       {/* Settings Panel */}
-      {isMenuOpen && (
-        <div className={`absolute top-0 right-0 w-80 h-full ${currentTheme.settingsBg} backdrop-blur-md z-50 p-6 overflow-y-auto`}>
-          <div className="flex justify-between items-center mb-6">
-            <h2 className={`text-xl font-bold ${currentTheme.textPrimary}`}>Settings</h2>
-            <button onClick={() => setIsMenuOpen(false)}>
-              <X className={`h-6 w-6 ${currentTheme.textPrimary}`} />
-            </button>
-          </div>
-          
-          {/* Dark Mode Toggle */}
-          <div className="mb-6">
-            <h3 className={`font-semibold mb-3 ${currentTheme.textPrimary}`}>Theme</h3>
-            <div className="flex items-center justify-between">
-              <span className={currentTheme.textSecondary}>Dark Mode</span>
-              <button
-                onClick={() => setDarkMode(!darkMode)}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  darkMode ? 'bg-blue-600' : 'bg-gray-300'
-                }`}
-              >
-                <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    darkMode ? 'translate-x-6' : 'translate-x-1'
-                  }`}
-                />
-              </button>
-            </div>
-          </div>
-         
-          {/* Background Selection */}
-          <div className="mb-6">
-            <h3 className={`font-semibold mb-3 ${currentTheme.textPrimary}`}>Background Theme</h3>
-            <div className="grid grid-cols-2 gap-2">
-              {Object.entries(backgrounds).map(([key, bg]) => (
-                <button
-                  key={key}
-                  onClick={() => setBackground(key)}
-                  className={`p-3 rounded-xl bg-gradient-to-br ${bg.gradient} text-white text-sm font-medium ${
-                    background === key ? 'ring-4 ring-blue-500' : ''
-                  }`}
-                >
-                  {bg.name}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* User Avatar Selection */}
-          <div className="mb-6">
-            <h3 className={`font-semibold mb-3 ${currentTheme.textPrimary}`}>Choose Your Avatar</h3>
-            <div className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto">
-              {Object.entries(userAvatars).map(([key, avatar]) => (
-                <button
-                  key={key}
-                  onClick={() => setUserAvatar(key)}
-                  className={`p-3 rounded-xl ${currentTheme.settingsPanel} text-center ${
-                    userAvatar === key ? 'ring-4 ring-green-500 bg-green-50' : ''
-                  }`}
-                >
-                  <div className="text-2xl mb-1">{avatar.emoji}</div>
-                  <div className={`text-xs font-medium ${currentTheme.textPrimary}`}>{avatar.name}</div>
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
+      <SettingsPanel
+        isOpen={isMenuOpen}
+        onClose={() => setIsMenuOpen(false)}
+        darkMode={darkMode}
+        onDarkModeChange={setDarkMode}
+        background={background}
+        onBackgroundChange={setBackground}
+        ageGroup={ageGroup}
+        showUserAvatar={true}
+        userAvatars={userAvatars}
+        currentUserAvatar={userAvatar}
+        onUserAvatarChange={setUserAvatar}
+      />
 
       {/* Main Content */}
       <div className="relative z-10 p-6 max-w-7xl mx-auto">

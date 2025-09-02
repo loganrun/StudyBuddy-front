@@ -36,6 +36,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { Link } from 'react-router-dom'
 import HomeworkUploader from '../components/HomeworkUploader';
 import SaveChatDialog from '../components/SaveChatDialog';
+import SettingsPanel, { theme, backgrounds } from '../components/SettingsPanel';
 
 
 const openUrl = import.meta.env.VITE_OPENAI_URL
@@ -83,31 +84,7 @@ const Study = () => {
 
   
 
-  // Background themes
-  const backgrounds = {
-    forest: {
-      name: "Magical Forest",
-      gradient: "from-green-400 via-blue-500 to-purple-600",
-      pattern: "🌲🌟🦋",
-    },
-    ocean: {
-      name: "Ocean Adventure", 
-      gradient: "from-blue-400 via-cyan-500 to-teal-600",
-      pattern: "🌊🐠🏝️",
-    },
-    space: {
-      name: "Space Explorer",
-      gradient: "from-purple-600 via-pink-500 to-red-500",
-      pattern: "🚀⭐🪐",
-    },
-    garden: {
-      name: "Secret Garden",
-      gradient: "from-pink-400 via-purple-500 to-indigo-600", 
-      pattern: "🌸🦋🌈",
-    }
-  };
-
-    const subjectIconMap = {
+  const subjectIconMap = {
     'Math': Calculator,
     'Mathematics': Calculator,
     'Algebra': Calculator,
@@ -181,34 +158,18 @@ const Study = () => {
   };
 
   // Dark mode theme configuration
-  const theme = {
+  // Extended theme for study.jsx specific properties
+  const extendedTheme = {
     light: {
-      panelBg: 'bg-white/90',
-      panelBorder: 'border-white/50',
-      headerBg: 'bg-white/95',
-      textPrimary: 'text-gray-800',
-      textSecondary: 'text-blue-800',
-      textTertiary: 'text-gray-500',
-      cardBg: 'bg-white/80',
-      settingsBg: 'bg-white/95',
-      settingsPanel: 'bg-gray-100',
-      settingsSelected: 'bg-blue-500 text-white',
+      ...theme.light,
+      textSecondary: 'text-blue-800', // Custom override for this page
       chatBg: 'bg-white/90',
       inputBg: 'bg-white',
       inputBorder: 'border-gray-300',
       inputText: 'text-black',
     },
     dark: {
-      panelBg: 'bg-gray-800/90',
-      panelBorder: 'border-gray-700/50',
-      headerBg: 'bg-gray-800/95',
-      textPrimary: 'text-white',
-      textSecondary: 'text-gray-300',
-      textTertiary: 'text-gray-400',
-      cardBg: 'bg-gray-700/80',
-      settingsBg: 'bg-gray-800/95',
-      settingsPanel: 'bg-gray-700',
-      settingsSelected: 'bg-blue-600 text-white',
+      ...theme.dark,
       chatBg: 'bg-gray-800/90',
       inputBg: 'bg-gray-700',
       inputBorder: 'border-gray-600',
@@ -216,7 +177,7 @@ const Study = () => {
     }
   };
 
-  const currentTheme = darkMode ? theme.dark : theme.light;
+  const currentTheme = darkMode ? extendedTheme.dark : extendedTheme.light;
 
   const components = {
     // Headings
@@ -544,92 +505,24 @@ const Study = () => {
       </div>
 
       {/* Settings Panel */}
-      {isMenuOpen && (
-        <div className={`absolute top-0 right-0 w-80 h-full ${currentTheme.settingsBg} backdrop-blur-md z-50 p-6 overflow-y-auto`}>
-          <div className="flex justify-between items-center mb-6">
-            <h2 className={`text-xl font-bold ${currentTheme.textPrimary}`}>Settings</h2>
-            <button onClick={() => setIsMenuOpen(false)}>
-              <X className={`h-6 w-6 ${currentTheme.textPrimary}`} />
-            </button>
-          </div>
-          
-          {/* Dark Mode Toggle */}
-          <div className="mb-6">
-            <h3 className={`font-semibold mb-3 ${currentTheme.textPrimary}`}>Theme</h3>
-            <div className="flex items-center justify-between">
-              <span className={currentTheme.textSecondary}>Dark Mode</span>
-              <button
-                onClick={() => setDarkMode(!darkMode)}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  darkMode ? 'bg-blue-600' : 'bg-gray-300'
-                }`}
-              >
-                <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    darkMode ? 'translate-x-6' : 'translate-x-1'
-                  }`}
-                />
-              </button>
-            </div>
-          </div>
-          
-          {/* Background Selection */}
-          <div className="mb-6">
-            <h3 className={`font-semibold mb-3 ${currentTheme.textPrimary}`}>Background Theme</h3>
-            <div className="grid grid-cols-2 gap-2">
-              {Object.entries(backgrounds).map(([key, bg]) => (
-                <button
-                  key={key}
-                  onClick={() => setBackground(key)}
-                  className={`p-3 rounded-xl bg-gradient-to-br ${bg.gradient} text-white text-sm font-medium ${
-                    background === key ? 'ring-4 ring-blue-500' : ''
-                  }`}
-                >
-                  {bg.name}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Character Selection */}
-          <div className="mb-6">
-            <h3 className={`font-semibold mb-3 ${currentTheme.textPrimary}`}>Choose Tyson</h3>
-            <div className="grid grid-cols-2 gap-2">
-              {Object.entries(characters).map(([key, char]) => (
-                <button
-                  key={key}
-                  onClick={() => setTysonCharacter(key)}
-                  className={`p-3 rounded-xl ${currentTheme.settingsPanel} text-center ${
-                    tysonCharacter === key ? 'ring-4 ring-blue-500 bg-blue-50' : ''
-                  }`}
-                >
-                  <div className="text-2xl mb-1">{char.emoji}</div>
-                  <div className={`text-xs font-medium ${currentTheme.textPrimary}`}>{char.name}</div>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* User Avatar Selection */}
-          <div className="mb-6">
-            <h3 className={`font-semibold mb-3 ${currentTheme.textPrimary}`}>Choose Your Avatar</h3>
-            <div className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto">
-              {Object.entries(userAvatars).map(([key, avatar]) => (
-                <button
-                  key={key}
-                  onClick={() => setUserAvatar(key)}
-                  className={`p-3 rounded-xl ${currentTheme.settingsPanel} text-center ${
-                    userAvatar === key ? 'ring-4 ring-green-500 bg-green-50' : ''
-                  }`}
-                >
-                  <div className="text-2xl mb-1">{avatar.emoji}</div>
-                  <div className={`text-xs font-medium ${currentTheme.textPrimary}`}>{avatar.name}</div>
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
+      <SettingsPanel
+        isOpen={isMenuOpen}
+        onClose={() => setIsMenuOpen(false)}
+        darkMode={darkMode}
+        onDarkModeChange={setDarkMode}
+        background={background}
+        onBackgroundChange={setBackground}
+        ageGroup={ageGroup}
+        onAgeGroupChange={setAgeGroup}
+        showCharacterSelection={true}
+        characters={characters}
+        currentCharacter={tysonCharacter}
+        onCharacterChange={setTysonCharacter}
+        showUserAvatar={true}
+        userAvatars={userAvatars}
+        currentUserAvatar={userAvatar}
+        onUserAvatarChange={setUserAvatar}
+      />
 
       {/* Desktop Layout */}
       <div className="hidden lg:flex relative z-10 h-[calc(100vh-80px)] gap-4 p-4">
@@ -646,14 +539,14 @@ const Study = () => {
                 Saved Notes
               </h3>
               <div className="space-y-2 max-h-56 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-                {notes.map((item, index) => (
+                {notes.slice().reverse().map((item, index) => (
                   <button
                     key={index}
                     onClick={() => {
                       setSelectedConversation(item);
                       setShowConversationDialog(true);
                     }}
-                    className={`w-full text-left ${styles.borderRadius} bg-gradient-to-r from-purple-50 to-pink-50 hover:from-purple-100 hover:to-pink-100 border border-purple-200 p-3 hover:scale-105 transition-all shadow-sm`}
+                    className={`w-full text-left ${styles.borderRadius} ${darkMode ? 'bg-gradient-to-r from-indigo-600/40 to-cyan-600/40 hover:from-indigo-500/50 hover:to-cyan-500/50 border border-indigo-500' : 'bg-gradient-to-r from-purple-50 to-pink-50 hover:from-purple-100 hover:to-pink-100 border border-purple-200'} p-3 hover:scale-105 transition-all shadow-sm`}
                   >
                     <div className="flex items-center gap-2 mb-1">
                       <IconComponent className="h-6 w-6 text-blue-800" />
@@ -662,7 +555,7 @@ const Study = () => {
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <div className={`text-blue-800 text-bold ${ageGroup === '1-5' ? 'text-sm' : 'text-xs'} bg-white/70 px-2 py-1 rounded-full font-medium`}>
+                      <div className={`${darkMode ? 'text-blue-300 bg-gray-700/70' : 'text-blue-800 bg-white/70'} text-bold ${ageGroup === '1-5' ? 'text-sm' : 'text-xs'} px-2 py-1 rounded-full font-medium`}>
                          {new Date(item.createdAt).toLocaleDateString()}
                       </div>
                     </div>
@@ -687,7 +580,7 @@ const Study = () => {
                 ].map((item, index) => (
                   <button
                     key={index}
-                    className={`w-full text-left ${styles.borderRadius} bg-gradient-to-r from-blue-50 to-purple-50 hover:from-blue-100 hover:to-purple-100 border border-blue-200 p-3 hover:scale-105 transition-all shadow-sm`}
+                    className={`w-full text-left ${styles.borderRadius} ${darkMode ? 'bg-gradient-to-r from-blue-900/30 to-purple-900/30 hover:from-blue-800/40 hover:to-purple-800/40 border border-blue-700' : 'bg-gradient-to-r from-blue-50 to-purple-50 hover:from-blue-100 hover:to-purple-100 border border-blue-200'} p-3 hover:scale-105 transition-all shadow-sm`}
                   >
                     <div className="flex items-center gap-2 mb-1">
                       <span className="text-lg">{item.emoji}</span>
@@ -915,14 +808,14 @@ const Study = () => {
                     Saved Notes
                   </h3>
                   <div className="space-y-2">
-                    {notes.map((item, index) => (
+                    {notes.slice().reverse().map((item, index) => (
                       <button
                         key={index}
                         onClick={() => {
                           setSelectedConversation(item);
                           setShowConversationDialog(true);
                         }}
-                        className={`w-full text-left ${styles.borderRadius} bg-gradient-to-r from-purple-50 to-pink-50 hover:from-purple-100 hover:to-pink-100 border border-purple-200 p-3 hover:scale-105 transition-all shadow-sm`}
+                        className={`w-full text-left ${styles.borderRadius} ${darkMode ? 'bg-gradient-to-r from-indigo-600/40 to-cyan-600/40 hover:from-indigo-500/50 hover:to-cyan-500/50 border border-indigo-500' : 'bg-gradient-to-r from-purple-50 to-pink-50 hover:from-purple-100 hover:to-pink-100 border border-purple-200'} p-3 hover:scale-105 transition-all shadow-sm`}
                       >
                         <div className="flex items-center gap-2 mb-1">
                           <IconComponent className="h-6 w-6 text-blue-800" />
@@ -931,7 +824,7 @@ const Study = () => {
                           </span>
                         </div>
                         <div className="flex items-center justify-between">
-                          <div className={`text-blue-800 text-bold ${ageGroup === '1-5' ? 'text-sm' : 'text-xs'} bg-white/70 px-2 py-1 rounded-full font-medium`}>
+                          <div className={`${darkMode ? 'text-blue-300 bg-gray-700/70' : 'text-blue-800 bg-white/70'} text-bold ${ageGroup === '1-5' ? 'text-sm' : 'text-xs'} px-2 py-1 rounded-full font-medium`}>
                              {new Date(item.createdAt).toLocaleDateString()}
                           </div>
                         </div>
@@ -954,7 +847,7 @@ const Study = () => {
                     ].map((item, index) => (
                       <button
                         key={index}
-                        className={`w-full text-left ${styles.borderRadius} bg-gradient-to-r from-blue-50 to-purple-50 hover:from-blue-100 hover:to-purple-100 border border-blue-200 p-3 hover:scale-105 transition-all shadow-sm`}
+                        className={`w-full text-left ${styles.borderRadius} ${darkMode ? 'bg-gradient-to-r from-blue-900/30 to-purple-900/30 hover:from-blue-800/40 hover:to-purple-800/40 border border-blue-700' : 'bg-gradient-to-r from-blue-50 to-purple-50 hover:from-blue-100 hover:to-purple-100 border border-blue-200'} p-3 hover:scale-105 transition-all shadow-sm`}
                       >
                         <div className="flex items-center gap-2 mb-1">
                           <span className="text-lg">{item.emoji}</span>
