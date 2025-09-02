@@ -67,6 +67,16 @@ const defaultUserAvatars = {
   superhero: { emoji: "🦸", name: "Superhero", color: "text-red-500" }
 };
 
+// Default characters (Tyson variations)
+const defaultCharacters = {
+  robot: { emoji: "🤖", name: "Robot Tyson", color: "text-blue-400" },
+  owl: { emoji: "🦉", name: "Wise Owl", color: "text-amber-600" },
+  dragon: { emoji: "🐲", name: "Friendly Dragon", color: "text-green-500" },
+  unicorn: { emoji: "🦄", name: "Magic Unicorn", color: "text-pink-500" },
+  bear: { emoji: "🐻", name: "Study Bear", color: "text-brown-500" },
+  rocket: { emoji: "🚀", name: "Rocket Tyson", color: "text-red-500" }
+};
+
 const SettingsPanel = ({
   isOpen,
   onClose,
@@ -223,5 +233,5 @@ const SettingsPanel = ({
   );
 };
 
-export { theme, backgrounds, defaultUserAvatars };
+export { theme, backgrounds, defaultUserAvatars, defaultCharacters };
 export default SettingsPanel;

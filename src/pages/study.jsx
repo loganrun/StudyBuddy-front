@@ -36,7 +36,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { Link } from 'react-router-dom'
 import HomeworkUploader from '../components/HomeworkUploader';
 import SaveChatDialog from '../components/SaveChatDialog';
-import SettingsPanel, { theme, backgrounds } from '../components/SettingsPanel';
+import SettingsPanel, { theme, backgrounds, defaultUserAvatars, defaultCharacters } from '../components/SettingsPanel';
 
 
 const openUrl = import.meta.env.VITE_OPENAI_URL
@@ -133,29 +133,9 @@ const Study = () => {
   const IconComponent = subjectIconMap[subject] || BookOpen;
   
 
-  // Character options
-  const characters = {
-    robot: { emoji: "🤖", name: "Robot Tyson", color: "text-blue-400" },
-    owl: { emoji: "🦉", name: "Wise Owl", color: "text-amber-600" },
-    dragon: { emoji: "🐲", name: "Friendly Dragon", color: "text-green-500" },
-    unicorn: { emoji: "🦄", name: "Magic Unicorn", color: "text-pink-500" },
-    bear: { emoji: "🐻", name: "Study Bear", color: "text-brown-500" },
-    rocket: { emoji: "🚀", name: "Rocket Tyson", color: "text-red-500" }
-  };
-
-  // User avatar options
-  const userAvatars = {
-    student: { emoji: "👤", name: "Student", color: "text-blue-800" },
-    explorer: { emoji: "🧭", name: "Explorer", color: "text-blue-500" },
-    scientist: { emoji: "🔬", name: "Scientist", color: "text-green-500" },
-    artist: { emoji: "🎨", name: "Artist", color: "text-purple-500" },
-    athlete: { emoji: "⚽", name: "Athlete", color: "text-orange-500" },
-    musician: { emoji: "🎵", name: "Musician", color: "text-pink-500" },
-    chef: { emoji: "👨‍🍳", name: "Chef", color: "text-yellow-600" },
-    detective: { emoji: "🕵️", name: "Detective", color: "text-indigo-500" },
-    astronaut: { emoji: "👨‍🚀", name: "Astronaut", color: "text-purple-600" },
-    superhero: { emoji: "🦸", name: "Superhero", color: "text-red-500" }
-  };
+  // Using imported characters and user avatars from SettingsPanel
+  const characters = defaultCharacters;
+  const userAvatars = defaultUserAvatars;
 
   // Dark mode theme configuration
   // Extended theme for study.jsx specific properties
