@@ -318,7 +318,7 @@ const Study = () => {
   };
 
   const handleLogout = () => {
-    if (messages.length > 0) {
+    if (messages.length > 1) {
       // Show save dialog
       setPendingAction('logout');
       setShowSaveDialog(true);
@@ -339,7 +339,7 @@ const Study = () => {
   };
 
   const handleChevronClick = () => {
-    if (messages.length > 0) {
+    if (messages.length > 1) {
       // Show save dialog
       setPendingAction('navigate');
       setShowSaveDialog(true);
