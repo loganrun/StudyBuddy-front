@@ -117,7 +117,7 @@ const StudentDashboard = () => {
     owner: notebook.owner,
     icon: getSubjectIcon(notebook.subject),
     gradient: subjectGradientMap[notebook.subject] || subjectGradientMap.default,
-    date: new Date().toLocaleDateString('en-US', { 
+    date: new Date(notebook.createdAt).toLocaleDateString('en-US', { 
       year: 'numeric', 
       month: 'short', 
       day: 'numeric' 
@@ -347,7 +347,7 @@ const StudentDashboard = () => {
                     <p className="text-white/80 text-sm mb-4">{subject.date}</p>
                     
                     {/* Progress Bar */}
-                    <div className="mb-4">
+                    {/* <div className="mb-4">
                       <div className="flex justify-between text-sm mb-1">
                         <span>Progress</span>
                         <span>{subject.progress}%</span>
@@ -358,7 +358,7 @@ const StudentDashboard = () => {
                           style={{ width: `${subject.progress}%` }}
                         ></div>
                       </div>
-                    </div>
+                    </div> */}
                     
                     <button 
                       className={`w-full ${styles.borderRadius} bg-white/20 hover:bg-white/30 text-white font-medium py-2 transition-colors`}
