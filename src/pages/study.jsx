@@ -61,7 +61,7 @@ const Study = () => {
   const navigate = useNavigate();
 
   //console.log(notes)
-  //console.log(user)  
+  console.log(user)  
   //console.log(_id)
 
   // Using shared subject icon utility

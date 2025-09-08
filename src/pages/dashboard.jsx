@@ -30,6 +30,7 @@ const StudentDashboard = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user.payload.user);
+  console.log(user)
   
   // Use imported defaultUserAvatars as userAvatars
   const userAvatars = defaultUserAvatars;

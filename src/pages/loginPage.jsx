@@ -223,7 +223,7 @@ function loginPage() {
       </div>
 
       {/* Settings Panel */}
-      {isMenuOpen && (
+      {/* {isMenuOpen && (
         <div className={`absolute top-0 right-0 w-80 h-full ${currentTheme.settingsBg} backdrop-blur-md z-50 p-6 overflow-y-auto`}>
           <div className="flex justify-between items-center mb-6">
             <h2 className={`text-xl font-bold ${currentTheme.textPrimary}`}>Settings</h2>
@@ -233,7 +233,7 @@ function loginPage() {
           </div>
           
           {/* Dark Mode Toggle */}
-          <div className="mb-6">
+          {/* <div className="mb-6">
             <h3 className={`font-semibold mb-3 ${currentTheme.textPrimary}`}>Theme</h3>
             <div className="flex items-center justify-between">
               <span className={currentTheme.textSecondary}>Dark Mode</span>
@@ -250,10 +250,10 @@ function loginPage() {
                 />
               </button>
             </div>
-          </div>
+          </div> */}
           
           {/* Background Selection */}
-          <div className="mb-6">
+          {/* <div className="mb-6">
             <h3 className={`font-semibold mb-3 ${currentTheme.textPrimary}`}>Background Theme</h3>
             <div className="grid grid-cols-2 gap-2">
               {Object.entries(backgrounds).map(([key, bg]) => (
@@ -268,10 +268,10 @@ function loginPage() {
                 </button>
               ))}
             </div>
-          </div>
+          </div> */}
 
           {/* Character Selection */}
-          <div className="mb-6">
+          {/* <div className="mb-6">
             <h3 className={`font-semibold mb-3 ${currentTheme.textPrimary}`}>Character</h3>
             <div className="grid grid-cols-3 gap-2">
               {Object.entries(characters).map(([key, char]) => (
@@ -289,7 +289,7 @@ function loginPage() {
             </div>
           </div>
         </div>
-      )}
+      )} */} 
 
       {/* Main Content */}
       <div className="relative z-10 flex items-center justify-center min-h-[calc(100vh-80px)] p-4">
