@@ -103,7 +103,7 @@ const AddNotebook = ({ isOpen, onClose }) => {
           transcript: '',
           date: new Date().toLocaleDateString(),
           _id: newNotebook._id || `notebook_${Date.now()}`,
-          notes: '',
+          notes: [],
           summary: '',
           roomId: `room_${Date.now()}`
         }
