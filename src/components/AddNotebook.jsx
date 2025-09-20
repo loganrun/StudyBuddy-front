@@ -91,7 +91,7 @@ const AddNotebook = ({ isOpen, onClose }) => {
 
       // Update Redux state - add new notebook to user.notebooks
       const newNotebook = response.data;
-      console.log(newNotebook)
+      //console.log(newNotebook)
       dispatch(addNotebook(newNotebook));
 
       // Navigate to study page with the new notebook data
@@ -103,7 +103,7 @@ const AddNotebook = ({ isOpen, onClose }) => {
           transcript: '',
           date: new Date().toLocaleDateString(),
           _id: newNotebook._id || `notebook_${Date.now()}`,
-          notes: '',
+          notes: [],
           summary: '',
           roomId: `room_${Date.now()}`
         }

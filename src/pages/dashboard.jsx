@@ -127,7 +127,7 @@ const StudentDashboard = () => {
     // Additional data for study page
     url: notebook.url || '',
     transcript: notebook.transcript || '',
-    notes: notebook.notes || '',
+    notes: notebook.notes || [],
     summary: notebook.summary || '',
     roomId: notebook.roomId || `room_${notebook._id}_${Date.now()}`
   })) : [];
