@@ -7,6 +7,7 @@ import conversationReducer from './reducers/conversationReducer';
 import tutorauthReducer from './reducers/tutorauthReducer';
 import lessonsReducer from './reducers/lessonsReducer';
 import docuploadReducer from './reducers/docsuploadreducer';
+import studyReducer from './reducers/studyReducer';
 
 
 const store = configureStore({
@@ -19,6 +20,7 @@ const store = configureStore({
     tutorauth: tutorauthReducer,
     lessons: lessonsReducer,
     docupload: docuploadReducer,
+    study: studyReducer,
     
   },
 });

@@ -12,6 +12,7 @@ import { getSubjectIcon } from '../utils/subjectIcons';
 import DeleteConfirmationDialog from '../components/DeleteConfirmationDialog';
 import SettingsPanel, { theme, backgrounds, defaultUserAvatars } from '../components/SettingsPanel';
 import { useDispatch, useSelector } from 'react-redux';
+import DashboardStreakCounter from '../components/DashboardStreakCounter';
 import { deleteNotebook } from '../reducers/authReducer';
 import { Link, useNavigate } from 'react-router-dom';
 import { logoutSuccess, logoutError } from '../reducers/authReducer';
@@ -30,7 +31,7 @@ const StudentDashboard = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user.payload.user);
-  console.log(user)
+  //console.log(user)
   
   // Use imported defaultUserAvatars as userAvatars
   const userAvatars = defaultUserAvatars;
@@ -116,6 +117,10 @@ const StudentDashboard = () => {
     subject: notebook.subject,
     _id: notebook._id,
     owner: notebook.owner,
+    currentStreak: notebook.currentStreak || 0,
+    longestStreak: notebook.longestStreak || 0,
+    lastActivityDate: notebook.lastActivityDate || null,
+
     icon: getSubjectIcon(notebook.subject),
     gradient: subjectGradientMap[notebook.subject] || subjectGradientMap.default,
     date: new Date(notebook.createdAt).toLocaleDateString('en-US', { 
@@ -123,17 +128,17 @@ const StudentDashboard = () => {
       month: 'short', 
       day: 'numeric' 
     }),
-    progress: Math.floor(Math.random() * 40) + 60, // Random progress between 60-100%
+    
     // Additional data for study page
     url: notebook.url || '',
     transcript: notebook.transcript || '',
     notes: notebook.notes || [],
     summary: notebook.summary || '',
-    roomId: notebook.roomId || `room_${notebook._id}_${Date.now()}`
+    
   })) : [];
 
   const handleCardClick = (subjectData) => {
-    //console.log(`Opening notebook: ${subjectData.name}`);
+    //console.log(subjectData);
     // Navigate to study page with all notebook data
     navigate('/study', {
       state: {
@@ -144,12 +149,12 @@ const StudentDashboard = () => {
         date: subjectData.date,
         _id: subjectData._id,
         notes: subjectData.notes,
-        summary: subjectData.summary,
-        roomId: subjectData.roomId,
         owner: subjectData.owner,
-        progress: subjectData.progress,
         userId: user.id,
-        
+        currentStreak: subjectData.currentStreak,
+        longestStreak: subjectData.longestStreak,
+        lastActivityDate: subjectData.lastActivityDate
+
       }
     });
   };
@@ -295,10 +300,17 @@ const StudentDashboard = () => {
 
         {/* Quick Stats */}
         <div className={`grid grid-cols-1 md:grid-cols-3 gap-4 mb-6`}>
-          <div className={`${currentTheme.cardBg} backdrop-blur-md ${styles.borderRadius} p-4 shadow-lg border ${currentTheme.panelBorder} text-center`}>
-            <Award className={`h-6 w-6 mx-auto mb-2 ${currentTheme.textPrimary}`} />
-            <p className={`font-bold ${currentTheme.textPrimary} text-sm`}>Learning Streak</p>
-            <p className={`text-xl font-bold ${currentTheme.textPrimary}`}>7 Days! 🔥</p>
+          {/* Streak Counter */}
+          <div className="md:col-span-1">
+            <DashboardStreakCounter
+              darkMode={darkMode}
+              size="normal"
+              showAnimation={true}
+              userId={user.id}
+              current={user.currentStreak}
+              longest={user.longestStreak}
+              lastStudyDate={user.lastActivityDate}
+            />
           </div>
           
           <div className={`${currentTheme.cardBg} backdrop-blur-md ${styles.borderRadius} p-4 shadow-lg border ${currentTheme.panelBorder} text-center`}>
