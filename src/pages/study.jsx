@@ -18,13 +18,19 @@ import { useDispatch, useSelector } from 'react-redux'
 import { addMessage, updateLastMessage, clearMessages } from '../reducers/conversationReducer';
 import { logoutSuccess, logoutError } from '../reducers/authReducer';
 import ReactMarkdown from 'react-markdown'
-import LoadingSpinner from '../components/LoadingSpinner';
+//import LoadingSpinner from '../components/LoadingSpinner';
 import { useLocation, useNavigate } from 'react-router-dom'
 import { Link } from 'react-router-dom'
 import HomeworkUploader from '../components/HomeworkUploader';
 import SaveChatDialog from '../components/SaveChatDialog';
 import SettingsPanel, { theme, backgrounds, defaultUserAvatars, defaultCharacters } from '../components/SettingsPanel';
 import { getSubjectIcon } from '../utils/subjectIcons';
+//import StudyTimer from '../components/StudyTimer';
+import BreakTimer from '../components/BreakTimer';
+//import StudyStats from '../components/StudyStats';
+import BrainBreak from '../components/BrainBreak';
+import StudyStreakCounter from '../components/StudyStreakCounter';
+
 
 const openUrl = import.meta.env.VITE_OPENAI_URL
 const addHomeworkUrl = import.meta.env.VITE_ADDHOMEWORK_URL ;
@@ -44,7 +50,7 @@ const Study = () => {
   const user = useSelector((state) => state.auth.user.payload.user);
   const [response, setResponse] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-   const { url, subject, transcript, date, _id, notes, summary, roomId, userId} = params.state;
+  const { subject,_id, notes,userId, currentStreak, longestStreak, lastActivityDate } = params.state;
   const dispatch = useDispatch();
   const chatEndRef = useRef(null);
   const chatContainerRef = useRef(null);
@@ -58,11 +64,13 @@ const Study = () => {
   const [pendingAction, setPendingAction] = useState(null); // 'logout' or 'navigate'
   const [showConversationDialog, setShowConversationDialog] = useState(false);
   const [selectedConversation, setSelectedConversation] = useState(null);
+  const [showBreakTimer, setShowBreakTimer] = useState(false);
   const navigate = useNavigate();
 
   //console.log(notes)
   //console.log(user)  
   //console.log(_id)
+  console.log(currentStreak, longestStreak, lastActivityDate )
 
   // Using shared subject icon utility
   const IconComponent = getSubjectIcon(subject);
@@ -168,6 +176,8 @@ const Study = () => {
             setInput("")
             eventSource.close();
             setIsLoading(false);
+            // Trigger study activity event for streak counter
+            window.dispatchEvent(new CustomEvent('studyActivityDetected'));
             // Focus the input after submission
             setTimeout(() => {
               if (inputRef.current) {
@@ -212,6 +222,8 @@ const Study = () => {
             setInput("")
             eventSource.close();
             setIsLoading(false);
+            // Trigger study activity event for streak counter
+            window.dispatchEvent(new CustomEvent('studyActivityDetected'));
             // Focus the input after submission
             setTimeout(() => {
               if (inputRef.current) {
@@ -369,6 +381,18 @@ const Study = () => {
     // Reset state without executing action
     setShowSaveDialog(false);
     setPendingAction(null);
+  };
+
+  // Handle break suggestion from StudyTimer
+  const handleBreakSuggested = () => {
+    setShowBreakTimer(true);
+  };
+
+  // Handle break completion from BreakTimer
+  const handleBreakComplete = (breakDuration) => {
+    setShowBreakTimer(false);
+    // Optional: You could show a notification or update some state here
+    console.log(`Break completed after ${Math.floor(breakDuration / 60)} minutes`);
   };
 
   const styles = ageStyles[ageGroup];
@@ -596,31 +620,49 @@ const Study = () => {
           </div>
         </div>
 
-        {/* Right Panel - Progress & Rewards */}
-        <div className={`w-1/4 ${currentTheme.panelBg} backdrop-blur-md ${styles.borderRadius} ${styles.panelPadding} shadow-xl border ${currentTheme.panelBorder}`}>
+        {/* Right Panel - Study Tools & Progress */}
+        <div className={`w-1/4 ${currentTheme.panelBg} backdrop-blur-md ${styles.borderRadius} ${styles.panelPadding} shadow-xl border ${currentTheme.panelBorder} overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]`}>
           <h2 className={`${styles.titleSize} font-bold ${currentTheme.textPrimary} mb-4 flex items-center gap-2`}>
             <Star className={styles.iconSize} />
-            {ageGroup === '1-5' ? 'My Progress' : 'Achievement Center'}
+            {ageGroup === '1-5' ? 'Study Tools' : 'Study Dashboard'}
           </h2>
           
           <div className={styles.spacing}>
-            <div className="text-center space-y-4">
-              <div className={`${styles.borderRadius} bg-gradient-to-r from-yellow-400 to-orange-500 text-white p-4`}>
-                <Award className="h-8 w-8 mx-auto mb-2" />
-                <p className="font-bold">Learning Streak</p>
-                <p className="text-2xl font-bold">7 Days! 🔥</p>
+            
+            <BrainBreak
+            notebookId={_id}
+              darkMode={darkMode}              
+            />
+
+            {/* Break Timer (only visible when break is suggested) */}
+            <BreakTimer
+              darkMode={darkMode}
+              isVisible={showBreakTimer}
+              onBreakComplete={handleBreakComplete}
+              className="mb-4"
+            />
+            <StudyStreakCounter
+              darkMode={darkMode}
+              size="normal"
+              showAnimation={true}
+              notebookId={_id}
+              current={currentStreak || 0}
+              longest={longestStreak || 0}
+              lastStudyDate={lastActivityDate || ""}
+            />  �
+
+            {/* Additional Achievement Cards */}
+            <div className="space-y-3">
+              <div className={`${styles.borderRadius} bg-gradient-to-r from-green-400 to-blue-500 text-white p-3 text-center`}>
+                <Heart className="h-6 w-6 mx-auto mb-2" />
+                <p className="font-bold text-sm">Questions Answered</p>
+                <p className="text-lg font-bold">42 ⭐</p>
               </div>
               
-              <div className={`${styles.borderRadius} bg-gradient-to-r from-green-400 to-blue-500 text-white p-4`}>
-                <Heart className="h-8 w-8 mx-auto mb-2" />
-                <p className="font-bold">Questions Answered</p>
-                <p className="text-2xl font-bold">42 ⭐</p>
-              </div>
-              
-              <div className={`${styles.borderRadius} bg-gradient-to-r from-pink-400 to-purple-500 text-white p-4`}>
-                <Smile className="h-8 w-8 mx-auto mb-2" />
-                <p className="font-bold">Fun Level</p>
-                <p className="text-2xl font-bold">Amazing! 🎉</p>
+              <div className={`${styles.borderRadius} bg-gradient-to-r from-pink-400 to-purple-500 text-white p-3 text-center`}>
+                <Smile className="h-6 w-6 mx-auto mb-2" />
+                <p className="font-bold text-sm">Fun Level</p>
+                <p className="text-lg font-bold">Amazing! 🎉</p>
               </div>
             </div>
           </div>
@@ -784,12 +826,31 @@ const Study = () => {
           {activePanel === 'progress' && (
             <div className={`h-full ${currentTheme.panelBg} backdrop-blur-md ${styles.panelPadding} overflow-y-auto pb-24`}>
               <div className={styles.spacing}>
-                <div className={`${styles.borderRadius} bg-gradient-to-r from-yellow-400 to-orange-500 text-white p-4 text-center`}>
-                  <Award className="h-8 w-8 mx-auto mb-2" />
-                  <p className="font-bold">Learning Streak</p>
-                  <p className="text-2xl font-bold">7 Days! 🔥</p>
-                </div>
+                {/* Study Timer */}
+                 <BrainBreak
+            notebookId={_id}
+              darkMode={darkMode}              
+            />
+
+                {/* Break Timer (only visible when break is suggested) */}
+                <BreakTimer
+                  darkMode={darkMode}
+                  isVisible={showBreakTimer}
+                  onBreakComplete={handleBreakComplete}
+                />
+                <StudyStreakCounter
+              darkMode={darkMode}
+              size="normal"
+              showAnimation={true}
+              notebookId={_id}
+              current={currentStreak || 0}
+              longest={longestStreak || 0}
+              lastStudyDate={lastActivityDate || ""}
+            /> 
+
+               
                 
+                {/* Additional Achievement Cards */}
                 <div className={`${styles.borderRadius} bg-gradient-to-r from-green-400 to-blue-500 text-white p-4 text-center`}>
                   <Heart className="h-8 w-8 mx-auto mb-2" />
                   <p className="font-bold">Questions Answered</p>
